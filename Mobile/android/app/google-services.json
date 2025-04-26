@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "853237163271",
+    "project_id": "hoaphat-6c6ce",
+    "storage_bucket": "hoaphat-6c6ce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:853237163271:android:3924432aa50ca7714e11a2",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjyAdhJX3YzvGwvu6dPd9JfnFkvr3IZhI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
