@@ -36,8 +36,11 @@ class HomePage extends StatelessWidget {
           if (index == 3) {
             Navigator.pushNamed(context, "cartPage");
           }
+          if (index == 2) {
+            Navigator.pushNamed(context, "messagePage");
+          }
         },
-        height: 70,
+        height: 50,
         color: Color(0xFF194689),
         items: [
           Icon(Icons.home, size: 30, color: Colors.white),
