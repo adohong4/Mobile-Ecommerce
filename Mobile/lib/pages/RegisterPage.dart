@@ -1,15 +1,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/HomePage.dart';
-import 'package:flutter_application_1/pages/RegisterPage.dart';
+import 'package:flutter_application_1/pages/LoginPage.dart';
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  bool _rememberPassword = false;
+class _RegisterPageState extends State<RegisterPage> {
+  bool _agreePolicyAndTerms = false;
   bool _isPasswordVisible = false;
 
   @override
@@ -27,7 +28,34 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 30.0),
 
               Text(
-                'Tài khoản',
+                'Tên đăng nhập',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  //   fontWeight: FontWeight.bold,
+                  color: Colors.grey[700],
+                ),
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  hintText: 'taikhoan123',
+                  prefixIcon: Icon(Icons.person_outline, color: Colors.grey),
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 15.0,
+                    horizontal: 10.0,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20.0),
+
+              Text(
+                'Email',
                 style: TextStyle(
                   fontSize: 16.0,
                   //   fontWeight: FontWeight.bold,
@@ -38,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
               TextFormField(
                 decoration: InputDecoration(
                   hintText: 'email@gmail.com',
-                  prefixIcon: Icon(Icons.person_outline, color: Colors.grey),
+                  prefixIcon: Icon(Icons.email_outlined, color: Colors.grey),
                   filled: true,
                   fillColor: Colors.grey[200],
                   border: OutlineInputBorder(
@@ -94,6 +122,47 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 16.0),
 
+              Text(
+                'Nhập lại mật khẩu',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  //   fontWeight: FontWeight.bold,
+                  color: Colors.grey[700],
+                ),
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                obscureText: !_isPasswordVisible,
+                decoration: InputDecoration(
+                  hintText: '*******',
+                  prefixIcon: Icon(Icons.lock_outline, color: Colors.grey),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 15.0,
+                    horizontal: 10.0,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20.0),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -103,10 +172,10 @@ class _LoginPageState extends State<LoginPage> {
                         width: 20.0,
                         height: 20.0,
                         child: Checkbox(
-                          value: _rememberPassword,
+                          value: _agreePolicyAndTerms,
                           onChanged: (value) {
                             setState(() {
-                              _rememberPassword = value!;
+                              _agreePolicyAndTerms = value!;
                             });
                           },
                           activeColor: Color(0xFF0D47A1),
@@ -114,37 +183,51 @@ class _LoginPageState extends State<LoginPage> {
                               MaterialTapTargetSize.shrinkWrap,
                         ),
                       ),
-                      SizedBox(width: 4.0),
-                      Text(
-                        'Nhớ mật khẩu',
-                        style: TextStyle(
-                          fontSize: 13.0,
-                          color: Colors.grey[700],
+                      SizedBox(width: 8.0),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Tôi đồng ý với ',
+                              style: TextStyle(
+                                fontSize: 13.0,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Chính sách',
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                color: Color(0xFF0D47A1),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' và ',
+                              style: TextStyle(
+                                fontSize: 13.0,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Điều khoản',
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                color: Color(0xFF0D47A1),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Quên mật khẩu ?',
-                      style: TextStyle(
-                        fontSize: 13.0,
-                        color: Color(0xFF0D47A1),
-                      ),
-                    ),
                   ),
                 ],
               ),
               SizedBox(height: 24.0),
 
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF0D47A1),
                   padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -154,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
                   elevation: 5.0,
                 ),
                 child: Text(
-                  'Đăng nhập',
+                  'Đăng ký',
                   style: TextStyle(
                     fontSize: 18.0,
                     // fontWeight: FontWeight.bold,
@@ -164,59 +247,13 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 24.0),
 
-              Row(
-                children: [
-                  Expanded(child: Divider(color: Colors.grey[400])),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      'Đăng nhập với',
-                      style: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
-                    ),
-                  ),
-                  Expanded(child: Divider(color: Colors.grey[400])),
-                ],
-              ),
-              SizedBox(height: 24.0),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: () {},
-                    child: Icon(
-                      Icons.facebook,
-                      size: 50.0,
-                      color: Color.fromARGB(255, 21, 109, 241),
-                    ),
-                  ),
-                  SizedBox(width: 24.0),
-
-                  InkWell(
-                    onTap: () {},
-                    child: Image.asset(
-                      'Google_icon.png',
-                      width: 60.0,
-                      height: 60.0,
-                    ),
-                  ),
-                  SizedBox(width: 24.0),
-
-                  InkWell(
-                    onTap: () {},
-                    child: Icon(Icons.apple, size: 50.0, color: Colors.black),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30.0),
-
               Text.rich(
                 TextSpan(
-                  text: 'Tôi chưa có tài khoản? ',
+                  text: 'Tôi đã có tài khoản? ',
                   style: TextStyle(fontSize: 16.0, color: Colors.black),
                   children: <TextSpan>[
                     TextSpan(
-                      text: 'Đăng ký ngay',
+                      text: 'Đăng nhập ngay',
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold,
@@ -229,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RegisterPage(),
+                                  builder: (context) => LoginPage(),
                                 ),
                               );
                             },

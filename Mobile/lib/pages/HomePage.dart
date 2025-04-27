@@ -1,5 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/CartPage.dart';
+import 'package:flutter_application_1/pages/MessagePage.dart';
 import 'package:flutter_application_1/widgets/HomeAppBar.dart';
 
 class HomePage extends StatelessWidget {
@@ -34,10 +36,16 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         onTap: (index) {
           if (index == 3) {
-            Navigator.pushNamed(context, "cartPage");
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => CartPage()),
+            );
           }
           if (index == 2) {
-            Navigator.pushNamed(context, "messagePage");
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MessagePage()),
+            );
           }
         },
         height: 50,

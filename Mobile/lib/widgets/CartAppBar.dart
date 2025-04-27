@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/HomePage.dart';
 
 class CartAppBar extends StatelessWidget {
   const CartAppBar({super.key});
@@ -13,7 +14,10 @@ class CartAppBar extends StatelessWidget {
           InkWell(
             onTap: () {
               // go back to the previous screen
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
             },
             child: Icon(Icons.arrow_back, size: 30, color: Color(0xFF4C53A5)),
           ),
