@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/CartPage.dart';
 import 'package:flutter_application_1/pages/HomePage.dart';
+import 'package:flutter_application_1/pages/LoginPage.dart';
 import 'package:flutter_application_1/pages/MessagePage.dart';
 
 void main() => runApp(MyApp());
@@ -11,12 +12,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
+      home: LoginPage(),
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-      routes: {
-        '/': (context) => HomePage(),
-        'messagePage': (context) => MessagePage(),
-        'cartPage': (context) => CartPage(),
-      },
+      // routes: {
+      //   '/': (context) => HomePage(),
+      //   'messagePage': (context) => MessagePage(),
+      //   'cartPage': (context) => CartPage(),
+      // },
     );
   }
 }
