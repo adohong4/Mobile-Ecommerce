@@ -32,12 +32,19 @@ class _LoginPageState extends State<LoginPage> {
                   fontSize: 16.0,
                   // fontWeight: FontWeight.bold,
                   color: Colors.grey[700],
+                  fontFamily:  'Poppins',
                 ),
               ),
               SizedBox(height: 8.0),
               TextFormField(
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
                 decoration: InputDecoration(
                   hintText: 'email@gmail.com',
+
                   prefixIcon: Icon(Icons.person_outline, color: Colors.grey),
                   filled: true,
                   fillColor: Colors.grey[200],
@@ -59,6 +66,7 @@ class _LoginPageState extends State<LoginPage> {
                   fontSize: 16.0,
                   //   fontWeight: FontWeight.bold,
                   color: Colors.grey[700],
+                  fontFamily:  'Poppins',
                 ),
               ),
               SizedBox(height: 8.0),
@@ -99,9 +107,11 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Row(
                     children: [
+
                       SizedBox(
                         width: 20.0,
                         height: 20.0,
+
                         child: Checkbox(
                           value: _rememberPassword,
                           onChanged: (value) {
@@ -118,8 +128,9 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         'Nhớ mật khẩu',
                         style: TextStyle(
-                          fontSize: 13.0,
+                          fontSize: 15.0,
                           color: Colors.grey[700],
+                          fontFamily:  'Poppins',
                         ),
                       ),
                     ],
@@ -131,6 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         fontSize: 13.0,
                         color: Color(0xFF0D47A1),
+                        fontFamily:  'Poppins',
                       ),
                     ),
                   ),
@@ -159,6 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: 18.0,
                     // fontWeight: FontWeight.bold,
                     color: Colors.white,
+                    fontFamily:  'Poppins',
                   ),
                 ),
               ),
@@ -171,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
                       'Đăng nhập với',
-                      style: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
+                      style: TextStyle(fontSize: 14.0, color: Colors.grey[700], fontFamily:  'Poppins'),
                     ),
                   ),
                   Expanded(child: Divider(color: Colors.grey[400])),
@@ -195,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                   InkWell(
                     onTap: () {},
                     child: Image.asset(
-                      'Google_Icon.png',
+                      'assets/Google_Icon.png',
                       width: 60.0,
                       height: 60.0,
                     ),
@@ -213,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
               Text.rich(
                 TextSpan(
                   text: 'Tôi chưa có tài khoản? ',
-                  style: TextStyle(fontSize: 16.0, color: Colors.black),
+                  style: TextStyle(fontSize: 16.0, color: Colors.black, fontFamily:  'Poppins', ),
                   children: <TextSpan>[
                     TextSpan(
                       text: 'Đăng ký ngay',
