@@ -15,7 +15,7 @@ class HomePage extends StatelessWidget {
           HomeAppBar(),
           Container(
             height: 500,
-            padding: EdgeInsets.only(top: 15),
+            padding: EdgeInsets.only(top: 5),
             decoration: BoxDecoration(
               color: Color(0xFFEDECF2),
               borderRadius: BorderRadius.only(

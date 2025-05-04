@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
                 'Tài khoản',
                 style: TextStyle(
                   fontSize: 16.0,
-                  //   fontWeight: FontWeight.bold,
+                  // fontWeight: FontWeight.bold,
                   color: Colors.grey[700],
                 ),
               ),
