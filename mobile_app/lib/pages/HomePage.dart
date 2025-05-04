@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app/pages/CartPage.dart';
@@ -6,56 +7,158 @@ import 'package:mobile_app/pages/ProfilePage.dart';
 import 'package:mobile_app/pages/WishList.dart';
 import 'package:mobile_app/widgets/HomeAppBar.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final PageController _pageController = PageController(viewportFraction: 0.9);
+  int _currentPage = 0;
+  late Timer _timer;
+
+  final List<String> _images = [
+    'assets/banner_1.jpg',
+    'assets/banner_2.png',
+    'assets/banner_3.png',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 6), (timer) {
+      if (_pageController.hasClients) {
+        int nextPage = (_currentPage + 1) % _images.length;
+        _pageController.animateToPage(
+          nextPage,
+          duration: Duration(milliseconds: 1000),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
         children: [
           HomeAppBar(),
+          SizedBox(height: 10),
           Container(
-            height: 500,
-            padding: EdgeInsets.only(top: 5),
-            decoration: BoxDecoration(
-              color: Color(0xFFEDECF2),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(35),
-                topRight: Radius.circular(35),
-              ),
-            ),
+            height: 200,
+            margin: EdgeInsets.only(bottom: 10),
             child: Column(
               children: [
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: _images.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return buildImage(_images[index]);
+                    },
+                  ),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _images.length,
+                        (index) => Container(
+                      width: 8,
+                      height: 8,
+                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _currentPage == index
+                            ? Colors.blue
+                            : Colors.grey,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
+          Container(
+            height: 200,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'DANH MỤC SẢN PHẨM',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: _images.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return buildImage(_images[index]);
+                    },
+                  ),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _images.length,
+                        (index) => Container(
+                      width: 8,
+                      height: 8,
+                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _currentPage == index ? Colors.blue : Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+
         ],
       ),
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: Colors.transparent,
         onTap: (index) {
-          if (index == 3) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => CartPage()),
-            );
-          }
           if (index == 1) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => WishList()),
             );
-          }
-          if (index == 2) {
+          } else if (index == 2) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => MessagePage()),
             );
-          }
-          if (index == 4) {
+          } else if (index == 3) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => CartPage()),
+            );
+          } else if (index == 4) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => ProfilePage()),
@@ -74,4 +177,15 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+  Widget buildImage(String asset) => Container(
+    margin: EdgeInsets.symmetric(horizontal: 8),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(12),
+      image: DecorationImage(
+        image: AssetImage(asset),
+        fit: BoxFit.cover,
+      ),
+    ),
+  );
 }

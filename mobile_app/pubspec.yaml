@@ -38,6 +38,7 @@ dependencies:
   badges: ^2.0.3
   curved_navigation_bar: ^1.0.3
   image_picker: ^0.8.6
+  carousel_slider: 4.2.0
 
 
 dev_dependencies:
@@ -52,7 +53,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+# following page: https://dart.dev/tools/pub/pubspecs
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -61,7 +62,9 @@ flutter:
   assets:
     - assets/
     - assets/FzPoppins/
-
+    - assets/banner_1.jpg
+    - assets/banner_2.png
+    - assets/banner_3.png
   fonts:
     - family: Poppins
       fonts:
