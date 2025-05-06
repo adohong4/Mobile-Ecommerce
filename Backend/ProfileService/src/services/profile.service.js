@@ -70,6 +70,7 @@ class ProfileService {
             const uploadResponse = await cloudinary.uploader.upload(image_filename, {
                 resource_type: 'auto'
             });
+
             const updatedProfile = await profileModel.findOneAndUpdate(
                 { userId },
                 { profilePic: uploadResponse.secure_url },
