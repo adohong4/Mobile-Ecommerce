@@ -51,6 +51,37 @@ class ProfileService {
         }
     }
 
+    static async updateProfilePic(req, res) {
+        try {
+            const userId = req.user._id;
+
+            const existProfile = await profileModel.findOne({ userId });
+            if (!existProfile) {
+                throw new BadRequestError('Cần cập nhật thông tin tài khoản');
+            }
+
+            let image_filename = "";
+            if (req.file) {
+                image_filename = req.file.path;
+            } else {
+                throw new Error("No file uploaded");
+            }
+
+            const uploadResponse = await cloudinary.uploader.upload(image_filename, {
+                resource_type: 'auto'
+            });
+            const updatedProfile = await profileModel.findOneAndUpdate(
+                { userId },
+                { profilePic: uploadResponse.secure_url },
+                { new: true, runValidators: true }
+            )
+
+            return updatedProfile;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 module.exports = ProfileService;

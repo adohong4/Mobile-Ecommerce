@@ -27,6 +27,18 @@ class ProfileController {
             next(error);
         }
     };
+
+    updateProfilePic = async (req, res, next) => {
+        try {
+            const result = await ProfileService.updateProfilePic(req, res);
+            new OK({
+                message: 'Cập nhật ảnh đại diện',
+                matedata: result,
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    };
 }
 
 module.exports = new ProfileController();
