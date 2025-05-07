@@ -66,6 +66,10 @@ flutter:
     - assets/banner_1.jpg
     - assets/banner_2.png
     - assets/banner_3.png
+    - assets/microsoft.png
+    - assets/apple.png
+    - assets/asus.png
+    - assets/samsung.png
   fonts:
     - family: Poppins
       fonts:
