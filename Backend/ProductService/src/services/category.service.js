@@ -13,21 +13,31 @@ class CategoryService {
                 throw new BadRequestError('Tên danh mục và ID danh mục là bắt buộc');
             }
 
-            let image_filename = '';
+            let imageUrl = '';
             if (req.file) {
-                image_filename = req.file.path;
-            } else {
-                throw new BadRequestError('Không có file ảnh được tải lên');
-            }
+                try {
+                    // Upload ảnh từ buffer của multer lên Cloudinary
+                    const uploadResponse = await new Promise((resolve, reject) => {
+                        cloudinary.uploader.upload_stream({
+                            resource_type: 'image',
+                        }, (error, result) => {
+                            if (error) {
+                                return reject(new BadRequestError('Lỗi khi upload ảnh lên Cloudinary'));
+                            }
+                            resolve(result);
+                        }).end(req.file.buffer);
+                    });
 
-            const uploadResponse = await cloudinary.uploader.upload(image_filename, {
-                resource_type: 'auto',
-            });
+                    imageUrl = uploadResponse.secure_url;
+                } catch (error) {
+                    throw new BadRequestError('Lỗi khi upload ảnh: ' + error.message);
+                }
+            }
 
             const newCategory = await categoryModel.create({
                 category,
                 categoryIds,
-                categoryPic: uploadResponse.secure_url,
+                categoryPic: imageUrl,
             });
 
             return { newCategory };

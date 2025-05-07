@@ -1,11 +1,20 @@
-'use strict'
+'use strict';
 
 const express = require('express');
 const { asyncHandler } = require('../../helpers/asyncHandler');
 const CategoryController = require('../../controller/category.controller');
 const { checkTokenCookie } = require('../../middleware/checkAuth');
-const upload = require('../../config/upload.config');
+// const upload = require('../../config/upload.config');
 const router = express.Router();
+const multer = require('multer');
+const storage = multer.memoryStorage();
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 40 * 1024 * 1024, // Giới hạn 40MB
+    },
+});
 
 router.get('/category/get', asyncHandler(CategoryController.getCategoryList));
 router.get('/category/get/:categoryId', asyncHandler(CategoryController.getCategoryById));
