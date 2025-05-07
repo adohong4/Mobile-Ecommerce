@@ -23,7 +23,6 @@ const ProfileSchema = new Schema({
     dateOfBirth: { type: Date },
     phoneNumber: { type: String },
     address: [AddressSchema],
-    cartData: { type: Object, default: {} },
 }, { minimize: false, timestamps: true });
 
 const profileModel = mongoose.models.profile || mongoose.model(DOCUMENT_NAME, ProfileSchema);

@@ -33,7 +33,6 @@ class IdentityService {
                 email: email,
                 password: password,
                 hashedPassword: hashedPassword,
-                role: 'USER'
             })
 
             const tokenPayload = {
