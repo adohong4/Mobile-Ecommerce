@@ -7,6 +7,7 @@ class CartService {
     static async addToCart(req, res) {
         try {
             const userId = req.user._id;
+            const { itemId } = req.body;
             let user = await userCartModel.findOne({ userId });
 
             let cartData = await user.cartData;
@@ -25,7 +26,7 @@ class CartService {
     static async getListCart(req, res) {
         try {
             const userId = req.user._id;
-            const cart = await userCartModel.findOne({ userId });
+            const cart = await userCartModel.find({ userId });
             return cart.cartData;
         } catch (error) {
             throw error;
@@ -35,7 +36,7 @@ class CartService {
     static async removeFromCart(req, res) {
         try {
             const userId = req.user._id;
-            const { itemId } = req.params;
+            const { itemId } = req.body;
             const profile = await userCartModel.findOne({ userId });
 
             let cartData = await profile.cartData;
