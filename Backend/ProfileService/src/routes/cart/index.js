@@ -10,4 +10,6 @@ router.get('/cart/add', checkTokenCookie, asyncHandler(CartController.addToCart)
 router.post('/cart/list', checkTokenCookie, asyncHandler(CartController.getListCart));
 router.post('/cart/remove', checkTokenCookie, asyncHandler(CartController.removeFromCart));
 
+router.post('/order/list', checkTokenCookie, asyncHandler(CartController.orderData));
+
 module.exports = router;
