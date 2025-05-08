@@ -153,6 +153,21 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text(
+                    "FLAST SALE",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                )
+              ],
+            ),
+          )
         ],
       ),
       bottomNavigationBar: CustomBottomNav(parentContext: context),

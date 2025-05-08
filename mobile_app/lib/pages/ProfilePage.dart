@@ -1,50 +1,134 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_app/components/ProfilePicture.dart';
-import 'package:mobile_app/pages/CartPage.dart';
-import 'package:mobile_app/pages/MessagePage.dart';
-import 'package:mobile_app/widgets/CartAppBar.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
+import 'package:mobile_app/pages/LoginPage.dart';
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'User Profile',
+      debugShowCheckedModeBanner: false,
+      home: const ProfilePage(),
+    );
+  }
+}
+
+// Fake data class
+class FakeUserData {
+  static const String name = "Nguyễn Việt Anh";
+  static const String email = "nguyenvana123@gmail.com";
+  static const String phone = "0901.234.567";
+  static const String birthDate = "15/08/1995";
+  static const String gender = "Nam";
+  static const String address = "123 Đường ABC, Quận 1, TP. HCM";
+}
+
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(children: [CartAppBar(), ProfilePicture()]),
+      appBar: AppBar(
+        title: const Text(""),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {},
+          ),
+        ],
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: Column(
+        children: [
+          const CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.pets, size: 40, color: Colors.white),
+          ),
+          const SizedBox(height: 8),
+          Text(FakeUserData.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: const [
+                UserInfoRow(label: "Email", value: FakeUserData.email),
+                UserInfoRow(label: "Số điện thoại", value: FakeUserData.phone),
+                UserInfoRow(label: "Ngày sinh", value: FakeUserData.birthDate),
+                UserInfoRow(label: "Giới tính", value: FakeUserData.gender),
+              ],
+            ),
+          ),
+          const Divider(height: 30),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text("Lịch sử mua hàng"),
+            trailing:
+            const Text("Chi tiết", style: TextStyle(color: Colors.blue)),
+            onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(Icons.location_on_outlined),
+            title: const Text("Địa chỉ nhận hàng"),
+            subtitle: Text(FakeUserData.address),
+            trailing: const Text("Thay đổi địa chỉ",
+                style: TextStyle(color: Colors.blue)),
+            onTap: () {},
+          ),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child:ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[800],
+                ),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                },
+                child: const Text("Đăng xuất", style: TextStyle(color: Colors.white)),
+              ),
+            ),
+          )
+        ],
+      ),
         bottomNavigationBar: CustomBottomNav(parentContext: context)
-      // bottomNavigationBar: CurvedNavigationBar(
-      //   backgroundColor: Colors.transparent,
-      //   onTap: (index) {
-      //     if (index == 3) {
-      //       Navigator.pushReplacement(
-      //         context,
-      //         MaterialPageRoute(builder: (context) => CartPage()),
-      //       );
-      //     }
-      //     if (index == 2) {
-      //       Navigator.pushReplacement(
-      //         context,
-      //         MaterialPageRoute(builder: (context) => MessagePage()),
-      //       );
-      //     }
-      //     if (index == 4) {
-      //       Navigator.pushReplacement(
-      //         context,
-      //         MaterialPageRoute(builder: (context) => ProfilePage()),
-      //       );
-      //     }
-      //   },
-      //   height: 50,
-      //   color: Color(0xFF194689),
-      //   items: [
-      //     Icon(Icons.home, size: 30, color: Colors.white),
-      //     Icon(Icons.favorite, size: 30, color: Colors.white),
-      //     Icon(Icons.message, size: 30, color: Colors.white),
-      //     Icon(Icons.shopping_bag_outlined, size: 30, color: Colors.white),
-      //     Icon(Icons.person, size: 30, color: Colors.white),
-      //   ],
-      // ),
+    );
+  }
+}
+
+class UserInfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const UserInfoRow({super.key, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          SizedBox(
+              width: 100,
+              child: Text(label, style: const TextStyle(color: Colors.grey))),
+          Expanded(
+              child:
+              Text(value, style: const TextStyle(fontWeight: FontWeight.w500))),
+        ],
+      ),
     );
   }
 }
