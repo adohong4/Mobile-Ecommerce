@@ -13,7 +13,7 @@ const UserSchema = new Schema({
     hashedPassword: { type: String, required: false },
     role: { type: String, enum: ['USER', 'ADMIN'], default: 'USER' },
     cartData: {
-        type: ObjectId,
+        type: Object,
         default: [],
         validate: [arrayLimit, 'Giỏ hàng chỉ tối đa 20 sản phẩm']
     },

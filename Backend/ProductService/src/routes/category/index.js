@@ -16,10 +16,10 @@ const upload = multer({
     },
 });
 
-router.get('/category/get', asyncHandler(CategoryController.getCategoryList));
-router.get('/category/get/:categoryId', asyncHandler(CategoryController.getCategoryById));
-router.post('/category/create', upload.single("categoryPic"), asyncHandler(CategoryController.createCategory));
-router.delete('/category/softDelete/:categoryId', asyncHandler(CategoryController.softDeleteCategory));
-router.delete('/category/delete/:categoryId', asyncHandler(CategoryController.deleteCategory));
+router.get('/product/category/get', asyncHandler(CategoryController.getCategoryList));
+router.get('/product/category/get/:categoryId', asyncHandler(CategoryController.getCategoryById));
+router.post('/product/category/create', upload.single("categoryPic"), asyncHandler(CategoryController.createCategory));
+router.delete('/product/category/softDelete/:categoryId', asyncHandler(CategoryController.softDeleteCategory));
+router.delete('/product/category/delete/:categoryId', asyncHandler(CategoryController.deleteCategory));
 
 module.exports = router;

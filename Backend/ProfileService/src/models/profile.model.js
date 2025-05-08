@@ -23,10 +23,11 @@ const ProfileSchema = new Schema({
     dateOfBirth: { type: Date },
     phoneNumber: { type: String },
     favourite: {
-        type: ObjectId,
+        type: Object,
         default: [],
         validate: [arrayLimit, 'Yêu thích chỉ tối đa 20 sản phẩm']
     },
+    saveVoucher: { type: Object, default: [] },
     address: [AddressSchema],
 }, { minimize: false, timestamps: true });
 
