@@ -2,8 +2,8 @@
 
 const userModel = require('../models/identity.model')
 const orderModel = require('../models/order.model')
-const { BadRequestError, ConflictRequestError, AuthFailureError, ForbiddenError } = require("../../core/error.response")
-const { CREATED } = require("../../core/success.response")
+const { BadRequestError, ConflictRequestError, AuthFailureError, ForbiddenError } = require("../core/error.response")
+const { CREATED } = require("../core/success.response")
 
 class CODController {
     CODplaceOrder = async (req, res) => {
