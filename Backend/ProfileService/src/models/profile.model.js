@@ -22,8 +22,17 @@ const ProfileSchema = new Schema({
     gender: { type: String, enum: ['MALE', 'FEMALE', 'OTHER'] },
     dateOfBirth: { type: Date },
     phoneNumber: { type: String },
+    favourite: {
+        type: ObjectId,
+        default: [],
+        validate: [arrayLimit, 'Yêu thích chỉ tối đa 20 sản phẩm']
+    },
     address: [AddressSchema],
 }, { minimize: false, timestamps: true });
+
+function arrayLimit(val) {
+    return val.length <= 20;
+}
 
 const profileModel = mongoose.models.profile || mongoose.model(DOCUMENT_NAME, ProfileSchema);
 

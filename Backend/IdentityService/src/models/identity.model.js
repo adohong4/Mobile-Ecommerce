@@ -12,9 +12,17 @@ const UserSchema = new Schema({
     password: { type: String, required: false },
     hashedPassword: { type: String, required: false },
     role: { type: String, enum: ['USER', 'ADMIN'], default: 'USER' },
-    cartData: { type: Object, default: {} },
+    cartData: {
+        type: ObjectId,
+        default: [],
+        validate: [arrayLimit, 'Giỏ hàng chỉ tối đa 20 sản phẩm']
+    },
     active: { type: Boolean, default: true }
 }, { minimize: false, timestamps: true });
+
+function arrayLimit(val) {
+    return val.length <= 20;
+}
 
 const identityModel = mongoose.models.user || mongoose.model(DOCUMENT_NAME, UserSchema)
 
