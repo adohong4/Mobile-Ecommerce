@@ -4,10 +4,10 @@ const express = require('express');
 const { asyncHandler } = require('../../helpers/asyncHandler');
 const ProductController = require('../../controller/product.controller');
 const { checkTokenCookie } = require('../../middleware/checkAuth');
-const upload = require('../../config/upload.config');
+const { upload, convertToWebp } = require('../../config/upload.config')
 const router = express.Router();
 
-router.post('/product/create', asyncHandler(ProductController.createProduct));
+router.post('/product/create', upload.array("images"), convertToWebp, asyncHandler(ProductController.createProduct));
 router.get('/product/get', asyncHandler(ProductController.getProduct));
 router.get('/product/get/:id', asyncHandler(ProductController.getProductById));
 router.get('/product/get/:product_slug', asyncHandler(ProductController.getProductByslug));
