@@ -145,6 +145,7 @@ class VoucherService {
 
             const {
                 code,
+                description,
                 discountType,
                 discountValue,
                 minOrderValue,
@@ -164,29 +165,25 @@ class VoucherService {
                 }
             }
 
-            const updatedVoucher = await voucherModel.findByIdAndUpdate(
-                voucherId,
-                {
-                    $set: {
-                        ...(code && { code }),
-                        ...(discountType && { discountType }),
-                        ...(discountValue !== undefined && { discountValue }),
-                        ...(minOrderValue !== undefined && { minOrderValue }),
-                        ...(maxDiscountAmount !== undefined && { maxDiscountAmount }),
-                        ...(applicableProducts && { applicableProducts }),
-                        ...(applicableCategories && { applicableCategories }),
-                        ...(usageLimit !== undefined && { usageLimit }),
-                        ...(startDate && { startDate }),
-                        ...(endDate && { endDate }),
-                        ...(active !== undefined && { active })
-                    }
-                },
-                { new: true, runValidators: true }
-            );
-
-            if (!updatedVoucher) {
+            const voucher = await voucherModel.findById(voucherId);
+            if (!voucher) {
                 throw new BadRequestError('Không tìm thấy phiếu giảm giá');
             }
+
+            if (code) voucher.code = code;
+            if (description !== undefined) voucher.description = description;
+            if (discountType) voucher.discountType = discountType;
+            if (discountValue !== undefined) voucher.discountValue = discountValue;
+            if (minOrderValue !== undefined) voucher.minOrderValue = minOrderValue;
+            if (maxDiscountAmount !== undefined) voucher.maxDiscountAmount = maxDiscountAmount;
+            if (applicableProducts) voucher.applicableProducts = applicableProducts;
+            if (applicableCategories) voucher.applicableCategories = applicableCategories;
+            if (usageLimit !== undefined) voucher.usageLimit = usageLimit;
+            if (startDate) voucher.startDate = startDate;
+            if (endDate) voucher.endDate = endDate;
+            if (active !== undefined) voucher.active = active;
+
+            const updatedVoucher = await voucher.save();
 
             return updatedVoucher;
         } catch (error) {

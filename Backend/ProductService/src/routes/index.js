@@ -7,5 +7,7 @@ router.use('/v1/api', require('./category'));
 router.use('/v1/api', require('./product'));
 router.use('/v1/api', require('./campaign'));
 router.use('/v1/api', require('./voucher'));
+router.use('/v1/api', require('./advertise'));
+
 
 module.exports = router;

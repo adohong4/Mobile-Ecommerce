@@ -146,14 +146,8 @@ class ProductService {
         const { id } = req.params;
         const product = await productModel.findById(id)
         const newActiveStatus = !product.active;
-        const actionDescription = newActiveStatus ? "Hồi phục sản phẩm" : "Xóa sản phẩm";
 
         product.active = newActiveStatus;
-        product.creator.push({
-            createdBy: staffId,
-            createdName: staffName,
-            description: actionDescription
-        })
         await product.save();
 
         return { metadata: product }
