@@ -190,6 +190,39 @@ class VoucherService {
             throw error;
         }
     }
+
+    static async useVoucher(req, res) {
+        try {
+            const { id, orderValue } = req.body;
+            const voucher = await voucherModel.findById(id);
+
+            if (!voucher.active) {
+                throw new BadRequestError('Phiếu giảm giá đã bị vô hiệu hóa');
+            }
+
+            const now = new Date();
+            if (now < voucher.startDate || now > voucher.endDate) {
+                throw new BadRequestError('Phiếu giảm giá không còn trong thời gian hiệu lực');
+            }
+
+            if (voucher.usageLimit >= 0 && voucher.usedCount >= voucher.usageLimit) {
+                throw new BadRequestError('Phiếu giảm giá đã hết lượt sử dụng');
+            }
+
+            if (orderValue !== undefined && orderValue < voucher.minOrderValue) {
+                throw new BadRequestError(
+                    `Giá trị đơn hàng phải tối thiểu ${voucher.minOrderValue} để sử dụng phiếu này`
+                );
+            }
+
+            voucher.usedCount += 1;
+            const updatedVoucher = await voucher.save();
+
+            return updatedVoucher;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = VoucherService;

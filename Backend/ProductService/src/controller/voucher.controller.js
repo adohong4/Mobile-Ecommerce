@@ -81,6 +81,18 @@ class VoucherController {
             next(error);
         }
     }
+
+    async useVoucher(req, res, next) {
+        try {
+            const result = await VoucherService.useVoucher(req, res);
+            new OK({
+                message: 'Áp phiếu giảm giá thành công',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new VoucherController();

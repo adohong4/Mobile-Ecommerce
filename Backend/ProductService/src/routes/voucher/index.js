@@ -13,5 +13,7 @@ router.get('/product/voucher/paginate', asyncHandler(voucherController.paginateV
 router.delete('/product/voucher/delete/:voucherId', asyncHandler(voucherController.softDeleteVoucher));
 router.delete('/product/voucher/delete/:voucherId', asyncHandler(voucherController.deleteVoucher));
 router.put('/product/voucher/update/:voucherId', asyncHandler(voucherController.updateVoucher));
+router.post('/product/voucher/use/:id', checkTokenCookie, asyncHandler(voucherController.updateVoucher));
+
 
 module.exports = router;

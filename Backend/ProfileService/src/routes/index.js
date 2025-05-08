@@ -4,8 +4,9 @@ const express = require('express');
 const router = express.Router();
 
 router.use('/v1/api', require('./profile'));
-router.use('/v1/api', require('./address'));
-router.use('/v1/api', require('./cart'));
+router.use('/v1/api/profile', require('./address'));
+router.use('/v1/api/profile', require('./cart'));
 router.use('/v1/api', require('./favourite'));
+router.use('/v1/api', require('./saveAds'));
 
 module.exports = router;
