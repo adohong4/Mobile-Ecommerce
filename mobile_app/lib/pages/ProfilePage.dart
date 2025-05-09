@@ -54,7 +54,7 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(FakeUserData.name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -70,17 +70,17 @@ class ProfilePage extends StatelessWidget {
           const Divider(height: 30),
           ListTile(
             leading: const Icon(Icons.history),
-            title: const Text("Lịch sử mua hàng"),
+            title: const Text("Lịch sử mua hàng", style: TextStyle(fontFamily: 'Poppins')),
             trailing:
-            const Text("Chi tiết", style: TextStyle(color: Colors.blue)),
+            const Text("Chi tiết", style: TextStyle(color: Colors.blue, fontFamily: 'Poppins')),
             onTap: () {},
           ),
           ListTile(
             leading: const Icon(Icons.location_on_outlined),
-            title: const Text("Địa chỉ nhận hàng"),
-            subtitle: Text(FakeUserData.address),
+            title: const Text("Địa chỉ nhận hàng", style: TextStyle(fontFamily: 'Poppins')),
+            subtitle: Text(FakeUserData.address, style: TextStyle(fontFamily: 'Poppins')),
             trailing: const Text("Thay đổi địa chỉ",
-                style: TextStyle(color: Colors.blue)),
+                style: TextStyle(color: Colors.blue, fontFamily: 'Poppins')),
             onTap: () {
               Navigator.push(
                 context,
@@ -106,7 +106,7 @@ class ProfilePage extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => LoginPage()),
                   );
                 },
-                child: const Text("Đăng xuất", style: TextStyle(color: Colors.white)),
+                child: const Text("Đăng xuất", style: TextStyle(color: Colors.white, fontFamily: 'Poppins')),
               ),
             ),
           )
@@ -130,13 +130,27 @@ class UserInfoRow extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-              width: 100,
-              child: Text(label, style: const TextStyle(color: Colors.grey))),
+            width: 100,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.grey,
+                fontFamily: 'Poppins',
+              ),
+            ),
+          ),
           Expanded(
-              child:
-              Text(value, style: const TextStyle(fontWeight: FontWeight.w500))),
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Poppins',
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
+
 }
