@@ -8,5 +8,6 @@ router.use('/v1/api/profile', require('./address'));
 router.use('/v1/api/profile', require('./cart'));
 router.use('/v1/api', require('./favourite'));
 router.use('/v1/api', require('./saveAds'));
+router.use('/v1/api', require('./comment'));
 
 module.exports = router;

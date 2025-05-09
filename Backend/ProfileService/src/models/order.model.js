@@ -9,7 +9,7 @@ const orderSchema = new Schema({
     items: { type: Array, required: true },
     amount: { type: Number, required: true },
     address: { type: Object, required: true },
-    status: { type: String, default: "pending", enum: ["pending", "prepared", "confirmed", "delivered", "cancelled"] },
+    status: { type: String, default: "pending", enum: ["pending", "confirmed", "shipping", "delivered", "cancelled"] },
     reasonCancel: { type: String },
     date: {
         type: String,
