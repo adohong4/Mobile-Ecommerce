@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/widgets/CartAppBar.dart';
 import 'package:mobile_app/widgets/CartBottomNavBar.dart';
 import 'package:mobile_app/widgets/CartItemSamples.dart';
-
+import 'package:mobile_app/widgets/bottom_navbar.dart';
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
 
@@ -57,7 +57,7 @@ class CartPage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: CartBottomNavBar(),
+      bottomNavigationBar: CustomBottomNav(parentContext: context),
     );
   }
 }

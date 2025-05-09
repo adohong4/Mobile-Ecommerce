@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:mobile_app/pages/LoginPage.dart';
+import 'package:mobile_app/pages/AddAddressPage.dart';
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -80,7 +81,14 @@ class ProfilePage extends StatelessWidget {
             subtitle: Text(FakeUserData.address),
             trailing: const Text("Thay đổi địa chỉ",
                 style: TextStyle(color: Colors.blue)),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AddAddressPage(),
+                ),
+              );
+            },
           ),
           const Spacer(),
           Padding(
@@ -104,7 +112,7 @@ class ProfilePage extends StatelessWidget {
           )
         ],
       ),
-        bottomNavigationBar: CustomBottomNav(parentContext: context)
+        bottomNavigationBar: CustomBottomNav(parentContext: context),
     );
   }
 }

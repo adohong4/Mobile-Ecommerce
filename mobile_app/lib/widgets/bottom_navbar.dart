@@ -5,6 +5,9 @@ import 'package:mobile_app/pages/ProfilePage.dart';
 import 'package:mobile_app/pages/WishList.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+
+
+
 class CustomBottomNav extends StatefulWidget {
   final BuildContext parentContext;
 
@@ -13,6 +16,7 @@ class CustomBottomNav extends StatefulWidget {
   @override
   State<CustomBottomNav> createState() => _CustomBottomNavState();
 }
+
 
 class _CustomBottomNavState extends State<CustomBottomNav> {
   int _selectedIndex = 0;
@@ -61,25 +65,25 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
       type: BottomNavigationBarType.fixed,
       selectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
       unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w400),
-      items: const [
+      items: [
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.house),
+          icon: FaIcon(FontAwesomeIcons.house, color: _selectedIndex == 0 ? Color(0xFF194689) : Colors.black),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.heart),
+          icon: FaIcon(FontAwesomeIcons.heart, color: _selectedIndex == 1 ? Color(0xFF194689) : Colors.black),
           label: 'My favourite',
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.comments),
+          icon: FaIcon(FontAwesomeIcons.comments, color: _selectedIndex == 2 ? Color(0xFF194689) : Colors.black),
           label: 'Contact',
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.cartShopping),
+          icon: FaIcon(FontAwesomeIcons.cartShopping, color: _selectedIndex == 3 ? Color(0xFF194689) : Colors.black),
           label: 'Cart',
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.user),
+          icon: FaIcon(FontAwesomeIcons.user, color: _selectedIndex == 4 ? Color(0xFF194689) : Colors.black),
           label: 'User',
         ),
       ],
