@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:mobile_app/pages/LoginPage.dart';
 import 'package:mobile_app/pages/AddAddressPage.dart';
+import 'package:mobile_app/pages/OrderDetailPage.dart';
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -73,7 +74,12 @@ class ProfilePage extends StatelessWidget {
             title: const Text("Lịch sử mua hàng", style: TextStyle(fontFamily: 'Poppins')),
             trailing:
             const Text("Chi tiết", style: TextStyle(color: Colors.blue, fontFamily: 'Poppins')),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const OrderDetailPage(),),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.location_on_outlined),
