@@ -8,8 +8,25 @@ class OrderDetailPage extends StatefulWidget {
   State<OrderDetailPage> createState() => _OrderDetailPageState();
 }
 
-class _OrderDetailPageState extends State<OrderDetailPage>
-    with SingleTickerProviderStateMixin {
+class Order {
+  final String title;
+  final String imageUrl;
+  final String price;
+  final String oldPrice;
+  final String status;
+  final int quantity;
+
+  Order({
+    required this.title,
+    required this.imageUrl,
+    required this.price,
+    required this.oldPrice,
+    required this.status,
+    required this.quantity,
+  });
+}
+
+class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   final List<String> tabTitles = [
@@ -17,6 +34,34 @@ class _OrderDetailPageState extends State<OrderDetailPage>
     'Chờ lấy hàng',
     'Chờ giao hàng',
     'Đánh giá',
+  ];
+
+  // Dữ liệu giả lập
+  final List<Order> orders = [
+    Order(
+      title: 'Màn Hình Di Động Thông Minh SIEGenX 27 inch',
+      imageUrl: 'assets/apple.png',
+      price: '17.500.000 đ',
+      oldPrice: '20.000.000 đ',
+      status: 'Chờ lấy hàng',
+      quantity: 4,
+    ),
+    Order(
+      title: 'Laptop SIEGenX Pro 15 inch',
+      imageUrl: 'assets/apple.png',
+      price: '25.000.000 đ',
+      oldPrice: '30.000.000 đ',
+      status: 'Chờ giao hàng',
+      quantity: 2,
+    ),
+    Order(
+      title: 'Tai Nghe SIEGenX BT',
+      imageUrl: 'assets/apple.png',
+      price: '2.000.000 đ',
+      oldPrice: '2.500.000 đ',
+      status: 'Đánh giá',
+      quantity: 3,
+    ),
   ];
 
   @override
@@ -38,6 +83,7 @@ class _OrderDetailPageState extends State<OrderDetailPage>
     required String oldPrice,
     required String status,
     required bool showReviewButton,
+    required int quantity,
   }) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -66,13 +112,13 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                               fontSize: 16,
                               fontFamily: 'Poppins')),
                       const SizedBox(height: 4),
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('1 sản phẩm',
-                              style: TextStyle(
+                          Text('$quantity sản phẩm',
+                              style: const TextStyle(
                                   fontSize: 14, fontFamily: 'Poppins')),
-                          Text('x1', style: TextStyle(fontFamily: 'Poppins')),
+                          Text('x$quantity', style: const TextStyle(fontFamily: 'Poppins')),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -96,14 +142,8 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                       const SizedBox(height: 4),
                       Text("Thành tiền: $price",
                           style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w500)),
+                              fontFamily: 'Poppins', fontWeight: FontWeight.w500)),
                       const SizedBox(height: 4),
-                      // Text(status,
-                      //     style: const TextStyle(
-                      //         color: Colors.red,
-                      //         fontSize: 14,
-                      //         fontFamily: 'Poppins')),
                     ],
                   ),
                 ),
@@ -126,8 +166,7 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                     );
                   },
                   child: const Text('Đánh giá',
-                      style: TextStyle(fontFamily: 'Poppins', color: Colors.white),
-                  ),
+                      style: TextStyle(fontFamily: 'Poppins', color: Colors.white)),
                 ),
               ),
             ],
@@ -140,17 +179,21 @@ class _OrderDetailPageState extends State<OrderDetailPage>
   Widget _buildTabContent(String status) {
     bool isReviewTab = status == 'Đánh giá';
 
+    // Lọc các đơn hàng theo trạng thái
+    List<Order> filteredOrders = orders.where((order) => order.status == status).toList();
+
     return ListView(
-      children: [
-        _buildOrderCard(
-          title: 'Màn Hình Di Động Thông Minh SIEGenX 27 inch',
-          imageUrl: 'assets/apple.png',
-          price: '17.500.000 đ',
-          oldPrice: '20.000.000 đ',
-          status: status,
+      children: filteredOrders.map((order) {
+        return _buildOrderCard(
+          title: order.title,
+          imageUrl: order.imageUrl,
+          price: order.price,
+          oldPrice: order.oldPrice,
+          status: order.status,
           showReviewButton: isReviewTab,
-        ),
-      ],
+          quantity: order.quantity,
+        );
+      }).toList(),
     );
   }
 
