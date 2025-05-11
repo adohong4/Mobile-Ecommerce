@@ -32,7 +32,6 @@ class _ReviewPageState extends State<ReviewPage> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
               const SizedBox(height: 16),
 
-              // Vùng chọn sao đánh giá
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(5, (index) {
@@ -53,16 +52,26 @@ class _ReviewPageState extends State<ReviewPage> {
 
               const SizedBox(height: 20),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF0D47A1),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
                 onPressed: selectedStars > 0
                     ? () {
-                  // Xử lý gửi đánh giá tại đây (ví dụ: gửi lên server)
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text('Bạn đã đánh giá $selectedStars sao.'),
                   ));
                 }
-                    : null, // Không cho gửi nếu chưa chọn sao
-                child: const Text('Gửi đánh giá', style: TextStyle(fontFamily: 'Poppins')),
-              ),
+                    : null,
+                child: const Text(
+                  'Gửi đánh giá',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: Colors.white,
+                  ),
+                ),
+              )
+
             ],
           ),
         ),
