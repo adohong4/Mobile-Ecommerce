@@ -1,7 +1,54 @@
 import 'package:flutter/material.dart';
 
-class AddAddressPage extends StatelessWidget {
+class AddAddressPage extends StatefulWidget {
   const AddAddressPage({super.key});
+
+  @override
+  State<AddAddressPage> createState() => _AddAddressPageState();
+}
+
+class _AddAddressPageState extends State<AddAddressPage> {
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _wardController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _provinceController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Giải phóng bộ nhớ khi widget bị huỷ
+    _nameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _wardController.dispose();
+    _cityController.dispose();
+    _provinceController.dispose();
+    super.dispose();
+  }
+
+  void _submitAddress() {
+    if (_nameController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        _addressController.text.isEmpty ||
+        _wardController.text.isEmpty ||
+        _cityController.text.isEmpty ||
+        _provinceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Thêm địa chỉ không thành công. Vui lòng điền đầy đủ thông tin.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Thêm địa chỉ thành công'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,25 +86,25 @@ class AddAddressPage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildTextField(label: 'Họ và tên:', decoration: inputDecoration),
-                _buildTextField(label: 'Số điện thoại :', decoration: inputDecoration),
-                _buildTextField(label: 'Địa chỉ :', decoration: inputDecoration),
-                _buildTextField(label: 'Phường :', decoration: inputDecoration),
-                _buildTextField(label: 'Thành phố :', decoration: inputDecoration),
-                _buildTextField(label: 'Tỉnh :', decoration: inputDecoration),
+                _buildTextField(label: 'Họ và tên:', controller: _nameController, decoration: inputDecoration),
+                _buildTextField(label: 'Số điện thoại:', controller: _phoneController, decoration: inputDecoration),
+                _buildTextField(label: 'Địa chỉ:', controller: _addressController, decoration: inputDecoration),
+                _buildTextField(label: 'Phường:', controller: _wardController, decoration: inputDecoration),
+                _buildTextField(label: 'Thành phố:', controller: _cityController, decoration: inputDecoration),
+                _buildTextField(label: 'Tỉnh:', controller: _provinceController, decoration: inputDecoration),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _submitAddress,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF003366), // Dark blue
+                      backgroundColor: const Color(0xFF003366),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text('Thêm địa chỉ',  style: TextStyle(color: Colors.white,fontFamily: 'Poppins')),
+                    child: const Text('Thêm địa chỉ', style: TextStyle(color: Colors.white, fontFamily: 'Poppins')),
                   ),
                 ),
               ],
@@ -69,15 +116,18 @@ class AddAddressPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({required String label, required InputDecoration decoration}) {
+  Widget _buildTextField({required String label, required TextEditingController controller, required InputDecoration decoration}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 16,fontFamily: 'Poppins'),),
+          Text(label, style: const TextStyle(fontSize: 16, fontFamily: 'Poppins')),
           const SizedBox(height: 6),
-          TextField(decoration: decoration),
+          TextField(
+            controller: controller,
+            decoration: decoration,
+          ),
         ],
       ),
     );
