@@ -14,11 +14,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        fontFamily: 'Poppins', // 👉 Đây là dòng quan trọng
-        textTheme: Theme.of(context).textTheme.apply(
-          bodyColor: Colors.black,
-          displayColor: Colors.black,
-        ),
+        // Áp dụng font Poppins cho toàn bộ ứng dụng
+        fontFamily: 'Poppins',
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: LoginPage(),
     );
