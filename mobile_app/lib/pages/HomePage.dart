@@ -39,6 +39,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    // Hiển thị popup quảng cáo khi màn hình load xong
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showAdPopup();
+    });
+
+    // Tự động cuộn banner
     _timer = Timer.periodic(Duration(seconds: 6), (timer) {
       if (_bannerController.hasClients) {
         int nextPage = (_bannerPage + 1) % _banners.length;
@@ -67,7 +74,7 @@ class _HomePageState extends State<HomePage> {
           HomeAppBar(),
           SizedBox(height: 10),
 
-          // --- Banner slider ---
+          // Banner slider
           Container(
             height: 200,
             margin: EdgeInsets.only(bottom: 10),
@@ -107,7 +114,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // --- Product category slider ---
+          // Product categories
           Container(
             height: 220,
             child: Column(
@@ -154,6 +161,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
+          // Flash Sale Section (placeholder)
           Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -161,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: Text(
-                    "FLAST SALE",
+                    "FLASH SALE",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 )
@@ -174,7 +182,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Banner builder
+  // Widget hiển thị banner
   Widget buildBanner(String asset) => Container(
     margin: EdgeInsets.symmetric(horizontal: 8),
     decoration: BoxDecoration(
@@ -186,7 +194,7 @@ class _HomePageState extends State<HomePage> {
     ),
   );
 
-  // Category builder
+  // Widget hiển thị danh mục sản phẩm
   Widget buildCategoryRow(List<Map<String, String>> items) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -197,21 +205,55 @@ class _HomePageState extends State<HomePage> {
               item['image']!,
               width: 100,
               height: 100,
-
               fit: BoxFit.contain,
             ),
             SizedBox(height: 8),
             Padding(
-              padding: EdgeInsets.only(left: 16.0), // Thêm padding bên trái
+              padding: EdgeInsets.only(left: 16.0),
               child: Text(
                 item['title']!,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             )
-
           ],
         );
       }).toList(),
+    );
+  }
+
+  void _showAdPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(' Ưu đãi đặc biệt!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/banner_3.png',
+                height: 150,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 10),
+              const Text('Giảm 20% toàn bộ sản phẩm hôm nay!'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Đóng'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Xem ngay'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

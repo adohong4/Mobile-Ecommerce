@@ -70,7 +70,6 @@ class ProductCard extends StatelessWidget {
   }
 }
 
-// Trang WishList sử dụng widget ProductCard
 class WishList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
