@@ -71,9 +71,9 @@ class ProfilePage extends StatelessWidget {
           const Divider(height: 30),
           ListTile(
             leading: const Icon(Icons.history),
-            title: const Text("Lịch sử mua hàng", style: TextStyle(fontFamily: 'Poppins')),
+            title: const Text("Lịch sử mua hàng", style: TextStyle(fontFamily: 'Poppins',)),
             trailing:
-            const Text("Chi tiết", style: TextStyle(color: Colors.blue, fontFamily: 'Poppins')),
+            const Text("Chi tiết", style: TextStyle(color: Colors.blue,fontSize: 14, fontFamily: 'Poppins')),
             onTap: () {
               Navigator.push(
                 context,
@@ -86,7 +86,7 @@ class ProfilePage extends StatelessWidget {
             title: const Text("Địa chỉ nhận hàng", style: TextStyle(fontFamily: 'Poppins')),
             subtitle: Text(FakeUserData.address, style: TextStyle(fontFamily: 'Poppins')),
             trailing: const Text("Thay đổi địa chỉ",
-                style: TextStyle(color: Colors.blue, fontFamily: 'Poppins')),
+                style: TextStyle(color: Colors.blue, fontFamily: 'Poppins',fontSize: 14)),
             onTap: () {
               Navigator.push(
                 context,
