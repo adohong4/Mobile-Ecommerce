@@ -99,7 +99,7 @@ class _CartPageState extends State<CartPage> {
                     },
                     child: Icon(
                       item['selected'] ? Icons.radio_button_checked : Icons.radio_button_off,
-                      color: Colors.blue,
+                      color: Color(0xFF003366),
                     ),
                   ),
                   title: Row(
@@ -121,7 +121,7 @@ class _CartPageState extends State<CartPage> {
                               children: [
                                 Text(
                                   '${item['price'].toStringAsFixed(0)} đ',
-                                  style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: Color(0xFF003366), fontWeight: FontWeight.bold),
                                 ),
                                 SizedBox(width: 6),
                                 Text(
@@ -188,7 +188,7 @@ class _CartPageState extends State<CartPage> {
                         cartItems.every((item) => item['selected'])
                             ? Icons.radio_button_checked
                             : Icons.radio_button_off,
-                        color: Colors.blue,
+                        color: Color(0xFF003366),
                       ),
                     ),
                     SizedBox(width: 8),
@@ -199,7 +199,7 @@ class _CartPageState extends State<CartPage> {
                       children: [
                         Text(
                           '${total.toStringAsFixed(0)} đ',
-                          style: TextStyle(fontSize: 16, color: Colors.blue, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 16, color: Color(0xFF003366), fontWeight: FontWeight.bold),
                         ),
                         Text(
                           'Giảm: ${discount.toStringAsFixed(0)} đ',
@@ -219,7 +219,7 @@ class _CartPageState extends State<CartPage> {
                       padding: EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: Text('Thanh toán (${selectedItems.length})'),
+                    child: Text('Thanh toán (${selectedItems.length})', style: TextStyle(color: Colors.white),),
                   ),
                 ),
               ],
