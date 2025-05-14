@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:mobile_app/pages/HomePage.dart';
-
+import 'package:mobile_app/pages/CheckoutPage.dart';
 class CartPage extends StatefulWidget {
   @override
   _CartPageState createState() => _CartPageState();
 }
 
 class _CartPageState extends State<CartPage> {
-  final List<Map<String, dynamic>> cartItems = List.generate(10, (index) {
+  final List<Map<String, dynamic>> cartItems = List.generate(5, (index) {
     final random = Random();
     final prices = [17500000, 20000000, 25000000, 30000000];
     final oldPrices = [25000000, 27000000, 30000000, 35000000];
@@ -18,11 +18,6 @@ class _CartPageState extends State<CartPage> {
       'Tai Nghe Bluetooth Sony WH-1000XM4',
       'Điện Thoại Samsung Galaxy S22',
       'Máy Tính Bảng Apple iPad Pro',
-      'Màn Hình Cong LG UltraWide 34 inch',
-      'Loa JBL Charge 5',
-      'Smartphone Xiaomi Mi 11',
-      'Màn Hình Acer Predator X34',
-      'Máy Tính Xách Tay Dell Inspiron 15'
     ];
     final images = [
       'assets/asus.png',
@@ -30,11 +25,6 @@ class _CartPageState extends State<CartPage> {
       'assets/asus.png',
       'assets/apple.png',
       'assets/asus.png',
-      'assets/asus.png',
-      'assets/asus.png',
-      'assets/asus.png',
-      'assets/asus.png',
-      'assets/asus.png'
     ];
 
     return {
@@ -213,7 +203,21 @@ class _CartPageState extends State<CartPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: selectedItems.isEmpty ? null : () {},
+                    onPressed: selectedItems.isEmpty
+                        ? null
+                        : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CheckoutPage(
+                            selectedItems: selectedItems,
+                            total: total,
+                          ),
+                        ),
+                      );
+                    },
+
+
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF003366),
                       padding: EdgeInsets.symmetric(vertical: 14),
