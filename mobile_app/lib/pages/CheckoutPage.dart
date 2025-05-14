@@ -97,7 +97,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 minimumSize: const Size.fromHeight(50),
               ),
-              child: const Text("ĐẶT HÀNG", style: TextStyle(fontSize: 16)),
+              child: const Text("ĐẶT HÀNG", style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
           ],
         ),

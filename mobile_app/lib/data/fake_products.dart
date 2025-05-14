@@ -1,0 +1,55 @@
+import 'package:mobile_app/models/models_products.dart';
+import 'package:flutter/material.dart';
+
+final fakeProducts = [
+  ProductModel(
+    image: 'assets/product.png',
+    brand: 'NGOC NGUYEN',
+    name: 'Tivi Xiaomi 75 inch 4K (EA75 model 2023)',
+    price: 2000000,
+    oldPrice: 2900000,
+    discountPercent: 20,
+    isFavorite: true,
+    isBestSeller: true,
+  ),
+  ProductModel(
+    image: 'assets/laptop.png',
+    brand: 'ASUS',
+    name: 'Laptop ASUS ROG Strix G16 RTX 4060',
+    price: 32000000,
+    oldPrice: 36000000,
+    discountPercent: 11,
+    isFavorite: false,
+    isBestSeller: true,
+  ),
+  ProductModel(
+    image: 'assets/phone.png',
+    brand: 'Samsung',
+    name: 'Samsung Galaxy S24 Ultra 5G 256GB',
+    price: 26900000,
+    oldPrice: 29900000,
+    discountPercent: 10,
+    isFavorite: true,
+    isBestSeller: false,
+  ),
+  ProductModel(
+    image: 'assets/headphone.png',
+    brand: 'Sony',
+    name: 'Tai nghe Sony WH-1000XM5 Chống ồn',
+    price: 7990000,
+    oldPrice: 8990000,
+    discountPercent: 11,
+    isFavorite: false,
+    isBestSeller: true,
+  ),
+  ProductModel(
+    image: 'assets/tablet.png',
+    brand: 'Apple',
+    name: 'iPad Pro M2 12.9 inch Wi-Fi 128GB',
+    price: 29900000,
+    oldPrice: 31900000,
+    discountPercent: 6,
+    isFavorite: true,
+    isBestSeller: false,
+  ),
+];

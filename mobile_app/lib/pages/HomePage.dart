@@ -6,7 +6,8 @@ import 'package:mobile_app/pages/ProfilePage.dart';
 import 'package:mobile_app/pages/WishList.dart';
 import 'package:mobile_app/widgets/HomeAppBar.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
-
+import 'package:mobile_app/components/product_card.dart' as component;
+import 'package:mobile_app/data/fake_products.dart';
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -162,20 +163,37 @@ class _HomePageState extends State<HomePage> {
           ),
 
           // Flash Sale Section (placeholder)
+          // Flash Sale Section
           Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: EdgeInsets.all(20),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
                   child: Text(
                     "FLASH SALE",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                )
+                ),
+                GridView.builder(
+                  physics: NeverScrollableScrollPhysics(), // Không cuộn bên trong
+                  shrinkWrap: true, // Gói chiều cao phù hợp
+                  itemCount: fakeProducts.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.65, // Điều chỉnh nếu cần
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemBuilder: (context, index) {
+                    return component.ProductCard(product: fakeProducts[index]);
+                  },
+                ),
               ],
             ),
-          )
+          ),
+
         ],
       ),
       bottomNavigationBar: CustomBottomNav(parentContext: context),
