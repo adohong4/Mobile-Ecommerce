@@ -47,7 +47,7 @@ class ProductCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
                   product.image,
-                  height: 140,
+                  height: 120,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -76,13 +76,6 @@ class ProductCard extends StatelessWidget {
                   ),
                 ),
 
-              // Badge best seller
-              if (product.isBestSeller)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Image.asset('assets/icons/bestseller.png', height: 24),
-                ),
 
               // Nút yêu thích
               Positioned(
@@ -167,7 +160,7 @@ class ProductCard extends StatelessWidget {
                 Text(
                   formatCurrency(product.oldPrice),
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 10,
                     color: Colors.grey,
                     decoration: TextDecoration.lineThrough,
                   ),
@@ -176,7 +169,7 @@ class ProductCard extends StatelessWidget {
               Text(
                 formatCurrency(product.price),
                 style: const TextStyle(
-                  fontSize: 15,
+                  fontSize: 13,
                   color: Colors.blueAccent,
                   fontWeight: FontWeight.bold,
                 ),
