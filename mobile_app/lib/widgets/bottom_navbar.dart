@@ -30,7 +30,7 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
       case 1:
         Navigator.pushReplacement(
           widget.parentContext,
-          MaterialPageRoute(builder: (context) => WishList()),
+          MaterialPageRoute(builder: (context) => WishList()), // <- Đúng tên class
         );
         break;
       case 2:

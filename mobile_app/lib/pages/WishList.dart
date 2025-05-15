@@ -1,106 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/pages/HomePage.dart';
-// Widget cho sản phẩm
-class ProductCard extends StatelessWidget {
-  final String title;
-  final String price;
-  final String imagePath;
-  final VoidCallback onDelete;
+import 'package:mobile_app/widgets/wish_list_provider.dart';
+import 'package:mobile_app/widgets/cart_provider.dart';
+import 'package:provider/provider.dart';
 
-  const ProductCard({
-    required this.title,
-    required this.price,
-    required this.imagePath,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: Image.asset(imagePath, fit: BoxFit.cover)),
-          SizedBox(height: 8),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(
-                      price,
-                      style: TextStyle(
-                        color: Colors.black,
-                        decoration: TextDecoration.lineThrough,
-                        fontSize: 12,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      price,
-                      style: TextStyle(color: Color(0xFF194689), fontSize: 14),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 8),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(icon: Icon(Icons.delete), onPressed: onDelete),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
+// Widget cho trang danh sách yêu thích
 class WishList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final wishList = context.watch<WishListProvider>();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sản phẩm yêu thích'),
-        backgroundColor: Color(0xFF194689),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            // Điều hướng về trang chủ
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()),
-            );
-          },
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => HomePage()),
+          ),
         ),
+        title: Text("Yêu thích"),
       ),
-      body: GridView.count(
-        crossAxisCount: 2,
-        childAspectRatio: 0.8,
-        children: List.generate(8, (index) {
-          return ProductCard(
-            title: 'Tivi Xiaomi 75 inch 4K (EA75 model 2023)',
-            price: '2.000.000 đ',
-            imagePath: 'assets/product.png', // Fake image path
-            onDelete: () {
-              // Xử lý sự kiện xóa sản phẩm
-            },
+      body: wishList.items.isEmpty
+          ? Center(child: Text("Bạn chưa có sản phẩm yêu thích"))
+          : ListView.builder(
+        itemCount: wishList.items.length,
+        itemBuilder: (ctx, i) {
+          final p = wishList.items[i];
+          return ListTile(
+            leading: Image.asset(p.image, width: 40, height: 40),
+            title: Text(p.name),
+            trailing: IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: () => wishList.remove(p),
+            ),
           );
-        }),
+        },
       ),
     );
   }

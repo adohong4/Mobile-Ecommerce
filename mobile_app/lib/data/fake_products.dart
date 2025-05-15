@@ -13,7 +13,7 @@ final fakeProducts = [
     isBestSeller: true,
   ),
   ProductModel(
-    image: 'assets/laptop.png',
+    image: 'assets/product.png',
     brand: 'ASUS',
     name: 'Laptop ASUS ROG Strix G16 RTX 4060',
     price: 32000000,
@@ -23,7 +23,7 @@ final fakeProducts = [
     isBestSeller: true,
   ),
   ProductModel(
-    image: 'assets/phone.png',
+    image: 'assets/product.png',
     brand: 'Samsung',
     name: 'Samsung Galaxy S24 Ultra 5G 256GB',
     price: 26900000,
@@ -33,7 +33,7 @@ final fakeProducts = [
     isBestSeller: false,
   ),
   ProductModel(
-    image: 'assets/headphone.png',
+    image: 'assets/product.png',
     brand: 'Sony',
     name: 'Tai nghe Sony WH-1000XM5 Chống ồn',
     price: 7990000,
@@ -43,7 +43,7 @@ final fakeProducts = [
     isBestSeller: true,
   ),
   ProductModel(
-    image: 'assets/tablet.png',
+    image: 'assets/product.png',
     brand: 'Apple',
     name: 'iPad Pro M2 12.9 inch Wi-Fi 128GB',
     price: 29900000,

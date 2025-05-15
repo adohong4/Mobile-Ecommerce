@@ -1,92 +1,210 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:mobile_app/models/models_products.dart';
+import 'package:intl/intl.dart';
+import 'package:mobile_app/pages/WishList.dart';
+import 'package:mobile_app/pages/CartPage.dart';
+import 'package:mobile_app/widgets/wish_list_provider.dart';
+import 'package:mobile_app/widgets/cart_provider.dart';
 
 class ProductCard extends StatelessWidget {
   final ProductModel product;
 
   const ProductCard({super.key, required this.product});
 
+  String formatCurrency(num price) {
+    final formatter = NumberFormat('#,###', 'vi_VN');
+    return "${formatter.format(price)} đ";
+  }
+
   @override
   Widget build(BuildContext context) {
+    final wishList = context.watch<WishListProvider>();
+    final cart = context.watch<CartProvider>();
+
     return Container(
-      margin: const EdgeInsets.all(6),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          )
+        ],
       ),
-      width: 160,
+      width: 180,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Hình ảnh + badges + nút yêu thích + giỏ hàng
           Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(product.image, height: 100, width: double.infinity, fit: BoxFit.cover),
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  product.image,
+                  height: 140,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
+
+              // Badge giảm giá
               if (product.discountPercent > 0)
                 Positioned(
-                  top: 6,
-                  left: 6,
+                  top: 8,
+                  left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       "-${product.discountPercent}%",
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
+
+              // Badge best seller
               if (product.isBestSeller)
                 Positioned(
-                  top: 6,
-                  right: 6,
+                  top: 8,
+                  right: 8,
                   child: Image.asset('assets/icons/bestseller.png', height: 24),
                 ),
-              if (product.isFavorite)
-                Positioned(
-                  bottom: 6,
-                  right: 6,
-                  child: Icon(Icons.thumb_up, color: Colors.cyan, size: 20),
+
+              // Nút yêu thích
+              Positioned(
+                bottom: 8,
+                left: 8,
+                child: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: IconButton(
+                    icon: Icon(
+                      wishList.items.contains(product)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: wishList.items.contains(product)
+                          ? Colors.pinkAccent
+                          : Colors.grey,
+                    ),
+                    onPressed: () {
+                      if (wishList.items.contains(product)) {
+                        wishList.remove(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Đã bỏ yêu thích')),
+                        );
+                      } else {
+                        wishList.add(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Đã thêm vào yêu thích')),
+                        );
+                      }
+                    },
+                  ),
                 ),
+              ),
+
+              // Nút thêm giỏ hàng
+              Positioned(
+                bottom: 8,
+                right: 8,
+                child: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: IconButton(
+                    icon: const Icon(Icons.add_shopping_cart, color: Colors.grey),
+                    onPressed: () {
+                      cart.add(product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 6),
-          Image.asset('assets/logo_ngocnguyen.png', height: 18), // logo thương hiệu
+
+          const SizedBox(height: 8),
+
+          // Thương hiệu
+          Text(
+            product.brand,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+
           const SizedBox(height: 4),
+
+          // Tên sản phẩm
           Text(
             product.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 13),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: 4),
+
+          const SizedBox(height: 6),
+
+          // Giá
           Row(
             children: [
-              Text(
-                "${product.oldPrice.toStringAsFixed(0)} đ",
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey,
-                  decoration: TextDecoration.lineThrough,
+              if (product.oldPrice > product.price)
+                Text(
+                  formatCurrency(product.oldPrice),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    decoration: TextDecoration.lineThrough,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 6),
               Text(
-                "${product.price.toStringAsFixed(0)} đ",
+                formatCurrency(product.price),
                 style: const TextStyle(
-                  fontSize: 13,
-                  color: Colors.blue,
+                  fontSize: 15,
+                  color: Colors.blueAccent,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
-          )
+          ),
+
+          const SizedBox(height: 4),
+
+          // Chuyển đến Wishlist và Cart (tùy chọn)
+          Row(
+            children: [
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => WishList()),
+                ),
+                child: const Text(' '),
+              ),
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => CartPage()),
+                ),
+                child: const Text(' '),
+              ),
+            ],
+          ),
         ],
       ),
     );
