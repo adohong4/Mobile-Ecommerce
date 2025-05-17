@@ -165,24 +165,26 @@ class _HomePageState extends State<HomePage> {
           // Flash Sale Section (placeholder)
           // Flash Sale Section
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: Text(
                     "FLASH SALE",
+                    textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
+
                 GridView.builder(
-                  physics: NeverScrollableScrollPhysics(), // Không cuộn bên trong
-                  shrinkWrap: true, // Gói chiều cao phù hợp
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
                   itemCount: fakeProducts.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 0.65, // Điều chỉnh nếu cần
+                    childAspectRatio: 0.7,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                   ),

@@ -7,6 +7,7 @@ class ProductModel {
   final int discountPercent;
   final bool isFavorite;
   final bool isBestSeller;
+  final String? description;
 
   ProductModel({
     required this.image,
@@ -17,5 +18,6 @@ class ProductModel {
     required this.discountPercent,
     this.isFavorite = false,
     this.isBestSeller = false,
+    this.description,
   });
 }

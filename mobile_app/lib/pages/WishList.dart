@@ -3,17 +3,17 @@ import 'package:mobile_app/pages/HomePage.dart';
 import 'package:mobile_app/widgets/wish_list_provider.dart';
 import 'package:mobile_app/widgets/cart_provider.dart';
 import 'package:provider/provider.dart';
-
-// Widget cho trang danh sách yêu thích
+import 'package:mobile_app/pages/ProductDetailPage.dart';
 class WishList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final wishList = context.watch<WishListProvider>();
+    final cart = context.read<CartProvider>();
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => HomePage()),
@@ -23,19 +23,92 @@ class WishList extends StatelessWidget {
       ),
       body: wishList.items.isEmpty
           ? Center(child: Text("Bạn chưa có sản phẩm yêu thích"))
-          : ListView.builder(
-        itemCount: wishList.items.length,
-        itemBuilder: (ctx, i) {
-          final p = wishList.items[i];
-          return ListTile(
-            leading: Image.asset(p.image, width: 40, height: 40),
-            title: Text(p.name),
-            trailing: IconButton(
-              icon: Icon(Icons.delete, color: Colors.red),
-              onPressed: () => wishList.remove(p),
-            ),
-          );
-        },
+          : Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GridView.builder(
+          itemCount: wishList.items.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 0.7,
+          ),
+          itemBuilder: (ctx, i) {
+            final p = wishList.items[i];
+            return InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ProductDetailPage(product: p)),
+                );
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        child: Image.asset(
+                          p.image,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      child: Text(
+                        p.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => wishList.remove(p),
+                            tooltip: "Xóa khỏi yêu thích",
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              cart.add(p);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Đã thêm vào giỏ hàng")),
+                              );
+                            },
+                            icon: Icon(Icons.add_shopping_cart),
+                            label: Text("Giỏ hàng"),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(100, 36),
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+
+        ),
       ),
     );
   }
