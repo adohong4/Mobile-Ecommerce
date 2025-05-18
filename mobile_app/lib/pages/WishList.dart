@@ -55,11 +55,12 @@ class WishList extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                         child: Image.asset(
-                          p.image,
+                          p.images.isNotEmpty ? p.images[0] : 'assets/images/asus.png', // ảnh mặc định nếu rỗng
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                       child: Text(

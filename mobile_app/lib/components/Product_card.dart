@@ -54,12 +54,13 @@ class ProductCard extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
-                    product.image,
+                    product.images.isNotEmpty ? product.images[0] : 'assets/images/asus.png',
                     height: 120,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
                 ),
+
 
                 // Badge giảm giá
                 if (product.discountPercent > 0)
