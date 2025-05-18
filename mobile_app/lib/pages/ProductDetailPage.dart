@@ -14,8 +14,12 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   int quantity = 1;
   int selectedImageIndex = 0;
-
+  bool _isExpanded = false;
   late List<String> productImages;
+
+  // Biến cho bình luận
+  double rating = 0;
+  final TextEditingController commentTextController = TextEditingController();
 
   String formatCurrency(num price) {
     final formatter = NumberFormat('#,###', 'vi_VN');
@@ -25,14 +29,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void initState() {
     super.initState();
-    // Giả sử bạn chỉ có 1 ảnh sản phẩm, tạm thời lặp lại ảnh đầu tiên trong danh sách images
+    // Nếu danh sách ảnh không đủ 3 ảnh thì tránh lỗi
     productImages = [
-      widget.product.images.isNotEmpty ? widget.product.images[0] : '',
-      widget.product.images.isNotEmpty ? widget.product.images[1] : '',
-      widget.product.images.isNotEmpty ? widget.product.images[2] : '',
+      if (widget.product.images.isNotEmpty) widget.product.images[0],
+      if (widget.product.images.length > 1) widget.product.images[1],
+      if (widget.product.images.length > 2) widget.product.images[2],
     ];
   }
 
+  @override
+  void dispose() {
+    commentTextController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +61,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     Stack(
                       children: [
                         Image.asset(
-                          productImages[selectedImageIndex],
-                          height: 250,
+                          productImages.isNotEmpty ? productImages[selectedImageIndex] : '',
+                          height: 350,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
@@ -76,7 +85,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ],
                     ),
 
-
                     // Ảnh nhỏ dưới
                     SizedBox(
                       height: 60,
@@ -96,11 +104,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               padding: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: selectedImageIndex == index ? Colors.orange : Colors.grey,
+                                  color: selectedImageIndex == index
+                                      ? const Color(0xFF194689)
+                                      : Colors.grey,
                                   width: 2,
                                 ),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Image.asset(productImages[index], width: 60, height: 60),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: Image.asset(
+                                  productImages[index],
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
                           );
                         },
@@ -129,40 +148,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               const SizedBox(width: 8),
                               Text(
                                 formatCurrency(product.price),
-                                style: const TextStyle(color: Colors.blue, fontSize: 18),
+                                style: const TextStyle(color: Color(0xFF194689), fontSize: 18),
                               ),
                             ],
                           ),
                         ],
-                      ),
-                    ),
-
-                    // Mô tả sản phẩm
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.blue, width: 1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text("MÔ TẢ SẢN PHẨM", style: TextStyle(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("• Hệ điều hành: Android TV"),
-                                Text("• Ngôn ngữ: Tiếng Việt, Tiếng Anh, Tiếng Trung"),
-                                Text("• Độ phân giải: 3840x2160 (4K)"),
-                                Text("• Tốc độ làm mới: 60Hz"),
-                              ],
-                            ),
-                          ],
-                        ),
                       ),
                     ),
 
@@ -175,27 +165,198 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           const SizedBox(width: 16),
                           Container(
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(6),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
                             ),
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
                                   icon: const Icon(Icons.remove),
-                                  onPressed: () {
-                                    if (quantity > 1) {
-                                      setState(() => quantity--);
-                                    }
-                                  },
+                                  onPressed: quantity > 1 ? () => setState(() => quantity--) : null,
+                                  color: quantity > 1 ? Color(0xFF194689) : Colors.grey,
                                 ),
-                                Text(quantity.toString(), style: const TextStyle(fontSize: 16)),
+                                Text(quantity.toString(), style: const TextStyle(fontSize: 20)),
                                 IconButton(
                                   icon: const Icon(Icons.add),
-                                  onPressed: () {
-                                    setState(() => quantity++);
-                                  },
+                                  onPressed: () => setState(() => quantity++),
+                                  color: Color(0xFF194689),
                                 ),
                               ],
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
+
+                    // Mô tả sản phẩm (có viền)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFF194689), width: 1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("MÔ TẢ SẢN PHẨM", style: TextStyle(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 6),
+                            const SizedBox(height: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: widget.product.specifications.entries.map((entry) {
+                                return Text("• ${entry.key}: ${entry.value}");
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("MÔ TẢ ", style: TextStyle(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 6),
+                            Text(
+                              widget.product.description ?? '',
+                              style: const TextStyle(fontSize: 14),
+                              maxLines: _isExpanded ? null : 3,
+                              overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 6),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isExpanded = !_isExpanded;
+                                });
+                              },
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      _isExpanded ? "Thu gọn" : "Xem chi tiết",
+                                      style: const TextStyle(
+                                        color: Color(0xFF194689),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                      color: const Color(0xFF194689),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("Bình luận của bạn", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          const SizedBox(height: 8),
+
+                          // TextField nhập bình luận
+                          TextField(
+                            controller: commentTextController,
+                            maxLines: 3,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                              hintText: "Viết bình luận của bạn...",
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Đánh giá sao
+                          Row(
+                            children: [
+                              const Text("Đánh giá: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                              ...List.generate(5, (index) {
+                                return IconButton(
+                                  icon: Icon(
+                                    index < rating ? Icons.star : Icons.star_border,
+                                    color: const Color(0xFFFFC107),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      rating = index + 1;
+                                    });
+                                  },
+                                );
+                              }),
+                            ],
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Nút gửi bình luận
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF194689),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                minimumSize: const Size(100, 40),
+                              ),
+                              onPressed: () {
+                                final comment = commentTextController.text.trim();
+                                if (comment.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Vui lòng nhập bình luận')),
+                                  );
+                                  return;
+                                }
+                                if (rating == 0) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Vui lòng đánh giá sao')),
+                                  );
+                                  return;
+                                }
+
+                                print('Gửi bình luận: $comment, đánh giá: $rating sao');
+
+                                commentTextController.clear();
+                                setState(() {
+                                  rating = 0;
+                                });
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Cảm ơn bạn đã bình luận!')),
+                                );
+                              },
+                              child: const Text(
+                                "Bình luận",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
                         ],
@@ -210,7 +371,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
             // Thanh điều hướng dưới
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(top: BorderSide(color: Colors.grey)),
@@ -221,17 +382,39 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1AA7DD),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
                       onPressed: () {},
-                      child: const Text("MUA NGAY"),
+                      child: const Text(
+                        "MUA NGAY",
+                        style: TextStyle(color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade300),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF194689),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
                       onPressed: () {},
-                      child: const Text("THÊM VÀO GIỎ HÀNG", style: TextStyle(color: Colors.black)),
+                      child: const Text(
+                        "THÊM GIỎ HÀNG",
+                        style: TextStyle(color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                   ),
                 ],

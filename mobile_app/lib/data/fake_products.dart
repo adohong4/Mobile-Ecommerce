@@ -18,7 +18,7 @@ final List<ProductModel> fakeProducts = [
       'Độ phân giải': '3840x2160 (4K)',
       'Tốc độ làm mới': '60Hz',
     },
-    description: "Một chiếc TV thông minh với đầy đủ tính năng giải trí.",
+    description: "Chiếc Smart TV LG 55 inch 4K mang đến trải nghiệm giải trí sống động với màn hình độ phân giải siêu cao. Android TV tích hợp sẵn giúp bạn truy cập hàng ngàn ứng dụng và nội dung giải trí, bao gồm YouTube, Netflix, và nhiều hơn nữa. Thiết kế hiện đại, viền mỏng và chất lượng âm thanh sống động sẽ nâng tầm không gian sống của bạn.",
   ),
 
   ProductModel(
@@ -38,7 +38,7 @@ final List<ProductModel> fakeProducts = [
       'Ổ cứng': '512GB SSD',
       'Màn hình': '14 inch Full HD',
     },
-    description: "Laptop mỏng nhẹ, hiệu năng tốt cho học tập và làm việc.",
+    description: "Vivobook 14 là chiếc laptop lý tưởng cho sinh viên và nhân viên văn phòng. Thiết kế thời trang, pin lâu, và hiệu năng ổn định đáp ứng mọi nhu cầu làm việc và giải trí. Bàn phím gõ êm và màn hình hiển thị sắc nét là những điểm cộng lớn của sản phẩm này.",
   ),
 
   ProductModel(
@@ -58,7 +58,7 @@ final List<ProductModel> fakeProducts = [
       'Ổ cứng': '64GB eMMC',
       'Màn hình': '10 inch PixelSense',
     },
-    description: "Máy tính bảng nhỏ gọn, dễ dàng di chuyển và làm việc mọi lúc mọi nơi.",
+    description: "Surface Go là sự kết hợp tuyệt vời giữa hiệu năng và tính di động. Thiết kế tinh tế, nhẹ nhàng giúp bạn dễ dàng mang theo bên mình. Phù hợp cho cả học tập, công việc và giải trí nhẹ nhàng như xem phim, đọc sách.",
   ),
 
   ProductModel(
@@ -78,7 +78,7 @@ final List<ProductModel> fakeProducts = [
       'RAM': '8GB',
       'Pin': '4000mAh',
     },
-    description: "Điện thoại cao cấp với camera chất lượng và hiệu năng mạnh mẽ.",
+    description: "Samsung Galaxy S21 sở hữu camera đỉnh cao, khả năng quay video 8K và hiệu năng mượt mà nhờ chip mạnh mẽ. Thiết kế tinh tế cùng nhiều công nghệ tiên tiến như 5G, vân tay dưới màn hình, và màn hình 120Hz sẽ khiến bạn mê mẩn.",
   ),
 
   ProductModel(
@@ -98,6 +98,6 @@ final List<ProductModel> fakeProducts = [
       'Thời gian pin': '30 giờ',
       'Tính năng': 'Chống ồn chủ động',
     },
-    description: "Tai nghe không dây với chất lượng âm thanh tuyệt hảo và chống ồn hiệu quả.",
+    description: "Sony WH-1000XM4 là chiếc tai nghe chống ồn hàng đầu, mang đến trải nghiệm âm thanh đắm chìm. Công nghệ chống ồn chủ động giúp bạn tập trung tối đa. Thời lượng pin 30 giờ và thiết kế đeo thoải mái phù hợp cho cả ngày dài sử dụng.",
   ),
 ];

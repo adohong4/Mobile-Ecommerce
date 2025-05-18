@@ -8,11 +8,10 @@ class ProductModel {
   final bool isBestSeller;
   final String? description;
 
-  /// Danh sách ảnh sản phẩm (ảnh lớn và ảnh nhỏ bên dưới)
   final List<String> images;
 
-  /// Thông số kỹ thuật sản phẩm (mô tả chi tiết bên dưới)
   final Map<String, String> specifications;
+
 
   ProductModel({
     required this.name,
