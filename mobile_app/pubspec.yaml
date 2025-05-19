@@ -38,6 +38,9 @@ dependencies:
   badges: ^2.0.3
   curved_navigation_bar: ^1.0.3
   image_picker: ^0.8.6
+  carousel_slider: 4.2.0
+  font_awesome_flutter: ^10.5.0
+  provider: ^6.0.0
 
 
 dev_dependencies:
@@ -52,19 +55,34 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+# following page: https://dart.dev/tools/pub/pubspecs
 
 # The following section is specific to Flutter packages.
 flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/FzPoppins/
+    - assets/banner_1.jpg
+    - assets/banner_2.png
+    - assets/banner_3.png
+    - assets/microsoft.png
+    - assets/apple.png
+    - assets/asus.png
+    - assets/samsung.png
+    - assets/stripe.png
+    - assets/zalopay.png
+    - assets/product.png
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/FzPoppins/FZ_Poppins-Light.ttf
+        - asset: assets/FzPoppins/FZ_Poppins-Bold.ttf
+          weight: 700
+        - asset: assets/FzPoppins/FZ_Poppins-Italic.ttf
+          style: italic
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

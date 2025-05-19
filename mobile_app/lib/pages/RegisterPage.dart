@@ -34,10 +34,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   fontSize: 16.0,
                   //   fontWeight: FontWeight.bold,
                   color: Colors.grey[700],
+                  fontFamily:  'Poppins',
                 ),
               ),
               SizedBox(height: 8.0),
               TextFormField(
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
                 decoration: InputDecoration(
                   hintText: 'taikhoan123',
                   prefixIcon: Icon(Icons.person_outline, color: Colors.grey),
@@ -61,10 +67,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   fontSize: 16.0,
                   //   fontWeight: FontWeight.bold,
                   color: Colors.grey[700],
+                  fontFamily:  'Poppins',
                 ),
               ),
               SizedBox(height: 8.0),
               TextFormField(
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
                 decoration: InputDecoration(
                   hintText: 'email@gmail.com',
                   prefixIcon: Icon(Icons.email_outlined, color: Colors.grey),
@@ -88,10 +100,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   fontSize: 16.0,
                   //   fontWeight: FontWeight.bold,
                   color: Colors.grey[700],
+                  fontFamily:  'Poppins',
                 ),
               ),
               SizedBox(height: 8.0),
               TextFormField(
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   hintText: '*******',
@@ -129,10 +147,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   fontSize: 16.0,
                   //   fontWeight: FontWeight.bold,
                   color: Colors.grey[700],
+                  fontFamily:  'Poppins',
                 ),
               ),
               SizedBox(height: 8.0),
               TextFormField(
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
                 obscureText: !_isHasedPasswordVisible,
                 decoration: InputDecoration(
                   hintText: '*******',
@@ -193,6 +217,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               style: TextStyle(
                                 fontSize: 13.0,
                                 color: Colors.grey[700],
+                                fontFamily:  'Poppins',
                               ),
                             ),
                             TextSpan(
@@ -201,6 +226,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontSize: 14.0,
                                 color: Color(0xFF0D47A1),
                                 fontWeight: FontWeight.bold,
+                                fontFamily:  'Poppins',
                               ),
                             ),
                             TextSpan(
@@ -208,6 +234,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               style: TextStyle(
                                 fontSize: 13.0,
                                 color: Colors.grey[700],
+                                fontFamily:  'Poppins',
                               ),
                             ),
                             TextSpan(
@@ -216,6 +243,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontSize: 14.0,
                                 color: Color(0xFF0D47A1),
                                 fontWeight: FontWeight.bold,
+                                fontFamily:  'Poppins',
                               ),
                             ),
                           ],
@@ -243,6 +271,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     fontSize: 18.0,
                     // fontWeight: FontWeight.bold,
                     color: Colors.white,
+                    fontFamily:  'Poppins',
                   ),
                 ),
               ),
@@ -251,13 +280,14 @@ class _RegisterPageState extends State<RegisterPage> {
               Text.rich(
                 TextSpan(
                   text: 'Tôi đã có tài khoản? ',
-                  style: TextStyle(fontSize: 16.0, color: Colors.black),
+                  style: TextStyle(fontSize: 16.0, color: Colors.black,fontFamily:  'Poppins',),
                   children: <TextSpan>[
                     TextSpan(
                       text: 'Đăng nhập ngay',
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold,
+                        fontFamily:  'Poppins',
                         color: Color(0xFF0D47A1),
                       ),
                       recognizer:

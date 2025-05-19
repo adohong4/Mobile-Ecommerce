@@ -1,94 +1,115 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/pages/HomePage.dart';
-
+import 'package:mobile_app/widgets/wish_list_provider.dart';
+import 'package:mobile_app/widgets/cart_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:mobile_app/pages/ProductDetailPage.dart';
 class WishList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final wishList = context.watch<WishListProvider>();
+    final cart = context.read<CartProvider>();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sản phẩm yêu thích'),
-        backgroundColor: Color(0xFF194689),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            // Điều hướng về trang chủ
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()),
-            );
-          },
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => HomePage()),
+          ),
         ),
+        title: Text("Yêu thích"),
       ),
-      body: GridView.count(
-        crossAxisCount: 2,
-        childAspectRatio: 0.8,
-        children: List.generate(4, (index) {
-          return _buildWishlistItem(
-            title: 'Tivi Xiaomi 75 inch 4K (EA75 model 2023)',
-            price: '2.000.000 đ',
-            onDelete: () {
-              // Xử lý sự kiện xóa sản phẩm
-            },
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildWishlistItem({
-    required String title,
-    required String price,
-    required VoidCallback onDelete,
-  }) {
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: Image.asset('product.png', fit: BoxFit.cover)),
-          SizedBox(height: 8),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+      body: wishList.items.isEmpty
+          ? Center(child: Text("Bạn chưa có sản phẩm yêu thích"))
+          : Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GridView.builder(
+          itemCount: wishList.items.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 0.7,
+          ),
+          itemBuilder: (ctx, i) {
+            final p = wishList.items[i];
+            return InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ProductDetailPage(product: p)),
+                );
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                SizedBox(height: 4),
-                Row(
+                elevation: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      price,
-                      style: TextStyle(
-                        color: Colors.black,
-                        decoration: TextDecoration.lineThrough,
-                        fontSize: 12,
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        child: Image.asset(
+                          p.images.isNotEmpty ? p.images[0] : 'assets/images/asus.png', // ảnh mặc định nếu rỗng
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      price,
-                      style: TextStyle(color: Color(0xFF194689), fontSize: 14),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      child: Text(
+                        p.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => wishList.remove(p),
+                            tooltip: "Xóa khỏi yêu thích",
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              cart.add(p);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Đã thêm vào giỏ hàng")),
+                              );
+                            },
+                            icon: Icon(Icons.add_shopping_cart),
+                            label: Text("Giỏ hàng"),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(100, 36),
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          SizedBox(height: 8),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(icon: Icon(Icons.delete), onPressed: onDelete),
-              ],
-            ),
-          ),
-        ],
+              ),
+            );
+          },
+
+        ),
       ),
     );
   }

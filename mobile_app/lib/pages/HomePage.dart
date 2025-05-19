@@ -1,77 +1,279 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mobile_app/pages/CartPage.dart';
 import 'package:mobile_app/pages/MessagePage.dart';
 import 'package:mobile_app/pages/ProfilePage.dart';
 import 'package:mobile_app/pages/WishList.dart';
 import 'package:mobile_app/widgets/HomeAppBar.dart';
+import 'package:mobile_app/widgets/bottom_navbar.dart';
+import 'package:mobile_app/components/product_card.dart' as component;
+import 'package:mobile_app/data/fake_products.dart';
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
 
-class HomePage extends StatelessWidget {
+class _HomePageState extends State<HomePage> {
+  final PageController _bannerController = PageController(viewportFraction: 0.9);
+  final PageController _categoryController = PageController(viewportFraction: 1.0);
+  int _bannerPage = 0;
+  int _categoryPage = 0;
+  late Timer _timer;
+
+  final List<String> _banners = [
+    'assets/banner_1.jpg',
+    'assets/banner_2.png',
+    'assets/banner_3.png',
+  ];
+
+  final List<List<Map<String, String>>> _productCategories = [
+    [
+      {'image': 'assets/apple.png', 'title': 'APPLE'},
+      {'image': 'assets/microsoft.png', 'title': 'MICROSOFT'},
+    ],
+    [
+      {'image': 'assets/apple.png', 'title': 'ASUS'},
+      {'image': 'assets/microsoft.png', 'title': 'SAMSUNG'},
+    ],
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Hiển thị popup quảng cáo khi màn hình load xong
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showAdPopup();
+    });
+
+    // Tự động cuộn banner
+    _timer = Timer.periodic(Duration(seconds: 6), (timer) {
+      if (_bannerController.hasClients) {
+        int nextPage = (_bannerPage + 1) % _banners.length;
+        _bannerController.animateToPage(
+          nextPage,
+          duration: Duration(milliseconds: 1000),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _bannerController.dispose();
+    _categoryController.dispose();
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
         children: [
           HomeAppBar(),
+          SizedBox(height: 10),
+
+          // Banner slider
           Container(
-            height: 500,
-            padding: EdgeInsets.only(top: 15),
-            decoration: BoxDecoration(
-              color: Color(0xFFEDECF2),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(35),
-                topRight: Radius.circular(35),
-              ),
-            ),
+            height: 200,
+            margin: EdgeInsets.only(bottom: 10),
             child: Column(
               children: [
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _bannerController,
+                    itemCount: _banners.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _bannerPage = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return buildBanner(_banners[index]);
+                    },
+                  ),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _banners.length,
+                        (index) => Container(
+                      width: 8,
+                      height: 8,
+                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _bannerPage == index ? Colors.blue : Colors.grey,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
+
+          // Product categories
+          Container(
+            height: 220,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'DANH MỤC SẢN PHẨM',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _categoryController,
+                    itemCount: _productCategories.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _categoryPage = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return buildCategoryRow(_productCategories[index]);
+                    },
+                  ),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _productCategories.length,
+                        (index) => Container(
+                      width: 8,
+                      height: 8,
+                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _categoryPage == index ? Colors.blue : Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Flash Sale Section (placeholder)
+          // Flash Sale Section
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Text(
+                    "FLASH SALE",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+                GridView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: fakeProducts.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.7,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemBuilder: (context, index) {
+                    return component.ProductCard(product: fakeProducts[index]);
+                  },
+                ),
+              ],
+            ),
+          ),
+
         ],
       ),
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Colors.transparent,
-        onTap: (index) {
-          if (index == 3) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => CartPage()),
-            );
-          }
-          if (index == 1) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => WishList()),
-            );
-          }
-          if (index == 2) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => MessagePage()),
-            );
-          }
-          if (index == 4) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => ProfilePage()),
-            );
-          }
-        },
-        height: 50,
-        color: Color(0xFF194689),
-        items: [
-          Icon(Icons.home, size: 30, color: Colors.white),
-          Icon(Icons.favorite, size: 30, color: Colors.white),
-          Icon(Icons.message, size: 30, color: Colors.white),
-          Icon(Icons.shopping_bag_outlined, size: 30, color: Colors.white),
-          Icon(Icons.person, size: 30, color: Colors.white),
-        ],
+      bottomNavigationBar: CustomBottomNav(parentContext: context),
+    );
+  }
+
+  // Widget hiển thị banner
+  Widget buildBanner(String asset) => Container(
+    margin: EdgeInsets.symmetric(horizontal: 8),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(12),
+      image: DecorationImage(
+        image: AssetImage(asset),
+        fit: BoxFit.cover,
       ),
+    ),
+  );
+
+  // Widget hiển thị danh mục sản phẩm
+  Widget buildCategoryRow(List<Map<String, String>> items) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: items.map((item) {
+        return Row(
+          children: [
+            Image.asset(
+              item['image']!,
+              width: 100,
+              height: 100,
+              fit: BoxFit.contain,
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: EdgeInsets.only(left: 16.0),
+              child: Text(
+                item['title']!,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            )
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  void _showAdPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(' Ưu đãi đặc biệt!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/banner_3.png',
+                height: 150,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 10),
+              const Text('Giảm 20% toàn bộ sản phẩm hôm nay!'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Đóng'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Xem ngay'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
