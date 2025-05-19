@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/models/models_products.dart';
+import 'package:mobile_app/models/productModel.dart';
 
 class ProductDetailPage extends StatefulWidget {
-  final ProductModel product;
+  final ProductsModel product;
 
   const ProductDetailPage({super.key, required this.product});
 
@@ -61,7 +62,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     Stack(
                       children: [
                         Image.asset(
-                          productImages.isNotEmpty ? productImages[selectedImageIndex] : '',
+                          productImages.isNotEmpty
+                              ? productImages[selectedImageIndex]
+                              : '',
                           height: 350,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -73,15 +76,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           child: CircleAvatar(
                             backgroundColor: Colors.black45,
                             child: IconButton(
-                              icon: const Icon(Icons.arrow_back, color: Colors.white),
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                              ),
                               onPressed: () {
                                 Navigator.pop(context);
                               },
                             ),
                           ),
                         ),
-                        const Positioned(left: 50, top: 100, child: Icon(Icons.chevron_left, size: 32)),
-                        const Positioned(right: 10, top: 100, child: Icon(Icons.chevron_right, size: 32)),
+                        const Positioned(
+                          left: 50,
+                          top: 100,
+                          child: Icon(Icons.chevron_left, size: 32),
+                        ),
+                        const Positioned(
+                          right: 10,
+                          top: 100,
+                          child: Icon(Icons.chevron_right, size: 32),
+                        ),
                       ],
                     ),
 
@@ -104,9 +118,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               padding: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: selectedImageIndex == index
-                                      ? const Color(0xFF194689)
-                                      : Colors.grey,
+                                  color:
+                                      selectedImageIndex == index
+                                          ? const Color(0xFF194689)
+                                          : Colors.grey,
                                   width: 2,
                                 ),
                                 borderRadius: BorderRadius.circular(8),
@@ -127,41 +142,44 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
 
                     // Tên sản phẩm và giá
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(product.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              if (product.oldPrice > product.price)
-                                Text(
-                                  formatCurrency(product.oldPrice),
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              const SizedBox(width: 8),
-                              Text(
-                                formatCurrency(product.price),
-                                style: const TextStyle(color: Color(0xFF194689), fontSize: 18),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    //   child: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Text(product.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    //       const SizedBox(height: 4),
+                    //       Row(
+                    //         children: [
+                    //           if (product.oldPrice > product.price)
+                    //             Text(
+                    //               formatCurrency(product.oldPrice),
+                    //               style: const TextStyle(
+                    //                 decoration: TextDecoration.lineThrough,
+                    //                 color: Colors.grey,
+                    //                 fontSize: 14,
+                    //               ),
+                    //             ),
+                    //           const SizedBox(width: 8),
+                    //           Text(
+                    //             formatCurrency(product.price),
+                    //             style: const TextStyle(color: Color(0xFF194689), fontSize: 18),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
 
                     // Số lượng
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
-                          const Text("Số lượng", style: TextStyle(fontWeight: FontWeight.bold)),
+                          const Text(
+                            "Số lượng",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           const SizedBox(width: 16),
                           Container(
                             decoration: BoxDecoration(
@@ -180,10 +198,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               children: [
                                 IconButton(
                                   icon: const Icon(Icons.remove),
-                                  onPressed: quantity > 1 ? () => setState(() => quantity--) : null,
-                                  color: quantity > 1 ? Color(0xFF194689) : Colors.grey,
+                                  onPressed:
+                                      quantity > 1
+                                          ? () => setState(() => quantity--)
+                                          : null,
+                                  color:
+                                      quantity > 1
+                                          ? Color(0xFF194689)
+                                          : Colors.grey,
                                 ),
-                                Text(quantity.toString(), style: const TextStyle(fontSize: 20)),
+                                Text(
+                                  quantity.toString(),
+                                  style: const TextStyle(fontSize: 20),
+                                ),
                                 IconButton(
                                   icon: const Icon(Icons.add),
                                   onPressed: () => setState(() => quantity++),
@@ -192,53 +219,60 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               ],
                             ),
                           ),
-
                         ],
                       ),
                     ),
 
                     // Mô tả sản phẩm (có viền)
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    //   child: Container(
+                    //     width: double.infinity,
+                    //     padding: const EdgeInsets.all(12),
+                    //     decoration: BoxDecoration(
+                    //       border: Border.all(color: const Color(0xFF194689), width: 1),
+                    //       borderRadius: BorderRadius.circular(6),
+                    //     ),
+                    //     child: Column(
+                    //       crossAxisAlignment: CrossAxisAlignment.start,
+                    //       children: [
+                    //         const Text("MÔ TẢ SẢN PHẨM", style: TextStyle(fontWeight: FontWeight.bold)),
+                    //         const SizedBox(height: 6),
+                    //         const SizedBox(height: 12),
+                    //         Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: widget.product.specifications.entries.map((entry) {
+                    //             return Text("• ${entry.key}: ${entry.value}");
+                    //           }).toList(),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFF194689), width: 1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text("MÔ TẢ SẢN PHẨM", style: TextStyle(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            const SizedBox(height: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: widget.product.specifications.entries.map((entry) {
-                                return Text("• ${entry.key}: ${entry.value}");
-                              }).toList(),
-                            ),
-                          ],
-                        ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
                       ),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("MÔ TẢ ", style: TextStyle(fontWeight: FontWeight.bold)),
+                            const Text(
+                              "MÔ TẢ ",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                             const SizedBox(height: 6),
                             Text(
                               widget.product.description ?? '',
                               style: const TextStyle(fontSize: 14),
                               maxLines: _isExpanded ? null : 3,
-                              overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                              overflow:
+                                  _isExpanded
+                                      ? TextOverflow.visible
+                                      : TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 6),
                             GestureDetector(
@@ -262,7 +296,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                     ),
                                     const SizedBox(width: 4),
                                     Icon(
-                                      _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                      _isExpanded
+                                          ? Icons.keyboard_arrow_up
+                                          : Icons.keyboard_arrow_down,
                                       color: const Color(0xFF194689),
                                     ),
                                   ],
@@ -275,11 +311,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
 
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text("Bình luận của bạn", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          const Text(
+                            "Bình luận của bạn",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                           const SizedBox(height: 8),
 
                           // TextField nhập bình luận
@@ -287,7 +332,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             controller: commentTextController,
                             maxLines: 3,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
                               hintText: "Viết bình luận của bạn...",
                             ),
                           ),
@@ -297,11 +344,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           // Đánh giá sao
                           Row(
                             children: [
-                              const Text("Đánh giá: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                              const Text(
+                                "Đánh giá: ",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                               ...List.generate(5, (index) {
                                 return IconButton(
                                   icon: Icon(
-                                    index < rating ? Icons.star : Icons.star_border,
+                                    index < rating
+                                        ? Icons.star
+                                        : Icons.star_border,
                                     color: const Color(0xFFFFC107),
                                   ),
                                   onPressed: () {
@@ -328,21 +380,28 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 minimumSize: const Size(100, 40),
                               ),
                               onPressed: () {
-                                final comment = commentTextController.text.trim();
+                                final comment =
+                                    commentTextController.text.trim();
                                 if (comment.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Vui lòng nhập bình luận')),
+                                    const SnackBar(
+                                      content: Text('Vui lòng nhập bình luận'),
+                                    ),
                                   );
                                   return;
                                 }
                                 if (rating == 0) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Vui lòng đánh giá sao')),
+                                    const SnackBar(
+                                      content: Text('Vui lòng đánh giá sao'),
+                                    ),
                                   );
                                   return;
                                 }
 
-                                print('Gửi bình luận: $comment, đánh giá: $rating sao');
+                                print(
+                                  'Gửi bình luận: $comment, đánh giá: $rating sao',
+                                );
 
                                 commentTextController.clear();
                                 setState(() {
@@ -350,7 +409,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 });
 
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Cảm ơn bạn đã bình luận!')),
+                                  const SnackBar(
+                                    content: Text('Cảm ơn bạn đã bình luận!'),
+                                  ),
                                 );
                               },
                               child: const Text(
@@ -378,7 +439,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               ),
               child: Row(
                 children: [
-                  IconButton(icon: const Icon(Icons.favorite_border), onPressed: () {}),
+                  IconButton(
+                    icon: const Icon(Icons.favorite_border),
+                    onPressed: () {},
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(

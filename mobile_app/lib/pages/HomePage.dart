@@ -1,21 +1,33 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:mobile_app/models/productModel.dart';
 import 'package:mobile_app/pages/CartPage.dart';
 import 'package:mobile_app/pages/MessagePage.dart';
 import 'package:mobile_app/pages/ProfilePage.dart';
 import 'package:mobile_app/pages/WishList.dart';
+import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/widgets/HomeAppBar.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:mobile_app/components/product_card.dart' as component;
 import 'package:mobile_app/data/fake_products.dart';
+
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final PageController _bannerController = PageController(viewportFraction: 0.9);
-  final PageController _categoryController = PageController(viewportFraction: 1.0);
+  final ProductService productService = ProductService();
+  late Future<List<ProductsModel>> _productsFuture;
+
+  final PageController _bannerController = PageController(
+    viewportFraction: 0.9,
+  );
+  final PageController _categoryController = PageController(
+    viewportFraction: 1.0,
+  );
   int _bannerPage = 0;
   int _categoryPage = 0;
   late Timer _timer;
@@ -40,6 +52,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    _productsFuture = ProductService.fetchAllProducts();
 
     // Hiển thị popup quảng cáo khi màn hình load xong
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -100,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
                     _banners.length,
-                        (index) => Container(
+                    (index) => Container(
                       width: 8,
                       height: 8,
                       margin: EdgeInsets.symmetric(horizontal: 2),
@@ -147,13 +161,14 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
                     _productCategories.length,
-                        (index) => Container(
+                    (index) => Container(
                       width: 8,
                       height: 8,
                       margin: EdgeInsets.symmetric(horizontal: 2),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _categoryPage == index ? Colors.blue : Colors.grey,
+                        color:
+                            _categoryPage == index ? Colors.blue : Colors.grey,
                       ),
                     ),
                   ),
@@ -177,25 +192,38 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
+                FutureBuilder<List<ProductsModel>>(
+                  future: _productsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No products available'));
+                    }
 
-                GridView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: fakeProducts.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.7,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  itemBuilder: (context, index) {
-                    return component.ProductCard(product: fakeProducts[index]);
+                    final products = snapshot.data!;
+                    return GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: products.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.7,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+                      itemBuilder: (context, index) {
+                        return component.ProductCard(products: products[index]);
+                      },
+                    );
                   },
                 ),
               ],
             ),
           ),
-
         ],
       ),
       bottomNavigationBar: CustomBottomNav(parentContext: context),
@@ -207,10 +235,7 @@ class _HomePageState extends State<HomePage> {
     margin: EdgeInsets.symmetric(horizontal: 8),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(12),
-      image: DecorationImage(
-        image: AssetImage(asset),
-        fit: BoxFit.cover,
-      ),
+      image: DecorationImage(image: AssetImage(asset), fit: BoxFit.cover),
     ),
   );
 
@@ -218,26 +243,27 @@ class _HomePageState extends State<HomePage> {
   Widget buildCategoryRow(List<Map<String, String>> items) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: items.map((item) {
-        return Row(
-          children: [
-            Image.asset(
-              item['image']!,
-              width: 100,
-              height: 100,
-              fit: BoxFit.contain,
-            ),
-            SizedBox(height: 8),
-            Padding(
-              padding: EdgeInsets.only(left: 16.0),
-              child: Text(
-                item['title']!,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            )
-          ],
-        );
-      }).toList(),
+      children:
+          items.map((item) {
+            return Row(
+              children: [
+                Image.asset(
+                  item['image']!,
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 8),
+                Padding(
+                  padding: EdgeInsets.only(left: 16.0),
+                  child: Text(
+                    item['title']!,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
     );
   }
 

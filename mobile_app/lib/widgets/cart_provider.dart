@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/models/models_products.dart';
+import 'package:mobile_app/models/productModel.dart';
 
 class CartProvider extends ChangeNotifier {
-  final List<ProductModel> _cartItems = [];
+  final List<ProductsModel> _cartItems = [];
 
-  List<ProductModel> get cartItems => _cartItems;
+  List<ProductsModel> get cartItems => _cartItems;
 
-  void add(ProductModel product) {
+  void add(ProductsModel product) {
     _cartItems.add(product);
     notifyListeners();
   }

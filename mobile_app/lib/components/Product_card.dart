@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/services/ApiService.dart';
 import 'package:provider/provider.dart';
-import 'package:mobile_app/models/models_products.dart';
+import 'package:mobile_app/models/productModel.dart'; // Import ProductsModel
 import 'package:intl/intl.dart';
 import 'package:mobile_app/widgets/wish_list_provider.dart';
 import 'package:mobile_app/widgets/cart_provider.dart';
 import 'package:mobile_app/pages/ProductDetailPage.dart';
 
 class ProductCard extends StatelessWidget {
-  final ProductModel product;
+  final ProductsModel products;
 
-  const ProductCard({super.key, required this.product});
+  const ProductCard({super.key, required this.products});
 
   String formatCurrency(num price) {
     final formatter = NumberFormat('#,###', 'vi_VN');
@@ -26,7 +27,7 @@ class ProductCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ProductDetailPage(product: product),
+            builder: (_) => ProductDetailPage(product: products),
           ),
         );
       },
@@ -36,12 +37,12 @@ class ProductCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black12,
               blurRadius: 8,
               offset: Offset(0, 4),
-            )
+            ),
           ],
         ),
         width: 180,
@@ -53,28 +54,46 @@ class ProductCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(
-                    product.images.isNotEmpty ? product.images[0] : 'assets/images/asus.png',
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  child:
+                      products.images.isNotEmpty
+                          ? Image.network(
+                            '${ApiService.imageBaseUrl}${products.images[0]}',
+                            height: 120,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) => Image.asset(
+                                  'assets/images/asus.png',
+                                  height: 120,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                          )
+                          : Image.asset(
+                            'assets/images/asus.png',
+                            height: 120,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                 ),
 
-
                 // Badge giảm giá
-                if (product.discountPercent > 0)
+                if (products.discountPercent != null &&
+                    products.discountPercent! > 0)
                   Positioned(
                     top: 8,
                     left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.redAccent,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        "-${product.discountPercent}%",
+                        "-${products.discountPercent}%",
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -92,23 +111,26 @@ class ProductCard extends StatelessWidget {
                     backgroundColor: Colors.white,
                     child: IconButton(
                       icon: Icon(
-                        wishList.items.contains(product)
+                        wishList.items.contains(products)
                             ? Icons.favorite
                             : Icons.favorite_border,
-                        color: wishList.items.contains(product)
-                            ? Colors.pinkAccent
-                            : Colors.grey,
+                        color:
+                            wishList.items.contains(products)
+                                ? Colors.pinkAccent
+                                : Colors.grey,
                       ),
                       onPressed: () {
-                        if (wishList.items.contains(product)) {
-                          wishList.remove(product);
+                        if (wishList.items.contains(products)) {
+                          wishList.remove(products);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Đã bỏ yêu thích')),
                           );
                         } else {
-                          wishList.add(product);
+                          wishList.add(products);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đã thêm vào yêu thích')),
+                            const SnackBar(
+                              content: Text('Đã thêm vào yêu thích'),
+                            ),
                           );
                         }
                       },
@@ -123,9 +145,12 @@ class ProductCard extends StatelessWidget {
                   child: CircleAvatar(
                     backgroundColor: Colors.white,
                     child: IconButton(
-                      icon: const Icon(Icons.add_shopping_cart, color: Colors.grey),
+                      icon: const Icon(
+                        Icons.add_shopping_cart,
+                        color: Colors.grey,
+                      ),
                       onPressed: () {
-                        cart.add(product);
+                        cart.add(products);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
                         );
@@ -138,9 +163,9 @@ class ProductCard extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // Thương hiệu
+            // Thương hiệu (sử dụng category)
             Text(
-              product.brand,
+              products.category,
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
@@ -152,7 +177,7 @@ class ProductCard extends StatelessWidget {
 
             // Tên sản phẩm
             Text(
-              product.name,
+              products.name,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
@@ -163,9 +188,10 @@ class ProductCard extends StatelessWidget {
             // Giá
             Row(
               children: [
-                if (product.oldPrice > product.price)
+                if (products.oldPrice != null &&
+                    products.oldPrice! > products.price)
                   Text(
-                    formatCurrency(product.oldPrice),
+                    formatCurrency(products.oldPrice!),
                     style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
@@ -174,7 +200,7 @@ class ProductCard extends StatelessWidget {
                   ),
                 const SizedBox(width: 6),
                 Text(
-                  formatCurrency(product.price),
+                  formatCurrency(products.price),
                   style: const TextStyle(
                     fontSize: 13,
                     color: Colors.blueAccent,
