@@ -29,4 +29,27 @@ class ProductService {
       throw Exception('Error fetching products: $e');
     }
   }
+
+  static Future<ProductsModel> fetchProductById(String id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiService.productList}/$id'),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        if (data is! Map<String, dynamic> || data['metadata'] == null) {
+          throw Exception('Invalid JSON structure: missing metadata');
+        }
+        return ProductsModel.fromJson(data['metadata']['product']);
+      } else {
+        throw Exception(
+          'Failed to load product: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e) {
+      print('Error fetching product by ID: $e');
+      rethrow;
+    }
+  }
 }
