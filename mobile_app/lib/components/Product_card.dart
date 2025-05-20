@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/providers/cart_provider.dart';
+import 'package:mobile_app/providers/wish_list_provider.dart';
 import 'package:mobile_app/services/ApiService.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/models/productModel.dart'; // Import ProductsModel
 import 'package:intl/intl.dart';
-import 'package:mobile_app/widgets/wish_list_provider.dart';
-import 'package:mobile_app/widgets/cart_provider.dart';
+
 import 'package:mobile_app/pages/ProductDetailPage.dart';
 
 class ProductCard extends StatelessWidget {
