@@ -19,8 +19,13 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthProvider>(context, listen: false).initAuth();
+    });
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Mobile Ecommerce',

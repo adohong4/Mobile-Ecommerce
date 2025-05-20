@@ -3,7 +3,7 @@
 const express = require('express');
 const { asyncHandler } = require('../../helpers/asyncHandler');
 const ProfileController = require('../../controllers/profile.controller');
-const { checkTokenCookie } = require('../../middleware/checkAuth');
+const { checkTokenCookie, checkTokenCookieAdmin } = require('../../middleware/checkAuth');
 const router = express.Router();
 const multer = require('multer');
 const storage = multer.memoryStorage();
@@ -16,7 +16,7 @@ const upload = multer({
 });
 
 router.get('/profile/get', checkTokenCookie, asyncHandler(ProfileController.getProfile));
-router.post('/profile/update', checkTokenCookie, asyncHandler(ProfileController.updateInfoProfile));
-router.post('/profile/image', checkTokenCookie, upload.single("profilePic"), asyncHandler(ProfileController.updateProfilePic));
+router.post('/profile/update', checkTokenCookieAdmin, asyncHandler(ProfileController.updateInfoProfile));
+router.post('/profile/image', checkTokenCookieAdmin, upload.single("profilePic"), asyncHandler(ProfileController.updateProfilePic));
 
 module.exports = router;

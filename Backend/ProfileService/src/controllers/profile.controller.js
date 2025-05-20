@@ -9,7 +9,7 @@ class ProfileController {
             const result = await ProfileService.getProfile(req, res);
             new OK({
                 message: 'Lấy thông tin',
-                matedata: result
+                metadata: result
             }).send(res);
         } catch (error) {
             next(error);

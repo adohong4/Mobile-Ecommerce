@@ -7,8 +7,9 @@ const { BadRequestError, ConflictRequestError, AuthFailureError, ForbiddenError 
 class ProfileService {
     static async getProfile(req, res) {
         try {
-            const profileId = req.user._id;
-            const profile = await profileModel.findById(profileId).select('-__v -createdAt');
+            const userId = req.user._id;
+            console.log("userid: ", userId)
+            const profile = await profileModel.find({ userId });
             return profile;
         } catch (error) {
             throw error;

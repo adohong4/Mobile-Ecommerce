@@ -17,17 +17,22 @@ class LoginService {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        // Lưu token và cookies vào SharedPreferences
+        // Lấy token và user từ response
         final token = data['metadata']['token'];
         final user = data['metadata']['user'];
-        final cookies = response.headers['set-cookie'];
 
+        // Tạo cookie với định dạng jwt=<token>
+        final cookie = 'jwt=$token';
+
+        // Lưu token và user vào SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
         await prefs.setString('user', jsonEncode(user));
-        if (cookies != null) {
-          await prefs.setString('cookies', cookies);
-        }
+        await prefs.setString('cookies', cookie);
+
+        // Debug: In ra để kiểm tra
+        // print('Stored token: $token');
+        // print('Stored cookie: $cookie');
 
         return {
           'success': true,
@@ -49,7 +54,9 @@ class LoginService {
   // Hàm để lấy token từ SharedPreferences
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
+    final token = prefs.getString('auth_token');
+    // print('Retrieved token: $token'); // Debug
+    return token;
   }
 
   // Hàm để lấy user từ SharedPreferences
@@ -65,6 +72,8 @@ class LoginService {
   // Hàm để lấy cookies từ SharedPreferences
   static Future<String?> getCookies() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('cookies');
+    final cookies = prefs.getString('cookies');
+    // print('Retrieved cookies: $cookies'); // Debug
+    return cookies;
   }
 }
