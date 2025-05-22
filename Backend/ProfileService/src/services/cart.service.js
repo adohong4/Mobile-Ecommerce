@@ -8,15 +8,18 @@ class CartService {
         try {
             const userId = req.user._id;
             const { itemId } = req.body;
-            let user = await userCartModel.findOne({ userId });
-
-            let cartData = await user.cartData;
+            let user = await userCartModel.findById(userId);
+            let cartData = user.cartData || {};
             if (!cartData[itemId]) {
                 cartData[itemId] = 1;
             } else {
                 cartData[itemId] += 1;
             }
-            const upadateCart = await userCartModel.findByIdAndUpdate({ userId }, { cartData });
+            const upadateCart = await userCartModel.findByIdAndUpdate(
+                userId,
+                { cartData: cartData },
+                { new: true }
+            );
             return upadateCart.cartData;
         } catch (error) {
             throw error;
@@ -26,7 +29,7 @@ class CartService {
     static async getListCart(req, res) {
         try {
             const userId = req.user._id;
-            const cart = await userCartModel.find({ userId });
+            const cart = await userCartModel.findById(userId);
             return cart.cartData;
         } catch (error) {
             throw error;
@@ -37,20 +40,24 @@ class CartService {
         try {
             const userId = req.user._id;
             const { itemId } = req.body;
-            const profile = await userCartModel.findOne({ userId });
+            const user = await userCartModel.findById(userId);
 
-            let cartData = await profile.cartData;
-            if (cartData[itemId]) {
+            let cartData = user.cartData || {};
+            if (cartData[itemId] && cartData[itemId] > 0) {
                 cartData[itemId] -= 1;
             }
 
-            const updatedProfile = await userCartModel.findOneAndUpdate(
-                { userId },
-                { cartData },
+            if (cartData[itemId] === 0) {
+                delete cartData[itemId];
+            }
+
+            const updatedUser = await userCartModel.findByIdAndUpdate(
+                userId,
+                { cartData: cartData },
                 { new: true }
             );
 
-            return updatedProfile.cartData;
+            return updatedUser.cartData;
         } catch (error) {
             throw error;
         }
