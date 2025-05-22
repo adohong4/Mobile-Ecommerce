@@ -10,7 +10,6 @@ class ProductService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // Kiểm tra nếu metadata hoặc product không tồn tại
         if (data is! Map<String, dynamic> ||
             data['metadata'] == null ||
             data['metadata']['product'] == null) {
@@ -57,7 +56,6 @@ class ProductService {
     List<String> ids,
   ) async {
     try {
-      // Giả định backend có endpoint để lấy nhiều sản phẩm theo IDs
       final response = await http.post(
         Uri.parse('${ApiService.productList}/by-ids'),
         headers: {'Content-Type': 'application/json'},
@@ -79,7 +77,6 @@ class ProductService {
         );
       }
     } catch (e) {
-      // Nếu backend không hỗ trợ endpoint /by-ids, gọi fetchProductById cho từng ID
       print(
         'Error fetching products by IDs: $e. Falling back to individual fetches.',
       );

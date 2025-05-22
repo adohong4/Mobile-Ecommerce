@@ -5,7 +5,6 @@ import 'package:mobile_app/services/LoginService.dart';
 class FavouriteService {
   static const String _baseUrl = 'http://localhost:9003/v1/api/profile';
 
-  // Thêm sản phẩm vào danh sách yêu thích
   Future<Map<String, dynamic>> addToFavourite(String itemId) async {
     final url = Uri.parse('$_baseUrl/favourite/add');
     try {
@@ -46,7 +45,6 @@ class FavouriteService {
     }
   }
 
-  // Lấy danh sách yêu thích
   Future<Map<String, dynamic>> getListFavourite() async {
     final url = Uri.parse('$_baseUrl/favourite/list');
     try {
@@ -86,7 +84,6 @@ class FavouriteService {
     }
   }
 
-  // Xóa sản phẩm khỏi danh sách yêu thích
   Future<Map<String, dynamic>> removeFromFavourite(String itemId) async {
     final url = Uri.parse('$_baseUrl/favourite/remove');
     try {

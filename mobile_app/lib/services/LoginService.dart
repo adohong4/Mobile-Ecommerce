@@ -51,7 +51,7 @@ class LoginService {
     }
   }
 
-  // Hàm để lấy token từ SharedPreferences
+  // get token from SharedPreferences
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
@@ -59,7 +59,7 @@ class LoginService {
     return token;
   }
 
-  // Hàm để lấy user từ SharedPreferences
+  //get user from SharedPreferences
   static Future<Map<String, dynamic>?> getUser() async {
     final prefs = await SharedPreferences.getInstance();
     final userString = prefs.getString('user');
@@ -69,7 +69,7 @@ class LoginService {
     return null;
   }
 
-  // Hàm để lấy cookies từ SharedPreferences
+  // get cookies from SharedPreferences
   static Future<String?> getCookies() async {
     final prefs = await SharedPreferences.getInstance();
     final cookies = prefs.getString('cookies');

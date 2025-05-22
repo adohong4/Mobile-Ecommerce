@@ -4,8 +4,8 @@ import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/services/cart_service.dart';
 
 class CartProvider extends ChangeNotifier {
-  Map<String, int> _cartData = {}; // Lưu { productId: quantity }
-  List<ProductsModel> _cartItems = []; // Lưu danh sách sản phẩm chi tiết
+  Map<String, int> _cartData = {};
+  List<ProductsModel> _cartItems = [];
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -26,7 +26,6 @@ class CartProvider extends ChangeNotifier {
 
     if (result['success']) {
       _cartData = Map<String, int>.from(result['cartData']);
-      // Lấy chi tiết sản phẩm
       if (_cartData.isNotEmpty) {
         final productIds = _cartData.keys.toList();
         try {
@@ -56,7 +55,6 @@ class CartProvider extends ChangeNotifier {
 
     if (result['success']) {
       _cartData = Map<String, int>.from(result['cartData']);
-      // Cập nhật chi tiết sản phẩm
       final productIds = _cartData.keys.toList();
       try {
         _cartItems = await ProductService.fetchProductsByIds(productIds);
@@ -80,7 +78,6 @@ class CartProvider extends ChangeNotifier {
 
     if (result['success']) {
       _cartData = Map<String, int>.from(result['cartData']);
-      // Cập nhật chi tiết sản phẩm
       final productIds = _cartData.keys.toList();
       try {
         _cartItems = await ProductService.fetchProductsByIds(productIds);
@@ -105,15 +102,12 @@ class CartProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    // Backend không có API cập nhật số lượng trực tiếp, nên gọi add/remove để đạt số lượng mong muốn
     final currentQuantity = _cartData[product.id] ?? 0;
     if (quantity > currentQuantity) {
-      // Thêm sản phẩm cho đến khi đạt số lượng
       for (int i = currentQuantity; i < quantity; i++) {
         await add(product);
       }
     } else if (quantity < currentQuantity) {
-      // Xóa sản phẩm cho đến khi đạt số lượng
       for (int i = currentQuantity; i > quantity; i--) {
         await remove(product);
       }

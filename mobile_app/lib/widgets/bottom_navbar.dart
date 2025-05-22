@@ -5,9 +5,6 @@ import 'package:mobile_app/pages/ProfilePage.dart';
 import 'package:mobile_app/pages/WishList.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
-
-
 class CustomBottomNav extends StatefulWidget {
   final BuildContext parentContext;
 
@@ -16,7 +13,6 @@ class CustomBottomNav extends StatefulWidget {
   @override
   State<CustomBottomNav> createState() => _CustomBottomNavState();
 }
-
 
 class _CustomBottomNavState extends State<CustomBottomNav> {
   int _selectedIndex = 0;
@@ -30,13 +26,21 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
       case 1:
         Navigator.pushReplacement(
           widget.parentContext,
-          MaterialPageRoute(builder: (context) => WishList()), // <- Đúng tên class
+          MaterialPageRoute(
+            builder: (context) => WishList(),
+          ), // <- Đúng tên class
         );
         break;
       case 2:
         Navigator.pushReplacement(
           widget.parentContext,
-          MaterialPageRoute(builder: (context) => MessagePage()),
+          MaterialPageRoute(
+            builder:
+                (context) => const MessagePage(
+                  receiverId: '682f22449b14ebd1d789b682', //ID
+                  receiverName: 'Dịch vụ chăm sóc khách hàng',
+                ),
+          ),
         );
         break;
       case 3:
@@ -67,23 +71,38 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
       unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w400),
       items: [
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.house, color: _selectedIndex == 0 ? Color(0xFF194689) : Colors.black),
+          icon: FaIcon(
+            FontAwesomeIcons.house,
+            color: _selectedIndex == 0 ? Color(0xFF194689) : Colors.black,
+          ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.heart, color: _selectedIndex == 1 ? Color(0xFF194689) : Colors.black),
+          icon: FaIcon(
+            FontAwesomeIcons.heart,
+            color: _selectedIndex == 1 ? Color(0xFF194689) : Colors.black,
+          ),
           label: 'My favourite',
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.comments, color: _selectedIndex == 2 ? Color(0xFF194689) : Colors.black),
+          icon: FaIcon(
+            FontAwesomeIcons.comments,
+            color: _selectedIndex == 2 ? Color(0xFF194689) : Colors.black,
+          ),
           label: 'Contact',
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.cartShopping, color: _selectedIndex == 3 ? Color(0xFF194689) : Colors.black),
+          icon: FaIcon(
+            FontAwesomeIcons.cartShopping,
+            color: _selectedIndex == 3 ? Color(0xFF194689) : Colors.black,
+          ),
           label: 'Cart',
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.user, color: _selectedIndex == 4 ? Color(0xFF194689) : Colors.black),
+          icon: FaIcon(
+            FontAwesomeIcons.user,
+            color: _selectedIndex == 4 ? Color(0xFF194689) : Colors.black,
+          ),
           label: 'User',
         ),
       ],
