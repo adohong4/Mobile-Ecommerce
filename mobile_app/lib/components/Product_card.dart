@@ -112,16 +112,16 @@ class ProductCard extends StatelessWidget {
                     backgroundColor: Colors.white,
                     child: IconButton(
                       icon: Icon(
-                        wishList.items.contains(products)
+                        wishList.isFavourite(products)
                             ? Icons.favorite
                             : Icons.favorite_border,
                         color:
-                            wishList.items.contains(products)
+                            wishList.isFavourite(products)
                                 ? Colors.pinkAccent
                                 : Colors.grey,
                       ),
                       onPressed: () {
-                        if (wishList.items.contains(products)) {
+                        if (wishList.isFavourite(products)) {
                           wishList.remove(products);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Đã bỏ yêu thích')),

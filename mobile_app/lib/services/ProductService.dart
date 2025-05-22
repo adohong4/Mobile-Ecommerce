@@ -52,4 +52,47 @@ class ProductService {
       rethrow;
     }
   }
+
+  static Future<List<ProductsModel>> fetchProductsByIds(
+    List<String> ids,
+  ) async {
+    try {
+      // Giả định backend có endpoint để lấy nhiều sản phẩm theo IDs
+      final response = await http.post(
+        Uri.parse('${ApiService.productList}/by-ids'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'ids': ids}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data is! Map<String, dynamic> || data['metadata'] == null) {
+          throw Exception('Invalid JSON structure: missing metadata');
+        }
+        final List<dynamic> productsJson = data['metadata'];
+        return productsJson
+            .map((json) => ProductsModel.fromJson(json))
+            .toList();
+      } else {
+        throw Exception(
+          'Failed to load products: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e) {
+      // Nếu backend không hỗ trợ endpoint /by-ids, gọi fetchProductById cho từng ID
+      print(
+        'Error fetching products by IDs: $e. Falling back to individual fetches.',
+      );
+      final products = <ProductsModel>[];
+      for (var id in ids) {
+        try {
+          final product = await fetchProductById(id);
+          products.add(product);
+        } catch (e) {
+          print('Failed to fetch product $id: $e');
+        }
+      }
+      return products;
+    }
+  }
 }

@@ -20,8 +20,8 @@ const authMiddleware = async (req, res, next) => {
 const checkTokenCookie = async (req, res, next) => {
     try {
         // console.log("cookie: ", req.headers.authorization);
+        const token = req.cookies.jwt;
 
-        const token = req.headers.authorization;
         if (!token) {
             return res.status(401).json({ success: false, message: "Unauthorized - No Token Provided" });
         }
@@ -40,9 +40,10 @@ const checkTokenCookie = async (req, res, next) => {
     }
 };
 
-const checkTokenCookieAdmin = async (req, res, next) => {
+const checkTokenHeader = async (req, res, next) => {
     try {
-        const token = req.cookies.jwt;
+        const token = req.headers.authorization;
+
         if (!token) {
             return res.status(401).json({ success: false, message: "Unauthorized - No Token Provided" });
         }
@@ -63,5 +64,5 @@ const checkTokenCookieAdmin = async (req, res, next) => {
 };
 
 module.exports = {
-    authMiddleware, checkTokenCookie, checkTokenCookieAdmin
+    authMiddleware, checkTokenCookie, checkTokenHeader
 }
