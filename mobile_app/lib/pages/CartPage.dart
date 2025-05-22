@@ -1,237 +1,336 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:mobile_app/pages/HomePage.dart';
 import 'package:mobile_app/pages/CheckoutPage.dart';
+import 'package:mobile_app/providers/cart_provider.dart';
+import 'package:mobile_app/models/productModel.dart';
+import 'package:mobile_app/services/ApiService.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+
 class CartPage extends StatefulWidget {
+  const CartPage({super.key});
+
   @override
   _CartPageState createState() => _CartPageState();
 }
 
 class _CartPageState extends State<CartPage> {
-  final List<Map<String, dynamic>> cartItems = List.generate(5, (index) {
-    final random = Random();
-    final prices = [17500000, 20000000, 25000000, 30000000];
-    final oldPrices = [25000000, 27000000, 30000000, 35000000];
-    final names = [
-      'Màn Hình Di Động Thông Minh SIEGenX 27 inch',
-      'Laptop ASUS ZenBook 14',
-      'Tai Nghe Bluetooth Sony WH-1000XM4',
-      'Điện Thoại Samsung Galaxy S22',
-      'Máy Tính Bảng Apple iPad Pro',
-    ];
-    final images = [
-      'assets/asus.png',
-      'assets/samsung.png',
-      'assets/asus.png',
-      'assets/apple.png',
-      'assets/asus.png',
-    ];
+  final Map<String, bool> _selectedItems = {};
 
-    return {
-      'id': index,
-      'name': names[random.nextInt(names.length)],
-      'price': prices[random.nextInt(prices.length)],
-      'oldPrice': oldPrices[random.nextInt(oldPrices.length)],
-      'discount': random.nextInt(30) + 10, // Giảm giá từ 10-40%
-      'quantity': random.nextInt(5) + 1, // Số lượng từ 1 đến 5
-      'selected': random.nextBool(), // Chọn ngẫu nhiên
-      'image': images[random.nextInt(images.length)],
-    };
-  });
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CartProvider>(context, listen: false).fetchCart();
+    });
+  }
+
+  String formatCurrency(double price) {
+    final formatter = NumberFormat('#,###', 'vi_VN');
+    return "${formatter.format(price)} đ";
+  }
 
   @override
   Widget build(BuildContext context) {
-    final selectedItems = cartItems.where((item) => item['selected'] == true).toList();
+    final cartProvider = context.watch<CartProvider>();
 
-    final total = selectedItems.fold(
-      0,
-          (sum, item) =>
-      sum + (item['price'] as int) * (item['quantity'] as int),
+    // Khởi tạo trạng thái chọn cho các sản phẩm
+    for (var item in cartProvider.cartItems) {
+      _selectedItems.putIfAbsent(item.id, () => true);
+    }
+
+    // Lấy danh sách sản phẩm được chọn
+    final List<ProductsModel> selectedItems =
+        cartProvider.cartItems
+            .where((item) => _selectedItems[item.id] == true)
+            .toList();
+
+    // Tính toán tổng giá và giảm giá
+    final double total = selectedItems.fold(
+      0.0,
+      (double sum, item) =>
+          sum + item.price * (cartProvider.cartData[item.id] ?? 1),
     );
-
-    final discount = selectedItems.fold(
-      0,
-          (sum, item) =>
-      sum + ((item['oldPrice'] as int) - (item['price'] as int) * (item['quantity'] as int)).toInt(),
+    final double discount = selectedItems.fold(
+      0.0,
+      (double sum, item) =>
+          sum +
+          ((item.oldPrice ?? item.price) - item.price) *
+              (cartProvider.cartData[item.id] ?? 1),
     );
 
     return Scaffold(
       appBar: AppBar(
-        title:  Text('Giỏ hàng (${cartItems.length})', style: TextStyle(color: Colors.black)),
+        title: Text(
+          'Giỏ hàng (${cartProvider.cartItems.length})',
+          style: const TextStyle(color: Colors.black),
+        ),
         centerTitle: false,
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()), // Chuyển hướng về trang chủ
+              MaterialPageRoute(builder: (context) => const HomePage()),
             );
           },
         ),
-
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.separated(
-              itemCount: cartItems.length,
-              separatorBuilder: (_, __) => Divider(height: 1),
-              itemBuilder: (context, index) {
-                final item = cartItems[index];
-                return ListTile(
-                  leading: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        item['selected'] = !(item['selected'] ?? false);
-                      });
-                    },
-                    child: Icon(
-                      item['selected'] ? Icons.radio_button_checked : Icons.radio_button_off,
-                      color: Color(0xFF003366),
+      body:
+          cartProvider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : cartProvider.errorMessage != null
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(cartProvider.errorMessage!),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () => cartProvider.fetchCart(),
+                      child: const Text('Thử lại'),
+                    ),
+                  ],
+                ),
+              )
+              : cartProvider.cartItems.isEmpty
+              ? const Center(child: Text('Giỏ hàng trống'))
+              : Column(
+                children: [
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: cartProvider.cartItems.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        final item = cartProvider.cartItems[index];
+                        final quantity = cartProvider.cartData[item.id] ?? 1;
+                        return ListTile(
+                          leading: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedItems[item.id] =
+                                    !(_selectedItems[item.id] ?? false);
+                              });
+                            },
+                            child: Icon(
+                              _selectedItems[item.id] ?? false
+                                  ? Icons.radio_button_checked
+                                  : Icons.radio_button_off,
+                              color: const Color(0xFF003366),
+                            ),
+                          ),
+                          title: Row(
+                            children: [
+                              item.images.isNotEmpty
+                                  ? Image.network(
+                                    '${ApiService.imageBaseUrl}${item.images[0]}',
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Image.asset(
+                                              'assets/images/asus.png',
+                                              width: 60,
+                                              height: 60,
+                                              fit: BoxFit.cover,
+                                            ),
+                                  )
+                                  : Image.asset(
+                                    'assets/images/asus.png',
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          formatCurrency(item.price),
+                                          style: const TextStyle(
+                                            color: Color(0xFF003366),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        if (item.oldPrice != null &&
+                                            item.oldPrice! > item.price)
+                                          Text(
+                                            formatCurrency(item.oldPrice!),
+                                            style: const TextStyle(
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                              color: Colors.grey,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () async {
+                                      await cartProvider.updateQuantity(
+                                        item,
+                                        quantity - 1,
+                                      );
+                                    },
+                                    icon: const Icon(Icons.remove, size: 20),
+                                  ),
+                                  Text('$quantity'),
+                                  IconButton(
+                                    onPressed: () async {
+                                      await cartProvider.updateQuantity(
+                                        item,
+                                        quantity + 1,
+                                      );
+                                    },
+                                    icon: const Icon(Icons.add, size: 20),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  title: Row(
-                    children: [
-                      Image.asset(
-                        item['image'],
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: Colors.grey.shade300),
                       ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      color: Colors.white,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
                           children: [
-                            Text(item['name'], style: TextStyle(fontWeight: FontWeight.bold)),
-                            SizedBox(height: 4),
-                            Row(
+                            GestureDetector(
+                              onTap: () {
+                                final allSelected = _selectedItems.values.every(
+                                  (selected) => selected,
+                                );
+                                setState(() {
+                                  _selectedItems.updateAll(
+                                    (key, value) => !allSelected,
+                                  );
+                                });
+                              },
+                              child: Icon(
+                                _selectedItems.values.every(
+                                      (selected) => selected,
+                                    )
+                                    ? Icons.radio_button_checked
+                                    : Icons.radio_button_off,
+                                color: const Color(0xFF003366),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text("Tất cả"),
+                            const Spacer(),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  '${item['price'].toStringAsFixed(0)} đ',
-                                  style: TextStyle(color: Color(0xFF003366), fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(width: 6),
-                                Text(
-                                  '${item['oldPrice'].toStringAsFixed(0)} đ',
-                                  style: TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: Colors.grey,
-                                    fontSize: 12,
+                                  formatCurrency(total),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF003366),
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(width: 6),
+                                Text(
+                                  'Giảm: ${formatCurrency(discount)}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                               ],
                             ),
                           ],
                         ),
-                      ),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                if (item['quantity'] > 1) item['quantity']--;
-                              });
-                            },
-                            icon: Icon(Icons.remove, size: 20),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed:
+                                selectedItems.isEmpty
+                                    ? null
+                                    : () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => CheckoutPage(
+                                                selectedItems:
+                                                    selectedItems
+                                                        .map(
+                                                          (item) => {
+                                                            'id': item.id,
+                                                            'name': item.name,
+                                                            'price': item.price,
+                                                            'oldPrice':
+                                                                item.oldPrice,
+                                                            'quantity':
+                                                                cartProvider
+                                                                    .cartData[item
+                                                                    .id],
+                                                            'image':
+                                                                item
+                                                                        .images
+                                                                        .isNotEmpty
+                                                                    ? item
+                                                                        .images[0]
+                                                                    : 'assets/images/asus.png',
+                                                          },
+                                                        )
+                                                        .toList(),
+                                                total: total.toInt(),
+                                              ),
+                                        ),
+                                      );
+                                    },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF003366),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Thanh toán (${selectedItems.length})',
+                              style: const TextStyle(color: Colors.white),
+                            ),
                           ),
-                          Text('${item['quantity']}'),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                item['quantity']++;
-                              });
-                            },
-                            icon: Icon(Icons.add, size: 20),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.grey.shade300)),
-              color: Colors.white,
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        final allSelected = cartItems.every((item) => item['selected']);
-                        setState(() {
-                          for (var item in cartItems) {
-                            item['selected'] = !allSelected;
-                          }
-                        });
-                      },
-                      child: Icon(
-                        cartItems.every((item) => item['selected'])
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_off,
-                        color: Color(0xFF003366),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text("Tất cả"),
-                    Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${total.toStringAsFixed(0)} đ',
-                          style: TextStyle(fontSize: 16, color: Color(0xFF003366), fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'Giảm: ${discount.toStringAsFixed(0)} đ',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
-                    )
-                  ],
-                ),
-                SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: selectedItems.isEmpty
-                        ? null
-                        : () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CheckoutPage(
-                            selectedItems: selectedItems,
-                            total: total,
-                          ),
-                        ),
-                      );
-                    },
-
-
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF003366),
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: Text('Thanh toán (${selectedItems.length})', style: TextStyle(color: Colors.white),),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: Color(0xFFF5F5F5),
+                ],
+              ),
+      backgroundColor: const Color(0xFFF5F5F5),
     );
   }
 }
