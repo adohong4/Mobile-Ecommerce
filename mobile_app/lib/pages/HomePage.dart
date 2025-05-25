@@ -223,8 +223,8 @@ class _HomePageState extends State<HomePage> {
                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                               childAspectRatio: 0.7,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 0,
+                              mainAxisSpacing: 0,
                             ),
                             itemBuilder: (context, index) {
                               return component.ProductCard(products: products[index]);

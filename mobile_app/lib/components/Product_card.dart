@@ -53,48 +53,43 @@ class ProductCard extends StatelessWidget {
             // Hình ảnh + badges + nút yêu thích + giỏ hàng
             Stack(
               children: [
+                // Ảnh sản phẩm
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child:
-                      products.images.isNotEmpty
-                          ? Image.network(
-                            '${ApiService.imageBaseUrl}${products.images[0]}',
-                            height: 120,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) => Image.asset(
-                                  'assets/images/asus.png',
-                                  height: 120,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                          )
-                          : Image.asset(
-                            'assets/images/asus.png',
-                            height: 120,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1.1,
+                    child: products.images.isNotEmpty
+                        ? Image.network(
+                      '${ApiService.imageBaseUrl}${products.images[0]}',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Image.asset(
+                        'assets/images/asus.png',
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : Image.asset(
+                      'assets/images/asus.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
 
                 // Badge giảm giá
-                if (products.discountPercent != null &&
-                    products.discountPercent! > 0)
+                if (products.discountPercent != null && products.discountPercent! > 0)
                   Positioned(
-                    top: 8,
-                    left: 8,
+                    top: 0,
+                    left: 0,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.redAccent,
-                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        "-${products.discountPercent}%",
+                        '-${products.discountPercent}%',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -104,63 +99,73 @@ class ProductCard extends StatelessWidget {
                     ),
                   ),
 
-                // Nút yêu thích
+                // Hai nút xếp dọc (yêu thích + thêm giỏ hàng)
                 Positioned(
-                  bottom: 8,
-                  left: 8,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: IconButton(
-                      icon: Icon(
-                        wishList.isFavourite(products)
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color:
+                  top: 0,
+                  right: 0,
+                  child: Column(
+                    children: [
+                      // Nút yêu thích
+                      InkWell(
+                        onTap: () {
+                          final wishList = context.read<WishListProvider>();
+                          if (wishList.isFavourite(products)) {
+                            wishList.remove(products);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Đã bỏ yêu thích')),
+                            );
+                          } else {
+                            wishList.add(products);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Đã thêm vào yêu thích')),
+                            );
+                          }
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: wishList.isFavourite(products)
+                              ? Colors.white
+                              : Color(0xFF1AA7DD),
+                          radius: 18,
+                          child: Icon(
                             wishList.isFavourite(products)
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: wishList.isFavourite(products)
                                 ? Colors.pinkAccent
-                                : Colors.grey,
-                      ),
-                      onPressed: () {
-                        if (wishList.isFavourite(products)) {
-                          wishList.remove(products);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đã bỏ yêu thích')),
-                          );
-                        } else {
-                          wishList.add(products);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Đã thêm vào yêu thích'),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                ),
+                                : Colors.white,
+                            size: 20,
+                          ),
+                        ),
 
-                // Nút thêm giỏ hàng
-                Positioned(
-                  bottom: 8,
-                  right: 8,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.add_shopping_cart,
-                        color: Colors.grey,
                       ),
-                      onPressed: () {
-                        cart.add(products);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
-                        );
-                      },
-                    ),
+
+                      const SizedBox(height: 6),
+
+                      // Nút thêm vào giỏ hàng
+                      InkWell(
+                        onTap: () {
+                          final cart = context.read<CartProvider>();
+                          cart.add(products);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
+                          );
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Color(0xFF194689),
+                          radius: 18,
+                          child: const Icon(
+                            Icons.add_shopping_cart,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
+
 
             const SizedBox(height: 8),
 
@@ -168,7 +173,7 @@ class ProductCard extends StatelessWidget {
             Text(
               products.category,
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 14,
                 color: Colors.grey,
                 fontWeight: FontWeight.w500,
               ),
@@ -181,7 +186,7 @@ class ProductCard extends StatelessWidget {
               products.name,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
 
             const SizedBox(height: 6),
@@ -194,7 +199,7 @@ class ProductCard extends StatelessWidget {
                   Text(
                     formatCurrency(products.oldPrice!),
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 14,
                       color: Colors.grey,
                       decoration: TextDecoration.lineThrough,
                     ),
