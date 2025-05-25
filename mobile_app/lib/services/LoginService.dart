@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginService {
-  static const String _baseUrl = 'http://localhost:9001/v1/api/identity';
+  static const String _baseUrl = 'http://192.168.1.9:9001/v1/api/identity';
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     final url = Uri.parse('$_baseUrl/login');

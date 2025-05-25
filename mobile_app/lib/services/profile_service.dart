@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mobile_app/services/LoginService.dart';
 
 class ProfileService {
-  static const String _baseUrl = 'http://localhost:9003/v1/api/profile';
+  static const String _baseUrl = 'http://192.168.1.9:9003/v1/api/profile';
 
   Future<Map<String, dynamic>> getProfile() async {
     final url = Uri.parse('$_baseUrl/get');
