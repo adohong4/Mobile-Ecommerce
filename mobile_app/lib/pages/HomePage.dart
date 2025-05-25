@@ -84,148 +84,163 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
+      body: Column(
         children: [
-          HomeAppBar(),
-          SizedBox(height: 10),
-
-          // Banner slider
           Container(
-            height: 200,
-            margin: EdgeInsets.only(bottom: 10),
-            child: Column(
-              children: [
-                Expanded(
-                  child: PageView.builder(
-                    controller: _bannerController,
-                    itemCount: _banners.length,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _bannerPage = index;
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      return buildBanner(_banners[index]);
-                    },
-                  ),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    _banners.length,
-                    (index) => Container(
-                      width: 8,
-                      height: 8,
-                      margin: EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _bannerPage == index ? Colors.blue : Colors.grey,
-                      ),
-                    ),
-                  ),
+            decoration: BoxDecoration(
+              color: Colors.white, // hoặc bất kỳ màu nền nào của app bar
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1), // màu bóng
+                  spreadRadius: 1,
+                  blurRadius: 6,
+                  offset: Offset(0, 3), // đổ bóng xuống dưới
                 ),
               ],
             ),
-          ),
-
-          // Product categories
-          Container(
-            height: 220,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: HomeAppBar(),
+          ),// Cố định ở trên
+          Expanded( // Nội dung cuộn được
+            child: ListView(
               children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'DANH MỤC SẢN PHẨM',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Expanded(
-                  child: PageView.builder(
-                    controller: _categoryController,
-                    itemCount: _productCategories.length,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _categoryPage = index;
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      return buildCategoryRow(_productCategories[index]);
-                    },
-                  ),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    _productCategories.length,
-                    (index) => Container(
-                      width: 8,
-                      height: 8,
-                      margin: EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color:
-                            _categoryPage == index ? Colors.blue : Colors.grey,
+                // Banner slider
+                Container(
+                  height: 200,
+                  margin: EdgeInsets.only(bottom: 10),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _bannerController,
+                          itemCount: _banners.length,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _bannerPage = index;
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            return buildBanner(_banners[index]);
+                          },
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Flash Sale Section (placeholder)
-          // Flash Sale Section
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text(
-                    "FLASH SALE",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                FutureBuilder<List<ProductsModel>>(
-                  future: _productsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No products available'));
-                    }
-
-                    final products = snapshot.data!;
-                    return GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: products.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.7,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          _banners.length,
+                              (index) => Container(
+                            width: 8,
+                            height: 8,
+                            margin: EdgeInsets.symmetric(horizontal: 2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _bannerPage == index ? Colors.blue : Colors.grey,
+                            ),
                           ),
-                      itemBuilder: (context, index) {
-                        return component.ProductCard(products: products[index]);
-                      },
-                    );
-                  },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Product categories
+                Container(
+                  height: 220,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'DANH MỤC SẢN PHẨM',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _categoryController,
+                          itemCount: _productCategories.length,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _categoryPage = index;
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            return buildCategoryRow(_productCategories[index]);
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          _productCategories.length,
+                              (index) => Container(
+                            width: 8,
+                            height: 8,
+                            margin: EdgeInsets.symmetric(horizontal: 2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _categoryPage == index ? Colors.blue : Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Flash Sale
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Text(
+                          "FLASH SALE",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      FutureBuilder<List<ProductsModel>>(
+                        future: _productsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return const Center(child: Text('No products available'));
+                          }
+
+                          final products = snapshot.data!;
+                          return GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: products.length,
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.7,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemBuilder: (context, index) {
+                              return component.ProductCard(products: products[index]);
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         ],
       ),
+
       bottomNavigationBar: CustomBottomNav(parentContext: context),
     );
   }
