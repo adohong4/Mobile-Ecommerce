@@ -91,6 +91,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           Container(
+            height: 100,
             decoration: BoxDecoration(
               color: Colors.white, // hoặc bất kỳ màu nền nào của app bar
               boxShadow: [

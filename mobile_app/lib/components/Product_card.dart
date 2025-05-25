@@ -199,7 +199,7 @@ class ProductCard extends StatelessWidget {
                   Text(
                     formatCurrency(products.oldPrice!),
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       color: Colors.grey,
                       decoration: TextDecoration.lineThrough,
                     ),
@@ -208,7 +208,7 @@ class ProductCard extends StatelessWidget {
                 Text(
                   formatCurrency(products.price),
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 15,
                     color: Colors.blueAccent,
                     fontWeight: FontWeight.bold,
                   ),
