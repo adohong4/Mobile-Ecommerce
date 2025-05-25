@@ -42,8 +42,12 @@ class _HomePageState extends State<HomePage> {
     [
       {'image': 'assets/apple.png', 'title': 'APPLE'},
       {'image': 'assets/microsoft.png', 'title': 'MICROSOFT'},
+      {'image': 'assets/apple.png', 'title': 'ASUS'},
+      {'image': 'assets/microsoft.png', 'title': 'SAMSUNG'},
     ],
     [
+      {'image': 'assets/apple.png', 'title': 'APPLE'},
+      {'image': 'assets/microsoft.png', 'title': 'MICROSOFT'},
       {'image': 'assets/apple.png', 'title': 'ASUS'},
       {'image': 'assets/microsoft.png', 'title': 'SAMSUNG'},
     ],
@@ -99,7 +103,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             child: HomeAppBar(),
-          ),// Cố định ở trên
+          ),
           Expanded( // Nội dung cuộn được
             child: ListView(
               children: [
@@ -129,8 +133,8 @@ class _HomePageState extends State<HomePage> {
                         children: List.generate(
                           _banners.length,
                               (index) => Container(
-                            width: 8,
-                            height: 8,
+                            width: 0,
+                            height: 0,
                             margin: EdgeInsets.symmetric(horizontal: 2),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -145,17 +149,25 @@ class _HomePageState extends State<HomePage> {
 
                 // Product categories
                 Container(
-                  height: 220,
+                  height: 180,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'DANH MỤC SẢN PHẨM',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Center(
+                          child: Text(
+                            'DANH MỤC SẢN PHẨM',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
                         ),
                       ),
+                      const SizedBox(height: 12),
                       Expanded(
                         child: PageView.builder(
                           controller: _categoryController,
@@ -166,22 +178,83 @@ class _HomePageState extends State<HomePage> {
                             });
                           },
                           itemBuilder: (context, index) {
-                            return buildCategoryRow(_productCategories[index]);
+                            final categoryList = _productCategories[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: categoryList.map<Widget>((category) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // TODO: Handle tap
+                                    },
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            width: 56, // 2 * radius
+                                            height: 56,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFFFFFFF), // Nền trắng
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: Color(0xFF194689), // Viền màu #194689
+                                                width: 2,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.1), // Bóng đổ nhẹ
+                                                  blurRadius: 6,
+                                                  spreadRadius: 1,
+                                                  offset: Offset(0, 3), // Đổ bóng xuống dưới
+                                                ),
+                                              ],
+                                            ),
+                                            child: Center(
+                                              child: Image.asset(
+                                                category['image']!,
+                                                width: 40,
+                                                height: 32,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ),
+
+                                          const SizedBox(height: 15),
+                                          SizedBox(
+                                            width: 100,
+                                            child: Text(
+                                              category['title']!,
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 5,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                  );
+                                }).toList(),
+                              ),
+                            );
                           },
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
                           _productCategories.length,
-                              (index) => Container(
-                            width: 8,
+                              (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            width: _categoryPage == index ? 16 : 8,
                             height: 8,
-                            margin: EdgeInsets.symmetric(horizontal: 2),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
                             decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: _categoryPage == index ? Colors.blue : Colors.grey,
+                              color: _categoryPage == index ? const Color(0xFF1AA7DD) : Colors.grey,
+                              borderRadius: BorderRadius.circular(4),
                             ),
                           ),
                         ),
@@ -189,6 +262,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
+
 
                 // Flash Sale
                 Container(
