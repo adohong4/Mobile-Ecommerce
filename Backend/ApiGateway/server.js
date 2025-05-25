@@ -7,7 +7,7 @@ const routes = {
     '/v1/api/identity': 'http://localhost:9001',
     '/v1/api/profile': 'http://localhost:9002',
     '/v1/api/product': 'http://localhost:9003',
-    '/v1/api/contact': 'http://localhost:9004',
+    '/v1/api/payment': 'http://localhost:9004',
 };
 
 // Create proxy middleware
@@ -17,8 +17,9 @@ const proxy = createProxyMiddleware({
     pathRewrite: {
         '^/v1/api/identity': '/v1/api/identity',
         '^/v1/api/profile': '/v1/api/profile',
+        '^/v1/api/message': '/v1/api/message',
         '^/v1/api/product': '/v1/api/product',
-        '^/v1/api/contact': '/v1/api/contact',
+        '^/v1/api/payment': '/v1/api/payment',
     },
     router: (req) => {
         // Select backend server based on the requested route
