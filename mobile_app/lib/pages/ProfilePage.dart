@@ -3,7 +3,7 @@ import 'package:mobile_app/services/profile_service.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:mobile_app/pages/LoginPage.dart';
-import 'package:mobile_app/pages/AddAddressPage.dart';
+import 'package:mobile_app/pages/ShippingAddressPage.dart';
 import 'package:mobile_app/pages/OrderDetailPage.dart';
 import 'package:mobile_app/providers/auth_provider.dart';
 import 'package:mobile_app/pages/EditProfilePage.dart';
@@ -213,10 +213,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const AddAddressPage(),
-                          ),
+                          MaterialPageRoute(builder: (_) => const ShippingAddressPage()),
                         );
+
                       },
                     ),
                     const SizedBox(height: 20),
