@@ -36,6 +36,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
     'Đánh giá',
   ];
 
+  final List<IconData> tabIcons = [
+    Icons.access_time,       // Chờ xác nhận
+    Icons.store_mall_directory,  // Chờ lấy hàng
+    Icons.delivery_dining,   // Chờ giao hàng
+    Icons.rate_review,       // Đánh giá
+  ];
+
   // Dữ liệu giả lập
   final List<Order> orders = [
     Order(
@@ -178,8 +185,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
 
   Widget _buildTabContent(String status) {
     bool isReviewTab = status == 'Đánh giá';
-
-    // Lọc các đơn hàng theo trạng thái
     List<Order> filteredOrders = orders.where((order) => order.status == status).toList();
 
     return ListView(
@@ -201,17 +206,40 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Đơn hàng của tôi',
-            style: TextStyle(fontFamily: 'Poppins')),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          indicatorColor: Color(0xFF0D47A1),
-          labelColor: Color(0xFF0D47A1),
-          unselectedLabelColor: Colors.black,
-          labelStyle: const TextStyle(fontFamily: 'Poppins'),
-          tabs: tabTitles.map((title) => Tab(text: title)).toList(),
+        title: const Text('Đơn hàng của tôi', style: TextStyle(fontFamily: 'Poppins')),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(70), // Tăng chiều cao thanh TabBar
+          child: TabBar(
+            controller: _tabController,
+            isScrollable: true,
+            indicatorColor: const Color(0xFF0D47A1),
+            labelColor: const Color(0xFF0D47A1),
+            unselectedLabelColor: Colors.black,
+            tabs: List.generate(tabTitles.length, (index) {
+              return SizedBox(
+                height: 65, // Tăng chiều cao từng tab
+                child: Tab(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(tabIcons[index], size: 28), // Tăng kích thước icon
+                      const SizedBox(height: 6),
+                      Text(
+                        tabTitles[index],
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
+
       ),
       body: TabBarView(
         controller: _tabController,
