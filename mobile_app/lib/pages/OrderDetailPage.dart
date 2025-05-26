@@ -150,7 +150,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
                       Text("Thành tiền: $price",
                           style: const TextStyle(
                               fontFamily: 'Poppins', fontWeight: FontWeight.w500)),
-                      const SizedBox(height: 4),
                     ],
                   ),
                 ),
@@ -162,14 +161,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF0D47A1),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10)),
+                      backgroundColor: const Color(0xFF0D47A1),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const ReviewPage()),
+                      MaterialPageRoute(builder: (context) => const ReviewPage()),
                     );
                   },
                   child: const Text('Đánh giá',
@@ -202,13 +199,17 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
     );
   }
 
+  int _getOrderCountForStatus(String status) {
+    return orders.where((order) => order.status == status).length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Đơn hàng của tôi', style: TextStyle(fontFamily: 'Poppins')),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(70), // Tăng chiều cao thanh TabBar
+          preferredSize: const Size.fromHeight(70),
           child: TabBar(
             controller: _tabController,
             isScrollable: true,
@@ -216,13 +217,44 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
             labelColor: const Color(0xFF0D47A1),
             unselectedLabelColor: Colors.black,
             tabs: List.generate(tabTitles.length, (index) {
+              final count = _getOrderCountForStatus(tabTitles[index]);
               return SizedBox(
-                height: 65, // Tăng chiều cao từng tab
+                height: 70,
                 child: Tab(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(tabIcons[index], size: 28), // Tăng kích thước icon
+                      Stack(
+                        children: [
+                          Icon(tabIcons[index], size: 35),
+                          if (count > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 18,
+                                  minHeight: 18,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '$count',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontFamily: 'Poppins',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                       const SizedBox(height: 6),
                       Text(
                         tabTitles[index],
@@ -239,7 +271,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
             }),
           ),
         ),
-
       ),
       body: TabBarView(
         controller: _tabController,

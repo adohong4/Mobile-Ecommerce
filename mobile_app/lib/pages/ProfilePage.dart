@@ -176,7 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       trailing: const Text(
                         "Chi tiết",
                         style: TextStyle(
-                          color: Colors.blue,
+                          color: Color(0xFF194689),
                           fontSize: 14,
                           fontFamily: 'Poppins',
                         ),
@@ -205,7 +205,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       trailing: const Text(
                         "Thay đổi địa chỉ",
                         style: TextStyle(
-                          color: Colors.blue,
+                          color: Color(0xFF194689),
                           fontSize: 14,
                           fontFamily: 'Poppins',
                         ),
@@ -227,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 48,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue[800],
+                            backgroundColor: Color(0xFF194689),
                           ),
                           onPressed: () async {
                             await Provider.of<AuthProvider>(
