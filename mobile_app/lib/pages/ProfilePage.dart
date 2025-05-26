@@ -6,6 +6,7 @@ import 'package:mobile_app/pages/LoginPage.dart';
 import 'package:mobile_app/pages/AddAddressPage.dart';
 import 'package:mobile_app/pages/OrderDetailPage.dart';
 import 'package:mobile_app/providers/auth_provider.dart';
+import 'package:mobile_app/pages/EditProfilePage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -122,6 +123,22 @@ class _ProfilePageState extends State<ProfilePage> {
                         fontFamily: 'Poppins',
                       ),
                     ),
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditProfilePage(profile: _profile!),
+                          ),
+                        ).then((_) => _fetchProfile()); // Refresh sau khi sửa
+                      },
+                      icon: const Icon(Icons.edit, color: Color(0xFF194689)),
+                      label: const Text(
+                        'Chỉnh sửa hồ sơ',
+                        style: TextStyle(color: Color(0xFF194689), fontFamily: 'Poppins'),
+                      ),
+                    ),
+
                     const SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
