@@ -14,8 +14,8 @@ class AdvertiseService {
             }
 
             let image_filename = "";
-            if (req.files) {
-                image_filename = req.files.map(file => file.filename);
+            if (req.file) {
+                image_filename = req.file.filename;
             } else {
                 throw new Error("No file uploaded");
             }
