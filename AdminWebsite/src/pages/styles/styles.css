@@ -50,10 +50,12 @@
 } */
 .addprd {
     max-width: 83%;
-    margin: 20px auto;
+    /* margin: 20px auto; */
     margin-right: 0;
 }
-
+.rounded-pill {
+    border-radius: 8px !important;
+}
 .admin-container .sidebar-right ul.nav-tabs li button {
     padding: 10px;
     border-top-left-radius: 5px;
@@ -61,21 +63,22 @@
     border-bottom-right-radius: 0px;
     border-bottom-left-radius: 0px;
     border: none;
-    color: #fff;
-    background-color: #00B98E;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: larger;
+    color: #194689;
+    background-color: #fff;
+    border-bottom: 5px solid #194689;
     transition: all 0.3s ease-in-out;
     transform: translateY(0px);
 }
 
-.admin-container .sidebar-right ul.nav-tabs li button:hover {
-    scale: 1.05;
-    background-color: #00A07B;
-}
 
-.admin-container .sidebar-right ul.nav-tabs li button.active {
+
+/* .admin-container .sidebar-right ul.nav-tabs li button.active {
     background-color: #008F6A;
     border: none;
-}
+} */
 
 .add-tab {
     height: 100%;
@@ -172,7 +175,7 @@ select:focus {
 
 .add-body-product button[type="submit"] {
     padding: 15px 24px !important;
-    background-color: #00B98E;
+    background-color: #194689;
     color: #fff;
     border: none;
     border-radius: 25px;
@@ -180,11 +183,13 @@ select:focus {
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-top: 10px;
+    margin-bottom: 10px;
     transition: all 0.3s ease-in-out;
     width: 170px;
 }
-
+.tab-right-content ,.mt-4 {
+    margin-top: 0rem !important;
+}
 .text-center {
     text-align: center;
 }
@@ -2904,13 +2909,13 @@ h2 {
 }
 
 .tab-item.active {
-    color: #008F6A;
-    border-bottom: 2px solid #00A07B;
+    color: #194689;
+    border-bottom: 2px solid #194689;
     font-weight: bold;
 }
 
 .tab-item:hover {
-    color: #009C72;
+    color: #194689;
 }
 
 

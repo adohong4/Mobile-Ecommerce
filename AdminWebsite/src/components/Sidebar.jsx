@@ -5,7 +5,7 @@ import { assets } from "../assets/assets";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSignOutAlt, faChevronDown, faPlusCircle, faListUl, faUserTie, faTruck,
-  faUser, faBoxOpen, faHeadset, faChartBar, faInbox, faBarcode, faChartColumn, faDisplay, faTicket
+  faUser, faBoxOpen, faHeadset, faChartBar, faInbox, faBarcode, faChartColumn, faDisplay, faTicket, faBox, faTags, faImage, faChartPie, faChartLine
 } from "@fortawesome/free-solid-svg-icons";
 
 const Sidebar = () => {
@@ -45,14 +45,14 @@ const Sidebar = () => {
 
           <div className="sidebar-options">
             <NavLink to="/dashboard" className="sidebar-option">
-              <FontAwesomeIcon icon={faDisplay} />
+              <FontAwesomeIcon icon={faChartPie} />
               <p>Tổng quan</p>
             </NavLink>
           </div>
 
           <div className="sidebar-options">
             <NavLink to="/statistic" className="sidebar-option">
-              <FontAwesomeIcon icon={faChartColumn} />
+              <FontAwesomeIcon icon={faChartLine} />
               <p>Thống kê</p>
             </NavLink>
           </div>
@@ -63,7 +63,7 @@ const Sidebar = () => {
               onClick={() => toggleMenu("sanPham")}
             >
               <div className="dad-menu sidebar-title">
-                <FontAwesomeIcon icon={faPlusCircle} />
+                <FontAwesomeIcon icon={faBox} />
                 <p>Sản phẩm</p>
               </div>
               <FontAwesomeIcon
@@ -86,7 +86,7 @@ const Sidebar = () => {
               onClick={() => toggleMenu("category")}
             >
               <div className="dad-menu sidebar-title">
-                <FontAwesomeIcon icon={faPlusCircle} />
+                <FontAwesomeIcon icon={faTags} />
                 <p>Phân loại</p>
               </div>
               <FontAwesomeIcon
@@ -108,7 +108,7 @@ const Sidebar = () => {
               onClick={() => toggleMenu("advertise")}
             >
               <div className="dad-menu sidebar-title">
-                <FontAwesomeIcon icon={faPlusCircle} />
+                <FontAwesomeIcon icon={faImage} />
                 <p>Banner && Quảng cáo</p>
               </div>
               <FontAwesomeIcon

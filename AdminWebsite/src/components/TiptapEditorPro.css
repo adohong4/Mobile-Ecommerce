@@ -1,0 +1,42 @@
+.editor-container {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  background: white;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  background: #f5f7fa;
+  border-bottom: 1px solid #eee;
+}
+
+.editor-btn {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.editor-btn:hover {
+  background: #eaf6ff;
+}
+
+.editor-btn.active {
+  background: #1AA7DD;
+  border-color: #1AA7DD;
+  color: white;
+}
+
+.editor-content {
+  padding: 15px;
+  min-height: 200px;
+  outline: none;
+}

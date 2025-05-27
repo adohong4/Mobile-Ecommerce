@@ -6,7 +6,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Tab, Tabs } from 'react-bootstrap';
 import { ProductContext } from '../../context/ProductContextProvider';
-
+import TiptapEditor from '../../components/TiptapEditor';
 const AddProduct = () => {
     const { url } = useContext(ProductContext);
     const [images, setImage] = useState([]);
@@ -146,20 +146,6 @@ const AddProduct = () => {
                                     </div>
                                     <div className='form-row'>
                                         <div className="form-group col-md-6">
-                                            <label htmlFor="title" className="mb-2">Tiêu đề (*)</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.title}
-                                                type="text"
-                                                name="title"
-                                                id="title"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập tiêu đề sản phẩm"
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="form-group col-md-6">
                                             <label htmlFor="nameProduct" className="mb-2">Tên Sản Phẩm (*)</label>
                                             <input
                                                 onChange={onChangeHandler}
@@ -169,6 +155,19 @@ const AddProduct = () => {
                                                 id="nameProduct"
                                                 className="form-control rounded-pill"
                                                 placeholder="Nhập tên sản phẩm"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="form-group col-md-6">
+                                            <label htmlFor="quantity" className="mb-2">Số lượng (*)</label>
+                                            <input
+                                                onChange={onChangeHandler}
+                                                value={data.quantity}
+                                                type="number"
+                                                name="quantity"
+                                                id="quantity"
+                                                className="form-control rounded-pill"
+                                                placeholder="20"
                                                 required
                                             />
                                         </div>
@@ -204,48 +203,22 @@ const AddProduct = () => {
                                                 required
                                             />
                                         </div>
-
                                     </div>
-                                    <div className="form-group col-md-6">
-                                        <label htmlFor="quantity" className="mb-2">Số lượng (*)</label>
-                                        <input
-                                            onChange={onChangeHandler}
-                                            value={data.quantity}
-                                            type="number"
-                                            name="quantity"
-                                            id="quantity"
-                                            className="form-control rounded-pill"
-                                            placeholder="20"
-                                            required
+                                    
+                                    <div className="form-group">
+                                        <label htmlFor="recap" className="mb-2">Mô tả sản phẩm (*)</label>
+                                        <TiptapEditor
+                                            value={data.recap}
+                                            onChange={(value) => onChangeHandler('recap', value)}
                                         />
                                     </div>
-                                    <div className="form-group">
-                                        <label htmlFor="recap" className="mb-2">Miêu tả ngắn (*)</label>
-                                        <textarea
-                                            onChange={onChangeHandler}
-                                            value={data.recap}
-                                            type="text"
-                                            name="recap"
-                                            id="recap"
-                                            rows="4"
-                                            className="form-control"
-                                            placeholder="Nhập miêu tả sản phẩm"
-                                            style={{ borderRadius: '15px' }}
-                                        ></textarea>
-                                    </div>
 
                                     <div className="form-group">
-                                        <label htmlFor="description" className="mb-2">Miêu tả sản phẩm (*)</label>
-                                        <textarea
-                                            onChange={onChangeHandler}
+                                        <label htmlFor="description" className="mb-2">Mô tả(*)</label>
+                                        <TiptapEditor
                                             value={data.description}
-                                            name="description"
-                                            id="description"
-                                            rows="4"
-                                            className="form-control"
-                                            placeholder="Miêu tả sản phẩm"
-                                            style={{ borderRadius: '15px' }}
-                                        ></textarea>
+                                            onChange={(value) => onChangeHandler('recap', value)}
+                                        />
                                     </div>
 
 
@@ -253,171 +226,13 @@ const AddProduct = () => {
 
 
                                 {/* Tab 2 */}
-                                <Tab eventKey="specifications" title="Thông Số Kỹ Thuật">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="mainBoard" className="mb-2">Thông Số Bo Mạch Chủ</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.mainBoard}
-                                                type="text"
-                                                name="mainBoard"
-                                                id="mainBoard"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập Thông Số Bo Mạch Chủ"
-                                            />
-                                        </div>
 
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="chip" className="mb-2">Chip</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.chip}
-                                                type="text"
-                                                name="chip"
-                                                id="chip"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập loại chip"
-                                            />
-                                        </div>
-
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="gpu" className="mb-2">GPU</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.gpu}
-                                                type="text"
-                                                name="gpu"
-                                                id="gpu"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập GPU"
-                                            />
-                                        </div>
-
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="cpu" className="mb-2">CPU</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.cpu}
-                                                type="text"
-                                                name="cpu"
-                                                id="cpu"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập CPU"
-                                            />
-                                        </div>
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="ram" className="mb-2">RAM</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.ram}
-                                                type="text"
-                                                name="ram"
-                                                id="ram"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập RAM"
-                                            />
-                                        </div>
-
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="memory" className="mb-2">Bộ nhớ</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.memory}
-                                                type="text"
-                                                name="memory"
-                                                id="memory"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập Dung lượng bộ nhớ (HDD/SSD)"
-                                            />
-                                        </div>
-
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="version" className="mb-2">Phiên bản</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.version}
-                                                type="text"
-                                                name="version"
-                                                id="version"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập phiên bản"
-                                            />
-                                        </div>
-
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="displaySize" className="mb-2">Kích Thước Hiển Thị</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.displaySize}
-                                                type="text"
-                                                name="displaySize"
-                                                id="displaySize"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập Thông số màn hình (IPS, OLED, v.v.)"
-                                            />
-                                        </div>
-
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="pixelDensity" className="mb-2">Độ Phân Giải</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.pixelDensity}
-                                                type="text"
-                                                name="pixelDensity"
-                                                id="pixelDensity"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập Port"
-                                            />
-                                        </div>
-
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="ports" className="mb-2">Cổng</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.ports}
-                                                type="text"
-                                                name="ports"
-                                                id="ports"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập pixelDensity"
-                                            />
-                                        </div>
-                                        {/* Weight */}
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="display" className="mb-2">Màn Hình</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.display}
-                                                type="text"
-                                                name="display"
-                                                id="display"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập màn hình"
-                                            />
-                                        </div>
-
-                                        {/* Battery */}
-                                        <div className="form-group col-md-6">
-                                            <label htmlFor="refreshRate" className="mb-2">refreshRate</label>
-                                            <input
-                                                onChange={onChangeHandler}
-                                                value={data.refreshRate}
-                                                type="text"
-                                                name="refreshRate"
-                                                id="refreshRate"
-                                                className="form-control rounded-pill"
-                                                placeholder="Nhập tần số quét"
-                                            />
-                                        </div>
-                                    </div>
-                                </Tab>
                             </Tabs>
 
                         </div>
                         <div className='tab-right col-2'>
                             <div className='tab-right-content'>
-                                <img src={assets.add_product} alt="add products" />
+                               
                                 <div className="text-center mt-4">
                                     <button type="submit" className="btn btn-primary rounded-pill px-4 py-2" disabled={loading}>
                                         {loading ? "Đang tải..." : "Thêm Sản Phẩm"}
@@ -428,11 +243,12 @@ const AddProduct = () => {
                                         type="submit"
                                         className="btn btn-primary rounded-pill px-4 py-2"
                                         disabled={loading}
-                                        style={{ background: "red" }}  // Đúng: Dùng object
+                                        style={{ background: "#1AA7DD" }}  
                                     >
                                         {loading ? "Đang tải..." : "Làm mới"}
                                     </button>
                                 </div>
+                                 <img src={assets.add_product} alt="add products" />
                             </div>
                         </div>
 
