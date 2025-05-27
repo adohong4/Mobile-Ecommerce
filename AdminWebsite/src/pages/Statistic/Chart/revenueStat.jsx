@@ -3,12 +3,12 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { StoreContext } from '../../../context/StoreContext';
+import { OrderContext } from '../../../context/OrderContextProvider';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const RevenueStat = () => {
-    const { url } = useContext(StoreContext);
+    const { url } = useContext(OrderContext);
     axios.defaults.withCredentials = true;
     const [selectedTime, setSelectedTime] = useState('week');
     const [revenue, setRevenue] = useState({ time: '', totalRevenue: 0, data: [] });
@@ -99,7 +99,7 @@ const RevenueStat = () => {
                     Năm
                 </div>
             </div>
-    
+
             {revenue.data.length > 0 ? (
                 <Bar data={chartData} options={options} />
             ) : (

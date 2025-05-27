@@ -1,20 +1,26 @@
 import React, { useState, useContext } from 'react';
-import { NavLink } from 'react-router-dom';
-import "./Styles/Styles.css";
+import { NavLink, useNavigate } from 'react-router-dom';
+import './Styles/Styles.css';
 import { assets } from '../assets/assets';
-import { motion } from "framer-motion";
-import { StoreContext } from '../context/StoreContext';
+import { motion } from 'framer-motion';
+import { AccountContext } from '../context/AccountContextProvider';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 
 const Sidebar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const { account_list, updateStaff } = useContext(StoreContext);
+    const { account, setToken } = useContext(AccountContext);
+    const navigate = useNavigate();
+
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
     };
 
     const handleLogout = () => {
         Cookies.remove('token');
+        setToken('');
+        toast.success('Đăng xuất thành công');
+        navigate('/admin-login');
     };
 
     return (
@@ -26,21 +32,21 @@ const Sidebar = () => {
                 className="header-admin"
             >
                 <motion.div
-                    className='header-admin-left'
+                    className="header-admin-left"
                     initial={{ x: -100, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 1, ease: "easeOut" }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
                 >
                     <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 2, repeat: Infinity, repeatType: "mirror" }}
+                        transition={{ duration: 2, repeat: Infinity, repeatType: 'mirror' }}
                     >
-                        Xin chào {account_list.StaffName} !
+                        Xin chào {account?.StaffName || 'Nhân viên'}!
                     </motion.p>
                 </motion.div>
                 <motion.div
-                    className='header-admin-right'
+                    className="header-admin-right"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8 }}
@@ -48,14 +54,16 @@ const Sidebar = () => {
                     <div className="profile-container">
                         <img
                             className="logo profile-pic"
-                            src={account_list.StaffPic || assets.avt}
-                            alt="avt"
+                            src={account?.StaffPic || assets.avt}
+                            alt="avatar"
                             onClick={toggleMenu}
                         />
                         {menuOpen && (
                             <div className="profile-menu">
                                 <NavLink to="/profile-admin">Thông tin</NavLink>
-                                <NavLink to="/admin-login" onClick={handleLogout}>Đăng Xuất</NavLink>
+                                <NavLink to="/admin-login" onClick={handleLogout}>
+                                    Đăng Xuất
+                                </NavLink>
                             </div>
                         )}
                     </div>
@@ -63,6 +71,6 @@ const Sidebar = () => {
             </motion.div>
         </div>
     );
-}
+};
 
 export default Sidebar;

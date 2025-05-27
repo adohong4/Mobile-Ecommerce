@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.post('/product/voucher/create', asyncHandler(voucherController.createVoucher));
 router.get('/product/voucher/get', asyncHandler(voucherController.getVoucherList));
+router.get('/product/voucher/get/:id', asyncHandler(voucherController.getVoucherById));
 router.get('/product/voucher/paginate', asyncHandler(voucherController.paginateVoucherList));
 router.delete('/product/voucher/delete/:voucherId', asyncHandler(voucherController.softDeleteVoucher));
 router.delete('/product/voucher/delete/:voucherId', asyncHandler(voucherController.deleteVoucher));

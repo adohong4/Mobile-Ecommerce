@@ -4,11 +4,11 @@ import '../styles/styles.css';
 import { assets } from '../../assets/assets';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { StoreContext } from '../../context/StoreContext';
 import { Tab, Tabs } from 'react-bootstrap';
+import { ProductContext } from '../../context/ProductContextProvider';
 
 const AddProduct = () => {
-    const { url } = useContext(StoreContext);
+    const { url } = useContext(ProductContext);
     const [images, setImage] = useState([]);
     const [data, setData] = useState({
         title: "",

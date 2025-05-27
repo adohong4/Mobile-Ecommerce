@@ -1,51 +1,48 @@
 import React, { useEffect, useContext, useState } from 'react';
 import axios from 'axios';
-import '../styles/styles.css'
-import { StoreContext } from '../../context/StoreContext';
-import { formatDayTime, formatCurrency } from '../../lib/utils'
-import { Table, Switch, Modal, Button, Select, Input, Popconfirm, Descriptions, Space } from "antd";
-import { BookFilled, EditFilled, DeleteOutlined,PlusOutlined } from '@ant-design/icons';
+import '../styles/styles.css';
+import { CampaignContext } from '../../context/CampaignContextProvider';
+import { formatDayTime, formatCurrency } from '../../lib/utils';
+import { Table, Modal, Button, Select, Input, Popconfirm, Descriptions, Space } from 'antd';
+import { BookFilled, EditFilled, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 const { Option } = Select;
 
 const CampaignPage = () => {
   axios.defaults.withCredentials = true;
-  const { url, activeCampaign } = useContext(StoreContext);
-  const [list, setList] = useState([]);
+  const {
+    campaignList,
+    fetchCampaignList,
+    deleteCampaign,
+    searchCampaignByCode,
+  } = useContext(CampaignContext);
   const [limit, setLimit] = useState(7);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
   const [viewingCampaign, setViewingCampaign] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
 
   const navigate = useNavigate();
 
-  const fetchCampaignList = async (page = 1, limit = 8) => {
+  const fetchPaginatedCampaigns = async (page = 1, limit = 7) => {
     try {
-      const response = await axios.get(`${url}/v1/api/product/campaign/paginate?page=${page}&limit=${limit}`);
-      if (response.data.message) {
-        setList(response.data.metadata.campaign);
-        setLimit(limit)
-        setTotalItems(response.data.metadata.totalCampaign);
-        setTotalPages(response.data.metadata.totalPages);
-      }
+      await fetchCampaignList(page, limit); // Use context's fetchCampaignList
     } catch (error) {
-      console.error('Xảy ra ngoại lệ khi lấy dữ liệu liên hệ');
+      toast.error('Lỗi khi lấy danh sách chiến dịch: ' + error.message);
     }
   };
 
   useEffect(() => {
-    fetchCampaignList(currentPage);
-  }, [currentPage]);
+    fetchPaginatedCampaigns(currentPage, limit);
+  }, [currentPage, limit]);
 
-  const handleDelete = async (code) => {
-    await activeCampaign(code);
-    fetchCampaignList(currentPage);
+  const handleDelete = async (campaignId) => {
+    await deleteCampaign(campaignId);
+    fetchPaginatedCampaigns(currentPage, limit);
   };
 
   const handleInfor = (id) => {
@@ -58,11 +55,26 @@ const CampaignPage = () => {
   };
 
   const handleAddCampaign = () => {
-    navigate("/add-campaign");
+    navigate('/add-campaign');
   };
 
-  // Lọc dữ liệu theo tìm kiếm và loại khuyến mãi
-  const filteredCampaigns = list.filter((campaign) => {
+  const handleSearch = async (value) => {
+    setSearchTerm(value);
+    if (value) {
+      try {
+        const result = await searchCampaignByCode(value);
+        if (result) {
+          setViewingCampaign(result);
+          setIsViewModalOpen(true);
+        }
+      } catch (error) {
+        toast.error('Không tìm thấy chiến dịch với mã này');
+      }
+    }
+  };
+
+  // Filter campaigns based on search term, type, and status
+  const filteredCampaigns = campaignList.filter((campaign) => {
     return (
       campaign.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedType ? campaign.type === selectedType : true) &&
@@ -72,32 +84,32 @@ const CampaignPage = () => {
 
   const columns = [
     {
-      title: "Mã khuyến mãi",
-      dataIndex: "code",
-      key: "code",
+      title: 'Mã khuyến mãi',
+      dataIndex: 'code',
+      key: 'code',
       sorter: (a, b) => a.code.localeCompare(b.code),
     },
     {
-      title: "Tên chiến dịch",
-      dataIndex: "name",
-      key: "name",
+      title: 'Tên chiến dịch',
+      dataIndex: 'name',
+      key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
-      title: "Giá trị",
-      dataIndex: "value",
-      key: "value",
+      title: 'Giá trị',
+      dataIndex: 'value',
+      key: 'value',
       render: (value, record) =>
-        record.type === "percentage" ? `${formatCurrency(value)}%` : `${formatCurrency(value)} VNĐ`,
+        record.type === 'percentage' ? `${formatCurrency(value)}%` : `${formatCurrency(value)} VNĐ`,
       sorter: (a, b) => a.value - b.value,
     },
     {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
       render: (status, record) => {
         let statusText;
-        let style = {}; // Object chứa style
+        let style = {};
 
         switch (record.status) {
           case 'active':
@@ -132,35 +144,33 @@ const CampaignPage = () => {
         return <span style={style}>{statusText}</span>;
       },
     },
-
     {
-      title: "Ngày bắt đầu",
-      dataIndex: "startDate",
-      key: "startDate",
-      render: (startDate, record) => formatDayTime(record.startDate),
+      title: 'Ngày bắt đầu',
+      dataIndex: 'startDate',
+      key: 'startDate',
+      render: (startDate) => formatDayTime(startDate),
       sorter: (a, b) => new Date(a.startDate) - new Date(b.startDate),
     },
     {
-      title: "Ngày kết thúc",
-      dataIndex: "endDate",
-      key: "endDate",
-      render: (endDate, record) => formatDayTime(record.endDate),
+      title: 'Ngày kết thúc',
+      dataIndex: 'endDate',
+      key: 'endDate',
+      render: (endDate) => formatDayTime(endDate),
       sorter: (a, b) => new Date(a.endDate) - new Date(b.endDate),
     },
     {
-      title: "Hành động",
-      key: "action",
+      title: 'Hành động',
+      key: 'action',
       align: 'center',
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="Xem chi tiết">
             <Button
               shape="circle"
-              icon={<BookFilled style={{ color: "orange" }} />}
+              icon={<BookFilled style={{ color: 'orange' }} />}
               onClick={() => showViewModal(record)}
             />
           </Tooltip>
-
           <Tooltip title="Cập nhật thông tin">
             <Button
               shape="circle"
@@ -168,7 +178,6 @@ const CampaignPage = () => {
               onClick={() => handleInfor(record._id)}
             />
           </Tooltip>
-
           <Popconfirm
             title="Xóa chiến dịch này?"
             onConfirm={() => handleDelete(record._id)}
@@ -196,7 +205,7 @@ const CampaignPage = () => {
 
   return (
     <div style={{ padding: 20 }}>
-      <div style={{ display: "flex", marginBottom: 16 }}>
+      <div style={{ display: 'flex', marginBottom: 16 }}>
         <Input
           placeholder="Tìm kiếm khuyến mãi"
           style={{
@@ -205,11 +214,11 @@ const CampaignPage = () => {
             backgroundColor: '#ffff',
           }}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
         />
         <Select
           placeholder="Loại khuyến mãi"
-          style={{ width: 150, marginRight: 8, }}
+          style={{ width: 150, marginRight: 8 }}
           value={selectedType}
           onChange={(value) => setSelectedType(value)}
           allowClear
@@ -239,10 +248,16 @@ const CampaignPage = () => {
         columns={columns}
         dataSource={filteredCampaigns.map((campaign, index) => ({ ...campaign, key: campaign._id || index }))}
         rowKey="key"
-        pagination={{ pageSize: limit }}
+        pagination={{
+          pageSize: limit,
+          current: currentPage,
+          total: filteredCampaigns.length,
+          onChange: (page, pageSize) => {
+            setCurrentPage(page);
+            setLimit(pageSize);
+          },
+        }}
       />
-
-      {/* Modal thông tin chiến dịch */}
       <Modal
         open={isViewModalOpen}
         onCancel={() => setIsViewModalOpen(false)}
@@ -278,7 +293,7 @@ const CampaignPage = () => {
                             : 'Nháp'}
               </Descriptions.Item>
             </Descriptions>
-            <h3>Lịch sử thay đổi</h3>
+            {/* <h3>Lịch sử thay đổi</h3>
             <Table
               columns={columnsCreator}
               dataSource={viewingCampaign.creator?.map((item, index) => ({
@@ -287,11 +302,10 @@ const CampaignPage = () => {
               }))}
               pagination={{ pageSize: 4 }}
               rowKey={(record) => record.key}
-            />
+            /> */}
           </div>
         )}
       </Modal>
-
     </div>
   );
 };

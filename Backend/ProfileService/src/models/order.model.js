@@ -24,7 +24,8 @@ const orderSchema = new Schema({
             });
         }
     },
-    paymentMethod: { type: String, default: "cod", enum: ["cod", "online"] },
+    // paymentMethod: { type: String, default: "cod", enum: ["cod", "online"] },
+    paymentMethod: { type: String },
     payment: { type: Boolean, default: false },
     active: { type: Boolean, default: true },
 }, { timestamps: true })

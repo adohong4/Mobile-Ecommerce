@@ -2,17 +2,17 @@ import React, { useEffect, useContext, useState } from 'react';
 import { Table, Input, Button, Popconfirm, Modal, Form, Checkbox, Select, notification } from "antd";
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { StoreContext } from '../../context/StoreContext';
 import ProductStatis from './Table/productStatis';
 import CategoryStatistic from './Chart/categoryStatistic';
 import RevenueStat from './Chart/revenueStat';
 import CategoryTable from './Table/categoryTable';
 import TopProduct from './Table/TopProduct';
+import { OrderContext } from '../../context/OrderContextProvider';
 
 const Statistic = () => {
     const [table, setTable] = useState([]);
     const [category, setCategory] = useState([]);
-    const { url } = useContext(StoreContext);
+    const { url } = useContext(OrderContext);
     axios.defaults.withCredentials = true;
 
     const fetchStatisticList = async () => {
