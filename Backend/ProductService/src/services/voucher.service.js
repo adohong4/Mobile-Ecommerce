@@ -59,6 +59,16 @@ class VoucherService {
         }
     }
 
+    static async getVoucherById(req, res) {
+        try {
+            const { id } = req.params;
+            const voucher = await voucherModel.findById(id);
+            return voucher;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     static async paginateVoucherList({ limit = 10, page = 1, active }) {
         try {
             const skip = (page - 1) * limit;

@@ -32,6 +32,7 @@ import TrashCampain from '../../pages/Campaign/TrashCampaign';
 import Statistic from '../../pages/Statistic/Statistic';
 import { ToastContainer } from 'react-toastify';
 import Cookies from 'js-cookie';
+import VoucherList from '../Voucher/VoucherList';
 
 const Admin = () => {
     // const token = Cookies.get("token");
@@ -85,6 +86,10 @@ const Admin = () => {
                                     <Route path="supplier" element={<Supplier />} />
                                     <Route path="trash-supplier" element={<TrashSupplier />} />
                                     <Route path="supplier/:id" element={<SupplierInfo />} />
+
+                                    <Route path="voucher" element={<VoucherList />} />
+
+
                                     <Route path="statistic" element={<Statistic />} />
                                 </Routes>
                             </div>

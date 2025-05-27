@@ -6,7 +6,7 @@ import { StoreContext } from '../context/StoreContext';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSignOutAlt, faChevronDown, faPlusCircle, faListUl, faUserTie, faTruck,
-  faUser, faBoxOpen, faHeadset, faChartBar, faInbox, faBarcode, faChartColumn, faDisplay
+  faUser, faBoxOpen, faHeadset, faChartBar, faInbox, faBarcode, faChartColumn, faDisplay, faTicket
 } from "@fortawesome/free-solid-svg-icons";
 
 const Sidebar = () => {
@@ -22,6 +22,7 @@ const Sidebar = () => {
     chienDich: false,
     nhaCungcap: false,
     nhanVien: false,
+    voucher: false,
     statistic: false
   });
 
@@ -99,7 +100,7 @@ const Sidebar = () => {
                 )}
               </div>
 
-              <div className="sidebar-dropdown">
+              {/* <div className="sidebar-dropdown">
                 <div className="sidebar-option sidebar-main" onClick={() => setIsOpenContact(!isOpenContact)}>
                   <div className="dad-menu sidebar-title">
                     <FontAwesomeIcon icon={faHeadset} />
@@ -113,7 +114,7 @@ const Sidebar = () => {
                     <li><NavLink to="/contact/trash" className="submenu-item">Thùng rác</NavLink></li>
                   </ul>
                 )}
-              </div>
+              </div> */}
             </>
           )}
 
@@ -137,7 +138,7 @@ const Sidebar = () => {
           {/* Show remaining menus only for non-Shipper roles */}
           {!isShipper && (
             <>
-              <div className="sidebar-dropdown">
+              {/* <div className="sidebar-dropdown">
                 <div
                   className="sidebar-option sidebar-main"
                   onClick={() => toggleMenu("nhapHang")}
@@ -165,9 +166,9 @@ const Sidebar = () => {
                     </li>
                   </ul>
                 )}
-              </div>
+              </div> */}
 
-              <div className="sidebar-dropdown">
+              {/* <div className="sidebar-dropdown">
                 <div
                   className="sidebar-option sidebar-main"
                   onClick={() => toggleMenu("nhaCungcap")}
@@ -200,7 +201,7 @@ const Sidebar = () => {
                     </li>
                   </ul>
                 )}
-              </div>
+              </div> */}
 
               <div className="sidebar-dropdown">
                 <div
@@ -237,7 +238,42 @@ const Sidebar = () => {
                 )}
               </div>
 
-              {showStaffMenu && (
+              <div className="sidebar-dropdown">
+                <div
+                  className="sidebar-option sidebar-main"
+                  onClick={() => toggleMenu("voucher")}
+                >
+                  <div className="dad-menu sidebar-title">
+                    <FontAwesomeIcon icon={faTicket} />
+                    <p>Phiếu giảm giá</p>
+                  </div>
+                  <FontAwesomeIcon
+                    icon={faChevronDown}
+                    className={`sidebar-icon ${openMenus.voucher ? "rotate" : ""}`}
+                  />
+                </div>
+                {openMenus.voucher && (
+                  <ul className="sidebar-submenu">
+                    <li>
+                      <NavLink to="/add-campaign" className="submenu-item">
+                        Thêm voucher
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to="/voucher" className="submenu-item">
+                        Danh sách voucher
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to="/trash-campaign" className="submenu-item">
+                        Thùng rác
+                      </NavLink>
+                    </li>
+                  </ul>
+                )}
+              </div>
+
+              {/* {showStaffMenu && (
                 <div className="sidebar-dropdown">
                   <div
                     className="sidebar-option sidebar-main"
@@ -267,7 +303,7 @@ const Sidebar = () => {
                     </ul>
                   )}
                 </div>
-              )}
+              )} */}
             </>
           )}
         </div>

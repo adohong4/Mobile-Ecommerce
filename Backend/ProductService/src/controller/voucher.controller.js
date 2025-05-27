@@ -19,8 +19,20 @@ class VoucherController {
     async getVoucherList(req, res, next) {
         try {
             const result = await VoucherService.getVoucherList();
-            new CREATED({
-                message: 'Tạo phiếu giảm giá thành công',
+            new OK({
+                message: 'Lấy phiếu giảm giá thành công',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getVoucherById(req, res, next) {
+        try {
+            const result = await VoucherService.getVoucherById(req, res);
+            new OK({
+                message: 'Lấy phiếu giảm giá thành công',
                 metadata: result
             }).send(res);
         } catch (error) {
