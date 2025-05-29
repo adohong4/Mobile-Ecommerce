@@ -91,7 +91,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           Container(
-            height: 100,
+            height: 80,
             decoration: BoxDecoration(
               color: Colors.white, // hoặc bất kỳ màu nền nào của app bar
               boxShadow: [
@@ -105,7 +105,8 @@ class _HomePageState extends State<HomePage> {
             ),
             child: HomeAppBar(),
           ),
-          Expanded( // Nội dung cuộn được
+          Expanded(
+            // Nội dung cuộn được
             child: ListView(
               children: [
                 // Banner slider
@@ -133,13 +134,16 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
                           _banners.length,
-                              (index) => Container(
+                          (index) => Container(
                             width: 0,
                             height: 0,
                             margin: EdgeInsets.symmetric(horizontal: 2),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: _bannerPage == index ? Colors.blue : Colors.grey,
+                              color:
+                                  _bannerPage == index
+                                      ? Colors.blue
+                                      : Colors.grey,
                             ),
                           ),
                         ),
@@ -181,63 +185,77 @@ class _HomePageState extends State<HomePage> {
                           itemBuilder: (context, index) {
                             final categoryList = _productCategories[index];
                             return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                              ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: categoryList.map<Widget>((category) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      // TODO: Handle tap
-                                    },
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            width: 56, // 2 * radius
-                                            height: 56,
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFFFFFFF), // Nền trắng
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: Color(0xFF194689), // Viền màu #194689
-                                                width: 2,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.1), // Bóng đổ nhẹ
-                                                  blurRadius: 6,
-                                                  spreadRadius: 1,
-                                                  offset: Offset(0, 3), // Đổ bóng xuống dưới
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children:
+                                    categoryList.map<Widget>((category) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          // TODO: Handle tap
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: 56, // 2 * radius
+                                              height: 56,
+                                              decoration: BoxDecoration(
+                                                color: const Color(
+                                                  0xFFFFFFFF,
+                                                ), // Nền trắng
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: Color(
+                                                    0xFF194689,
+                                                  ), // Viền màu #194689
+                                                  width: 2,
                                                 ),
-                                              ],
-                                            ),
-                                            child: Center(
-                                              child: Image.asset(
-                                                category['image']!,
-                                                width: 40,
-                                                height: 32,
-                                                fit: BoxFit.contain,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(
+                                                          0.1,
+                                                        ), // Bóng đổ nhẹ
+                                                    blurRadius: 6,
+                                                    spreadRadius: 1,
+                                                    offset: Offset(
+                                                      0,
+                                                      3,
+                                                    ), // Đổ bóng xuống dưới
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Image.asset(
+                                                  category['image']!,
+                                                  width: 40,
+                                                  height: 32,
+                                                  fit: BoxFit.contain,
+                                                ),
                                               ),
                                             ),
-                                          ),
 
-                                          const SizedBox(height: 15),
-                                          SizedBox(
-                                            width: 100,
-                                            child: Text(
-                                              category['title']!,
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w500,
+                                            const SizedBox(height: 15),
+                                            SizedBox(
+                                              width: 100,
+                                              child: Text(
+                                                category['title']!,
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                maxLines: 5,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                              textAlign: TextAlign.center,
-                                              maxLines: 5,
-                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                  );
-                                }).toList(),
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
                               ),
                             );
                           },
@@ -248,13 +266,16 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
                           _productCategories.length,
-                              (index) => AnimatedContainer(
+                          (index) => AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             width: _categoryPage == index ? 16 : 8,
                             height: 8,
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             decoration: BoxDecoration(
-                              color: _categoryPage == index ? const Color(0xFF1AA7DD) : Colors.grey,
+                              color:
+                                  _categoryPage == index
+                                      ? const Color(0xFF1AA7DD)
+                                      : Colors.grey,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -263,7 +284,6 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-
 
                 // Flash Sale
                 Container(
@@ -276,18 +296,29 @@ class _HomePageState extends State<HomePage> {
                         child: Text(
                           "FLASH SALE",
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       FutureBuilder<List<ProductsModel>>(
                         future: _productsFuture,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
                           } else if (snapshot.hasError) {
-                            return Center(child: Text('Error: ${snapshot.error}'));
-                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return const Center(child: Text('No products available'));
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return const Center(
+                              child: Text('No products available'),
+                            );
                           }
 
                           final products = snapshot.data!;
@@ -295,14 +326,17 @@ class _HomePageState extends State<HomePage> {
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: products.length,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.7,
-                              crossAxisSpacing: 0,
-                              mainAxisSpacing: 0,
-                            ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 0.7,
+                                  crossAxisSpacing: 0,
+                                  mainAxisSpacing: 0,
+                                ),
                             itemBuilder: (context, index) {
-                              return component.ProductCard(products: products[index]);
+                              return component.ProductCard(
+                                products: products[index],
+                              );
                             },
                           );
                         },

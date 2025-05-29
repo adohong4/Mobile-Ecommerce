@@ -233,6 +233,43 @@ class VoucherService {
             throw error;
         }
     }
+
+    static async getUserVoucherList(req, res) {
+        try {
+            const userId = req.user._id;
+            const vouchers = await voucherModel.find({
+                userUsed: { $nin: [userId] },
+                endDate: { $gte: new Date() },
+                active: true
+            }).sort({ createdAt: -1 }).exec();
+            return vouchers;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addUserVoucher(req, res) {
+        try {
+            const userId = req.user._id;
+            const { voucherId } = req.body;
+
+            if (!voucherId) {
+                throw new BadRequestError('Vui lòng cung cấp ID phiếu giảm giá');
+            }
+
+            const voucher = await voucherModel.findById(voucherId);
+            if (!voucher) {
+                throw new BadRequestError('Không tìm thấy phiếu giảm giá');
+            }
+
+            voucher.userUsed.push(userId);
+            const updatedVoucher = await voucher.save();
+
+            return updatedVoucher;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = VoucherService;

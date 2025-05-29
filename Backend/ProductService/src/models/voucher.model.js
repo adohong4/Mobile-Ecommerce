@@ -55,6 +55,7 @@ const VoucherSchema = new Schema(
             default: 0,
             min: [0, 'Số lần đã sử dụng không được âm'],
         },
+        userUsed: { type: Array, default: [] },
         startDate: { type: Date, required: true, },
         endDate: {
             type: Date,
@@ -70,10 +71,6 @@ const VoucherSchema = new Schema(
     },
     { minimize: false, timestamps: true }
 );
-
-// VoucherSchema.index({ code: 1 }, { unique: true });
-// VoucherSchema.index({ isActive: 1, startDate: 1, endDate: 1 });
-// VoucherSchema.index({ applicableCategories: 1 });
 
 VoucherSchema.pre('save', function (next) {
     const now = new Date();

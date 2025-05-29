@@ -105,6 +105,30 @@ class VoucherController {
             next(error);
         }
     }
+
+    async getUserVoucherList(req, res, next) {
+        try {
+            const result = await VoucherService.getUserVoucherList(req, res);
+            new OK({
+                message: 'Lấy danh sách phiếu giảm giá của người dùng thành công',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async addVoucherToUser(req, res, next) {
+        try {
+            const result = await VoucherService.addUserVoucher(req, res);
+            new OK({
+                message: 'Thêm phiếu giảm giá vào người dùng thành công',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new VoucherController();
