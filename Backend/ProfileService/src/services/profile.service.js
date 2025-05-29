@@ -8,7 +8,6 @@ class ProfileService {
     static async getProfile(req, res) {
         try {
             const userId = req.user._id;
-            console.log("userid: ", userId)
             const profile = await profileModel.find({ userId });
             return profile;
         } catch (error) {
