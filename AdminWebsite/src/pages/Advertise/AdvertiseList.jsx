@@ -11,6 +11,7 @@ import {
     Tooltip,
     Switch,
     Upload,
+    Checkbox,
 } from 'antd';
 import {
     BookFilled,
@@ -185,12 +186,12 @@ const AdvertiseList = () => {
     return (
         <div style={{ padding: 20 }}>
             <h2>Thêm banner mới</h2>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 20, justifyContent:'end'}}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 20, justifyContent: 'end' }}>
                 <Input
-                placeholder="Tìm kiếm quảng cáo"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ width: 300}}
+                    placeholder="Tìm kiếm quảng cáo"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ width: 300 }}
                 />
                 <Input
                     placeholder="Tiêu đề (recap)"
@@ -198,12 +199,23 @@ const AdvertiseList = () => {
                     onChange={(e) => setNewBanner({ ...newBanner, recap: e.target.value })}
                     style={{ width: 200 }}
                 />
-                <Input
-                    placeholder="Phân loại (classify)"
-                    value={newBanner.classify}
-                    onChange={(e) => setNewBanner({ ...newBanner, classify: e.target.value })}
-                    style={{ width: 200 }}
+                <Checkbox.Group
+                    options={[
+                        { label: 'Banner', value: 'Banner' },
+                        { label: 'Quảng Cáo', value: 'Quảng Cáo' }
+                    ]}
+                    style={{alignItems:'center'}}
+                    value={[newBanner.classify]} // nếu bạn muốn chọn 1 trong 2
+                    onChange={(checkedValues) => {
+                        // chỉ cho chọn 1 trong 2 (giống radio)
+                        if (checkedValues.length > 0) {
+                            setNewBanner({ ...newBanner, classify: checkedValues[0] });
+                        } else {
+                            setNewBanner({ ...newBanner, classify: '' });
+                        }
+                    }}
                 />
+
                 <Upload
                     showUploadList={false}
                     beforeUpload={(file) => {
@@ -231,7 +243,7 @@ const AdvertiseList = () => {
                 </div>
             )}
 
-            
+
 
             <Table
                 columns={columns}
