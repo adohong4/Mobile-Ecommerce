@@ -2976,3 +2976,79 @@ h2 {
     margin-top: 10px;
     border: 1px solid #dcdcdc;
 }
+
+
+
+/* CSS cho trang voucher */
+
+.form-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.form-title {
+  font-size: 26px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.form-two-column {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.form-column {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-input {
+  padding: 10px 14px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.form-input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.error-text {
+  font-size: 13px;
+  color: red;
+  margin-top: 4px;
+}
+
+.submit-btn {
+  background-color: #1AA7DD;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #178dbb;
+}
+
+.full-width {
+  margin-top: auto;
+}

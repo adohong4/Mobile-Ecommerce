@@ -175,7 +175,7 @@ const Sidebar = () => {
             {openMenus.voucher && (
               <ul className="sidebar-submenu">
                 <li>
-                  <NavLink to="/add-campaign" className="submenu-item">
+                  <NavLink to="/add-voucher" className="submenu-item">
                     Thêm voucher
                   </NavLink>
                 </li>
