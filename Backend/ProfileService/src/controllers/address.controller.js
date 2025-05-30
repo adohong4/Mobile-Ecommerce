@@ -39,6 +39,18 @@ class AddressController {
         }
     }
 
+    async setDefaultAddress(req, res, next) {
+        try {
+            const result = await AddressService.setDefaultAddress(req, res);
+            new OK({
+                message: 'set default address',
+                metadata: result,
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
 }
 
 module.exports = new AddressController();

@@ -30,6 +30,10 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
       setState(() {
         addresses = result['addresses'];
         isLoading = false;
+        if (!addresses.any((address) => address.active) &&
+            addresses.isNotEmpty) {
+          _setDefaultAddress(0);
+        }
       });
     } else {
       setState(() => isLoading = false);
@@ -40,20 +44,40 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
   }
 
   Future<void> _setDefaultAddress(int index) async {
-    setState(() {
-      addresses =
-          addresses
-              .map((address) => address.copyWith(isDefault: false))
-              .toList();
-      addresses[index] = addresses[index].copyWith(isDefault: true);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã đặt địa chỉ làm mặc định')),
-    );
+    final addressId = addresses[index].id;
+    if (addressId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lỗi: Địa chỉ không hợp lệ')),
+      );
+      return;
+    }
+
+    final result = await _addressService.setDefaultAddress(addressId);
+    if (result['success']) {
+      setState(() {
+        addresses =
+            addresses
+                .map((address) => address.copyWith(active: false))
+                .toList();
+        addresses[index] = addresses[index].copyWith(active: true);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã đặt địa chỉ làm mặc định')),
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result['message'])));
+    }
   }
 
   Future<void> _deleteAddress(String? addressId, int index) async {
-    if (addressId == null) return;
+    if (addressId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lỗi: Địa chỉ không hợp lệ')),
+      );
+      return;
+    }
     final result = await _addressService.deleteAddress(addressId);
     if (result['success']) {
       setState(() {
@@ -61,7 +85,7 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
       });
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Đã xóa địa chỉ')));
+      ).showSnackBar(const SnackBar(content: Text('Đã xóa địa chỉ')));
     } else {
       ScaffoldMessenger.of(
         context,
@@ -246,17 +270,27 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
                                   provinceController.text.isNotEmpty
                                       ? provinceController.text
                                       : null,
-                              isDefault: address.isDefault,
+                              active: address.active,
                             );
-                            setState(() {
-                              addresses[index] = updatedAddress;
-                            });
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Đã cập nhật địa chỉ'),
-                              ),
+                            final result = await _addressService.createAddress(
+                              updatedAddress,
                             );
+                            if (result['success']) {
+                              setState(() {
+                                addresses[index] = updatedAddress;
+                              });
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Đã cập nhật địa chỉ'),
+                                ),
+                              );
+                            } else {
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(result['message'])),
+                              );
+                            }
                           },
                           child: const Text(
                             "Lưu",
@@ -299,7 +333,7 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
                     fontFamily: 'Poppins',
                   ),
                 ),
-                if (address.isDefault)
+                if (address.active)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -334,11 +368,12 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: () => _setDefaultAddress(index),
+                  onPressed:
+                      address.active ? null : () => _setDefaultAddress(index),
                   child: Text(
                     "Chọn làm mặc định",
                     style: TextStyle(
-                      color: address.isDefault ? Colors.grey : lightBlue,
+                      color: address.active ? Colors.grey : lightBlue,
                       fontFamily: 'Poppins',
                     ),
                   ),
@@ -348,7 +383,10 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
                   onPressed: () => _showEditDialog(index),
                   child: const Text(
                     "Sửa",
-                    style: TextStyle(fontFamily: 'Poppins'),
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Color(0xFF1AA7DD),
+                    ),
                   ),
                 ),
               ],

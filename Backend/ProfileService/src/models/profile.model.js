@@ -13,6 +13,7 @@ const AddressSchema = new Schema({
     precinct: { type: String },
     city: { type: String },
     province: { type: String },
+    active: { type: Boolean, default: false },
 })
 
 const ProfileSchema = new Schema({

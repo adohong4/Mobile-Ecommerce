@@ -128,14 +128,19 @@ class _ProfilePageState extends State<ProfilePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditProfilePage(profile: _profile!),
+                            builder:
+                                (context) =>
+                                    EditProfilePage(profile: _profile!),
                           ),
                         ).then((_) => _fetchProfile()); // Refresh sau khi sửa
                       },
                       icon: const Icon(Icons.edit, color: Color(0xFF194689)),
                       label: const Text(
                         'Chỉnh sửa hồ sơ',
-                        style: TextStyle(color: Color(0xFF194689), fontFamily: 'Poppins'),
+                        style: TextStyle(
+                          color: Color(0xFF194689),
+                          fontFamily: 'Poppins',
+                        ),
                       ),
                     ),
 
@@ -197,9 +202,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         style: TextStyle(fontFamily: 'Poppins'),
                       ),
                       subtitle: Text(
-                        _profile!['address']?.isNotEmpty == true
-                            ? "${_profile!['address'][0]['street']}, ${_profile!['address'][0]['city']}"
-                            : 'Chưa cập nhật',
+                        _getActiveAddress(_profile!['address']),
                         style: const TextStyle(fontFamily: 'Poppins'),
                       ),
                       trailing: const Text(
@@ -213,9 +216,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const ShippingAddressPage()),
-                        );
-
+                          MaterialPageRoute(
+                            builder: (_) => const ShippingAddressPage(),
+                          ),
+                        ).then((_) => _fetchProfile());
                       },
                     ),
                     const SizedBox(height: 20),
@@ -265,6 +269,23 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       return date;
     }
+  }
+
+  String _getActiveAddress(List<dynamic>? addresses) {
+    if (addresses == null || addresses.isEmpty) {
+      return 'Chưa cập nhật';
+    }
+
+    // Find the active address
+    final activeAddress = addresses.firstWhere(
+      (address) => address['active'] == true,
+      orElse: () => addresses[0],
+    );
+
+    // Format the address string
+    return activeAddress != null
+        ? "${activeAddress['street']}, ${activeAddress['city']}${activeAddress['province'] != null ? ', ${activeAddress['province']}' : ''}"
+        : 'Chưa cập nhật';
   }
 }
 

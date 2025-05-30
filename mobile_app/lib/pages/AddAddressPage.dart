@@ -44,7 +44,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
             _provinceController.text.isNotEmpty
                 ? _provinceController.text
                 : null,
-        isDefault: false,
+        active: false,
       );
 
       final result = await _addressService.createAddress(address);

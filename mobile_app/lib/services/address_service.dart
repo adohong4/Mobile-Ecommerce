@@ -123,4 +123,35 @@ class AddressService {
       return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> setDefaultAddress(String addressId) async {
+    final url = Uri.parse('$_baseUrl/update/$addressId');
+    try {
+      final token = await LoginService.getToken();
+      if (token == null) {
+        return {
+          'success': false,
+          'message': 'Không tìm thấy token. Vui lòng đăng nhập lại.',
+        };
+      }
+
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json', 'Authorization': token},
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Không thể cài đặt mặc định địa chỉ',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
 }

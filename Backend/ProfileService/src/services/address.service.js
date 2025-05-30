@@ -66,6 +66,39 @@ class AddressService {
             throw error;
         }
     }
+
+    static async setDefaultAddress(req, res) {
+        try {
+            const userId = req.user._id;
+            const { addressId } = req.params;
+
+            const profile = await profileModel.findOne({ userId });
+            if (!profile) {
+                throw new BadRequestError("Tài khoản không tồn tại");
+            }
+
+            // Reset all addresses to inactive
+            await profileModel.updateMany(
+                { userId },
+                { $set: { "address.$[].active": false } }
+            );
+
+            // Set the specified address as active
+            const updatedProfile = await profileModel.findOneAndUpdate(
+                { userId, "address._id": addressId },
+                { $set: { "address.$.active": true } },
+                { new: true }
+            );
+
+            if (!updatedProfile) {
+                throw new BadRequestError("Không tìm thấy địa chỉ để đặt làm mặc định");
+            }
+
+            return updatedProfile.address;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = AddressService;

@@ -4,9 +4,9 @@ class AddressModel {
   final String? phone;
   final String? street;
   final String? city;
-  final String? precinct; // Có thể null vì JSON không trả về
-  final String? province; // Có thể null vì JSON không trả về
-  final bool isDefault; // Có thể null vì JSON không trả về
+  final String? precinct;
+  final String? province;
+  final bool active;
 
   AddressModel({
     this.id,
@@ -16,7 +16,7 @@ class AddressModel {
     this.city,
     this.precinct,
     this.province,
-    this.isDefault = false,
+    this.active = false,
   });
 
   // Parse JSON từ API
@@ -28,7 +28,7 @@ class AddressModel {
       city = json['city'] as String?,
       precinct = json['precinct'] as String?,
       province = json['province'] as String?,
-      isDefault = json['isDefault'] as bool? ?? false;
+      active = json['active'] as bool? ?? false;
 
   // Chuyển thành JSON để gửi API
   Map<String, dynamic> toJson() => {
@@ -39,7 +39,7 @@ class AddressModel {
     if (city != null) 'city': city,
     if (precinct != null) 'precinct': precinct,
     if (province != null) 'province': province,
-    'isDefault': isDefault,
+    'active': active,
   };
 
   AddressModel copyWith({
@@ -50,7 +50,7 @@ class AddressModel {
     String? city,
     String? precinct,
     String? province,
-    bool? isDefault,
+    bool? active,
   }) {
     return AddressModel(
       id: id ?? this.id,
@@ -60,7 +60,7 @@ class AddressModel {
       city: city ?? this.city,
       precinct: precinct ?? this.precinct,
       province: province ?? this.province,
-      isDefault: isDefault ?? this.isDefault,
+      active: active ?? this.active,
     );
   }
 
