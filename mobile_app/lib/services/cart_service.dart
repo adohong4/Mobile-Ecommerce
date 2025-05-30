@@ -123,4 +123,42 @@ class CartService {
       return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> getUserOrders() async {
+    final url = Uri.parse('$_baseUrl/order/list');
+    try {
+      final token = await LoginService.getToken();
+      if (token == null) {
+        return {
+          'success': false,
+          'message': 'Không tìm thấy token. Vui lòng đăng nhập lại.',
+        };
+      }
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': '$token',
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'orders': data['metadata'],
+          'message': data['message'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Không lấy được danh sách đơn hàng',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
 }

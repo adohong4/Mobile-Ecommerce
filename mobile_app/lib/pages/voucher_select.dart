@@ -59,6 +59,8 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
         ),
       );
       _codeController.clear();
+      // Làm mới danh sách voucher để hiển thị voucher vừa thêm
+      await provider.fetchUserVouchers();
     }
   }
 
@@ -82,6 +84,12 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
     final selectedVoucher = vouchers.firstWhere(
       (voucher) => voucher.id == _selectedVoucherId,
     );
+    // Cập nhật selectedVoucher trong VoucherProvider
+    Provider.of<VoucherProvider>(
+      context,
+      listen: false,
+    ).fetchVoucherById(_selectedVoucherId!);
+    // Quay lại CheckoutPage với voucher đã chọn
     Navigator.pop(context, selectedVoucher);
   }
 
@@ -207,7 +215,9 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
                           ? Colors.grey
                           : const Color(0xFF003366),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
+                    borderRadius: BorderRadius.circular(
+                      12,
+                    ), // Làm bo góc cho nút
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
@@ -217,6 +227,7 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
                     color: Colors.white,
                     fontFamily: 'Poppins',
                     fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -229,78 +240,91 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
   }
 
   Widget _buildVoucherItem(VoucherModel voucher) {
+    final isSelected = voucher.id == _selectedVoucherId;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isSelected ? const Color(0xFF003366) : Colors.transparent,
+          width: 2,
+        ),
+      ),
       elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            // Icon voucher
-            const Icon(Icons.discount, size: 50, color: Color(0xFF003366)),
-            const SizedBox(width: 15),
-            // Voucher Information
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Giảm ${voucher.formattedDiscount} cho đơn từ ${voucher.minOrderValue} VNĐ',
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 7),
-                  Row(
-                    children: [
-                      Text(
-                        'HSD: ${voucher.formattedEndDate}',
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
+      child: InkWell(
+        onTap: () => _selectVoucher(voucher.id),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Icon voucher
+              const Icon(Icons.discount, size: 50, color: Color(0xFF003366)),
+              const SizedBox(width: 15),
+              // Voucher Information
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Giảm ${voucher.formattedDiscount} cho đơn từ ${voucher.minOrderValue} VNĐ',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color:
+                            isSelected ? const Color(0xFF003366) : Colors.black,
                       ),
-                      const SizedBox(width: 16),
-                      GestureDetector(
-                        onTap: () {
-                          if (voucher.id != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        VoucherDetail(voucherId: voucher.id!),
-                              ),
-                            );
-                          }
-                        },
-                        child: const Text(
-                          'Điều kiện',
-                          style: TextStyle(
+                    ),
+                    const SizedBox(height: 7),
+                    Row(
+                      children: [
+                        Text(
+                          'HSD: ${voucher.formattedEndDate}',
+                          style: const TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
-                            color: Color(0xFF003366),
-                            // decoration: TextDecoration.underline,
+                            color: Colors.grey,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: 16),
+                        GestureDetector(
+                          onTap: () {
+                            if (voucher.id != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          VoucherDetail(voucherId: voucher.id!),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            'Điều kiện',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              color: Color(0xFF003366),
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            // Radio button
-            Radio<String?>(
-              value: voucher.id,
-              groupValue: _selectedVoucherId,
-              onChanged: (value) => _selectVoucher(value),
-              activeColor: const Color(0xFF003366),
-            ),
-          ],
+              // Radio button
+              Radio<String?>(
+                value: voucher.id,
+                groupValue: _selectedVoucherId,
+                onChanged: (value) => _selectVoucher(value),
+                activeColor: const Color(0xFF003366),
+              ),
+            ],
+          ),
         ),
       ),
     );

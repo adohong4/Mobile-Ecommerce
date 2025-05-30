@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/models/order_model.dart';
+import 'package:mobile_app/models/productModel.dart';
 import 'package:mobile_app/pages/ReviewPage.dart';
+import 'package:mobile_app/providers/cart_provider.dart';
+import 'package:mobile_app/services/ApiService.dart';
+import 'package:mobile_app/services/ProductService.dart';
+import 'package:provider/provider.dart';
 
 class OrderDetailPage extends StatefulWidget {
   const OrderDetailPage({super.key});
@@ -8,25 +14,8 @@ class OrderDetailPage extends StatefulWidget {
   State<OrderDetailPage> createState() => _OrderDetailPageState();
 }
 
-class Order {
-  final String title;
-  final String imageUrl;
-  final String price;
-  final String oldPrice;
-  final String status;
-  final int quantity;
-
-  Order({
-    required this.title,
-    required this.imageUrl,
-    required this.price,
-    required this.oldPrice,
-    required this.status,
-    required this.quantity,
-  });
-}
-
-class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProviderStateMixin {
+class _OrderDetailPageState extends State<OrderDetailPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   final List<String> tabTitles = [
@@ -37,44 +26,27 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
   ];
 
   final List<IconData> tabIcons = [
-    Icons.access_time,       // Chờ xác nhận
-    Icons.store_mall_directory,  // Chờ lấy hàng
-    Icons.delivery_dining,   // Chờ giao hàng
-    Icons.rate_review,       // Đánh giá
+    Icons.access_time,
+    Icons.store_mall_directory,
+    Icons.delivery_dining,
+    Icons.rate_review,
   ];
 
-  // Dữ liệu giả lập
-  final List<Order> orders = [
-    Order(
-      title: 'Màn Hình Di Động Thông Minh SIEGenX 27 inch',
-      imageUrl: 'assets/apple.png',
-      price: '17.500.000 đ',
-      oldPrice: '20.000.000 đ',
-      status: 'Chờ lấy hàng',
-      quantity: 4,
-    ),
-    Order(
-      title: 'Laptop SIEGenX Pro 15 inch',
-      imageUrl: 'assets/apple.png',
-      price: '25.000.000 đ',
-      oldPrice: '30.000.000 đ',
-      status: 'Chờ giao hàng',
-      quantity: 2,
-    ),
-    Order(
-      title: 'Tai Nghe SIEGenX BT',
-      imageUrl: 'assets/apple.png',
-      price: '2.000.000 đ',
-      oldPrice: '2.500.000 đ',
-      status: 'Đánh giá',
-      quantity: 3,
-    ),
-  ];
+  final Map<String, String> statusMapping = {
+    'pending': 'Chờ xác nhận',
+    'confirmed': 'Chờ lấy hàng',
+    'shipping': 'Chờ giao hàng',
+    'delivered': 'Đánh giá',
+  };
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: tabTitles.length, vsync: this);
+    // Lấy danh sách đơn hàng khi khởi tạo
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CartProvider>(context, listen: false).fetchUserOrders();
+    });
   }
 
   @override
@@ -83,131 +55,213 @@ class _OrderDetailPageState extends State<OrderDetailPage> with SingleTickerProv
     super.dispose();
   }
 
+  Future<ProductsModel?> _fetchProduct(String productId) async {
+    try {
+      return await ProductService.fetchProductById(productId);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Widget _buildOrderCard({
-    required String title,
-    required String imageUrl,
-    required String price,
-    required String oldPrice,
-    required String status,
+    required Order order,
     required bool showReviewButton,
-    required int quantity,
   }) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Image.asset(
-                  imageUrl,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    return FutureBuilder<List<Widget>>(
+      future: Future.wait(
+        order.items.map((item) async {
+          final product = await _fetchProduct(item.id);
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Text(title,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'Poppins')),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('$quantity sản phẩm',
-                              style: const TextStyle(
-                                  fontSize: 14, fontFamily: 'Poppins')),
-                          Text('x$quantity', style: const TextStyle(fontFamily: 'Poppins')),
-                        ],
+                      Image.network(
+                        product?.images.isNotEmpty ?? false
+                            ? '${ApiService.imageBaseUrl}${product!.images[0]}'
+                            : 'https://via.placeholder.com/80',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) => Image.asset(
+                              'assets/microsoft.png',
+                              width: 80,
+                              height: 80,
+                            ),
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(oldPrice,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product?.name ?? 'Sản phẩm không xác định',
                               style: const TextStyle(
-                                  fontSize: 14,
-                                  decoration: TextDecoration.lineThrough,
-                                  color: Colors.grey,
-                                  fontFamily: 'Poppins')),
-                          const SizedBox(width: 8),
-                          Text(price,
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF0D47A1),
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Poppins')),
-                        ],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${item.quantity} sản phẩm',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                Text(
+                                  'x${item.quantity}',
+                                  style: const TextStyle(fontFamily: 'Poppins'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                if (product?.oldPrice != null)
+                                  Text(
+                                    '${product!.oldPrice!.toStringAsFixed(0)} đ',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      decoration: TextDecoration.lineThrough,
+                                      color: Colors.grey,
+                                      fontFamily: 'Poppins',
+                                    ),
+                                  ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${item.price.toStringAsFixed(0)} đ',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF0D47A1),
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${order.payment ? 'Đã thanh toán' : 'Chưa thanh toán'}',
+                              style: const TextStyle(fontFamily: 'Poppins'),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      Text("Thành tiền: $price",
-                          style: const TextStyle(
-                              fontFamily: 'Poppins', fontWeight: FontWeight.w500)),
                     ],
                   ),
-                ),
-              ],
-            ),
-            if (showReviewButton) ...[
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0D47A1),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ReviewPage()),
-                    );
-                  },
-                  child: const Text('Đánh giá',
-                      style: TextStyle(fontFamily: 'Poppins', color: Colors.white)),
-                ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Thành tiền: ${(item.price * item.quantity).toStringAsFixed(0)} đ',
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  if (showReviewButton) ...[
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0D47A1),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ReviewPage(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Đánh giá',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ],
-          ],
-        ),
+            ),
+          );
+        }).toList(),
       ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          return const Center(child: Text('Lỗi khi tải thông tin đơn hàng'));
+        }
+        return Column(children: snapshot.data!);
+      },
     );
   }
 
   Widget _buildTabContent(String status) {
-    bool isReviewTab = status == 'Đánh giá';
-    List<Order> filteredOrders = orders.where((order) => order.status == status).toList();
+    final cartProvider = Provider.of<CartProvider>(context);
+    if (cartProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (cartProvider.errorMessage != null) {
+      return Center(child: Text(cartProvider.errorMessage!));
+    }
+
+    final filteredOrders =
+        cartProvider.orders
+            .where((order) => statusMapping[order.status] == status)
+            .toList();
+
+    if (filteredOrders.isEmpty) {
+      return const Center(child: Text('Không có đơn hàng nào'));
+    }
 
     return ListView(
-      children: filteredOrders.map((order) {
-        return _buildOrderCard(
-          title: order.title,
-          imageUrl: order.imageUrl,
-          price: order.price,
-          oldPrice: order.oldPrice,
-          status: order.status,
-          showReviewButton: isReviewTab,
-          quantity: order.quantity,
-        );
-      }).toList(),
+      children:
+          filteredOrders.map((order) {
+            return _buildOrderCard(
+              order: order,
+              showReviewButton: status == 'Đánh giá',
+            );
+          }).toList(),
     );
   }
 
   int _getOrderCountForStatus(String status) {
-    return orders.where((order) => order.status == status).length;
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    return cartProvider.orders
+        .where((order) => statusMapping[order.status] == status)
+        .length;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Đơn hàng của tôi', style: TextStyle(fontFamily: 'Poppins')),
+        title: const Text(
+          'Đơn hàng của tôi',
+          style: TextStyle(fontFamily: 'Poppins'),
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(70),
           child: TabBar(

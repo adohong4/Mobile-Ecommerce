@@ -8,13 +8,14 @@ const { CREATED } = require("../core/success.response")
 class CODController {
     CODplaceOrder = async (req, res) => {
         const userId = req.user;
+        console.log("userId", userId);
         try {
             const newOrder = new orderModel({
                 userId: userId,
                 items: req.body.items,
                 amount: req.body.amount,
                 address: req.body.address,
-                paymentMethod: "Thanh toán khi nhận hàng"
+                paymentMethod: "cod"
             });
 
             await newOrder.save();

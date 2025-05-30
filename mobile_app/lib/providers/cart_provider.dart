@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/models/order_model.dart';
 import 'package:mobile_app/models/productModel.dart';
 import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/services/cart_service.dart';
@@ -6,6 +7,8 @@ import 'package:mobile_app/services/cart_service.dart';
 class CartProvider extends ChangeNotifier {
   Map<String, int> _cartData = {};
   List<ProductsModel> _cartItems = [];
+  List<Order> _orders = [];
+  List<Order> get orders => _orders;
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -111,6 +114,46 @@ class CartProvider extends ChangeNotifier {
       for (int i = currentQuantity; i > quantity; i--) {
         await remove(product);
       }
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  // Lấy danh sách đơn hàng
+  Future<void> fetchUserOrders() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    final result = await _cartService.getUserOrders();
+
+    if (result['success']) {
+      _orders =
+          (result['orders'] as List<dynamic>)
+              .map(
+                (orderJson) => Order.fromJson({
+                  'id': orderJson['_id'],
+                  'items': orderJson['items'],
+                  'amount': orderJson['amount'].toDouble(),
+                  'address':
+                      orderJson['address'] ??
+                      {
+                        'fullname': 'Unknown',
+                        'street': 'Unknown',
+                        'city': 'Unknown',
+                        'province': 'Unknown',
+                      },
+                  'date': orderJson['date'],
+                  'paymentMethod': orderJson['paymentMethod'],
+                  'status': orderJson['status'],
+                  'payment': orderJson['payment'],
+                }),
+              )
+              .toList();
+    } else {
+      _errorMessage = result['message'];
+      _orders = [];
     }
 
     _isLoading = false;

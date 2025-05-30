@@ -6,9 +6,9 @@ const { BadRequestError } = require('../core/error.response');
 class OrderService {
     static async orderData(req, res) {
         try {
-            const { userId } = req.user._id;
+            const userId = req.user._id;
             const orderData = await orderModel.find({ userId })
-                .select('userId amount status paymentMethod payment statusActive date items._id items.images items.title items.price items.quantity items.category items.product_slug')
+                .select('userId amount status paymentMethod payment statusActive date items.id items.price items.quantity')
                 .sort({ createdAt: -1 })
                 .exec();
             return orderData;

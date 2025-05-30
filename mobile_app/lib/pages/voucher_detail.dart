@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_app/pages/CartPage.dart';
-import 'package:mobile_app/pages/voucher_select.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/providers/voucher_provider.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -257,7 +256,8 @@ class _VoucherDetailState extends State<VoucherDetail> {
                               '- Áp dụng cho phương thức thanh toán online',
                               style: const TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 14,
+                                fontSize: 13,
+                                height: 2.4,
                               ),
                             ),
                           ],
@@ -275,9 +275,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const VoucherSelectPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => const CartPage()),
                     );
                   },
                   style: ElevatedButton.styleFrom(

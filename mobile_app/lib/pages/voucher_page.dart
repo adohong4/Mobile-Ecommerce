@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/pages/CartPage.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/models/voucher_model.dart';
 import 'package:mobile_app/pages/voucher_detail.dart';
@@ -110,7 +111,12 @@ class _VoucherPageState extends State<VoucherPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ElevatedButton(
-                  onPressed: () => _useVoucher(voucher.id!),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CartPage()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF003366),
                     shape: RoundedRectangleBorder(

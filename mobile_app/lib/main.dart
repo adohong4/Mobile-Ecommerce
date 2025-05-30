@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_stripe/flutter_stripe.dart' as stripe;
 import 'package:mobile_app/providers/auth_provider.dart';
 import 'package:mobile_app/providers/voucher_provider.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +10,10 @@ import 'package:mobile_app/providers/wish_list_provider.dart';
 import 'package:mobile_app/providers/cart_provider.dart';
 
 void main() {
+  if (!kIsWeb) {
+    stripe.Stripe.publishableKey =
+        'pk_test_51RUVHWRr5z5pdPCHpnnv1nKGUvwf5v5rBBYJVGR240QDHYQm4Zja0gwLBBhFQsHeOHF6Wfe9e7kFuL4TApsMPlzC000oT3GTEJ';
+  }
   runApp(
     MultiProvider(
       providers: [
