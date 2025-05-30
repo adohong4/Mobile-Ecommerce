@@ -87,19 +87,9 @@ const Sidebar = () => {
             >
               <div className="dad-menu sidebar-title">
                 <FontAwesomeIcon icon={faTags} />
-                <p>Phân loại</p>
+                <NavLink to="/category" className="submenu-item" style={{ color: "white", fontWeight: 400 }}>Danh mục</NavLink>
               </div>
-              <FontAwesomeIcon
-                icon={faChevronDown}
-                className={`sidebar-icon ${openMenus.category ? "rotate" : ""}`}
-              />
             </div>
-            {openMenus.category && (
-              <ul className="sidebar-submenu">
-                <li><NavLink to="/category/add" className="submenu-item">Thêm phân loại</NavLink></li>
-                <li><NavLink to="/category" className="submenu-item">Phân loại</NavLink></li>
-              </ul>
-            )}
           </div>
 
           <div className="sidebar-dropdown">
@@ -109,19 +99,9 @@ const Sidebar = () => {
             >
               <div className="dad-menu sidebar-title">
                 <FontAwesomeIcon icon={faImage} />
-                <p>Banner && Quảng cáo</p>
+                <NavLink to="/advertise" className="submenu-item"  style={{ color: "white", fontWeight: 400 }}>Media</NavLink>
               </div>
-              <FontAwesomeIcon
-                icon={faChevronDown}
-                className={`sidebar-icon ${openMenus.advertise ? "rotate" : ""}`}
-              />
             </div>
-            {openMenus.advertise && (
-              <ul className="sidebar-submenu">
-                <li><NavLink to="/advertise/add" className="submenu-item">Thêm phân loại</NavLink></li>
-                <li><NavLink to="/advertise" className="submenu-item">Phân loại</NavLink></li>
-              </ul>
-            )}
           </div>
 
 

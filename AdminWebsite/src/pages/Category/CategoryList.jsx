@@ -7,19 +7,39 @@ import { CategoryContext } from '../../context/CategoryContextProvider';
 import '../styles/styles.css';
 
 const CategoryList = () => {
-    const { categoryList, fetchCategoryList, softDeleteCategory, deleteCategory } = useContext(CategoryContext);
+    const { categoryList, fetchCategoryList, softDeleteCategory, deleteCategory, addCategory } = useContext(CategoryContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [viewingCategory, setViewingCategory] = useState(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [newCategory, setNewCategory] = useState({
+        category: '',
+        categoryIds: '',
+        file: null,
+        preview: '',
+    });
+
+
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchCategoryList();
     }, [fetchCategoryList]);
+    // Xử lý chọn ảnh từ thiết bị
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setNewCategory({
+                ...newCategory,
+                file,
+                preview: URL.createObjectURL(file),
+            });
+        }
+    };
 
     const handleSoftDelete = async (categoryId) => {
         try {
             await softDeleteCategory(categoryId);
+            fetchCategoryList();
         } catch (error) {
             toast.error('Lỗi khi xóa mềm danh mục');
         }
@@ -28,6 +48,7 @@ const CategoryList = () => {
     const handleDelete = async (categoryId) => {
         try {
             await deleteCategory(categoryId);
+            fetchCategoryList();
         } catch (error) {
             toast.error('Lỗi khi xóa danh mục');
         }
@@ -41,6 +62,31 @@ const CategoryList = () => {
         setViewingCategory(category);
         setIsViewModalOpen(true);
     };
+
+    const handleQuickAddCategory = async () => {
+        const { category, categoryIds, file } = newCategory;
+
+        if (!category || !categoryIds) {
+            toast.warning('Tên và mã danh mục là bắt buộc');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('category', category);
+        formData.append('categoryIds', categoryIds);
+        formData.append('categoryPic', file); // backend cần hỗ trợ upload file qua FormData
+        formData.append('active', true);
+
+        try {
+            await addCategory(formData); // server cần hỗ trợ content-type multipart/form-data
+            toast.success('Thêm danh mục thành công');
+            setNewCategory({ category: '', categoryIds: '', file: null, preview: '' });
+            fetchCategoryList();
+        } catch (error) {
+            toast.error('Thêm danh mục thất bại');
+        }
+    };
+
 
     const filteredCategories = categoryList.filter((category) =>
         category.category?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -146,23 +192,80 @@ const CategoryList = () => {
 
     return (
         <div style={{ padding: 20 }}>
-            <div style={{ display: 'flex', marginBottom: 16 }}>
-                <Input
-                    placeholder="Tìm kiếm danh mục"
-                    style={{ width: 200, marginRight: 8, backgroundColor: '#fff' }}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCategory}>
-                    Thêm danh mục mới
-                </Button>
+            <div style={{ background: '#f9f9f9', padding: 24, borderRadius: 12, marginBottom: 24 }}>
+                <h2 style={{ marginBottom: 20 }}>Thêm danh mục sản phẩm</h2>
+
+                <div className="add-category-container">
+                    {/* Cột trái: Form nhập liệu */}
+                    <div className="form-left col-4">
+
+
+                        <Input
+                            placeholder="Tìm kiếm danh mục"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            allowClear
+                            style={{ marginTop: 12 }}
+                        />
+                        <Button
+                            type="primary"
+                            onClick={handleQuickAddCategory}
+                            style={{ width: '100%', marginTop: 12 }}
+                        >
+                            Thêm nhanh
+                        </Button>
+
+                    </div>
+
+                    {/* Cột phải: Ảnh + Tìm kiếm + Thêm */}
+                    <div className="form-right col-8">
+                        <Space direction="vertical" size="middle" style={{ width: '100%', display: 'flex' }}>
+                            <div className='form-right-container'>
+                                <div className='col-8'>
+                                    <Input
+                                        placeholder="Tên danh mục"
+                                        value={newCategory.category}
+                                        onChange={(e) => setNewCategory({ ...newCategory, category: e.target.value })}
+                                    />
+                                    <Input
+                                        placeholder="Mã danh mục"
+                                        value={newCategory.categoryIds}
+                                        onChange={(e) => setNewCategory({ ...newCategory, categoryIds: e.target.value })}
+                                    />
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        className="custom-file-input"
+                                    />
+                                </div>
+                                <div className='col-4'>
+                                    {newCategory.preview && (
+                                        <img
+                                            src={newCategory.preview}
+                                            alt="Preview"
+                                            className="preview-image"
+                                        />
+
+                                    )}
+                                </div>
+                            </div>
+                        </Space>
+                    </div>
+                </div>
             </div>
+
+
+
+            {/* Bảng danh mục */}
             <Table
                 columns={columns}
                 dataSource={filteredCategories.map((category) => ({ ...category, key: category._id }))}
                 rowKey="key"
                 pagination={{ pageSize: 7 }}
             />
+
+            {/* Modal xem chi tiết */}
             <Modal
                 open={isViewModalOpen}
                 onCancel={() => setIsViewModalOpen(false)}

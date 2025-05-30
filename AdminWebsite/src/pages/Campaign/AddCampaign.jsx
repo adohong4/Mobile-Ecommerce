@@ -1,27 +1,28 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import axios from 'axios';
-import { StoreContext } from '../../context/StoreContext';
+// import { StoreContext } from '../../context/StoreContext';
 import { toast } from 'react-toastify';
 import { formatDayTime, formatCurrency } from '../../lib/utils';
 import { Form, Input, Button, Select, DatePicker, InputNumber, Tooltip, Row, Col, Space } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { Card, Divider } from 'antd';
 import { BulbOutlined, BarChartOutlined, GiftOutlined, PercentageOutlined, ClockCircleOutlined, AppstoreOutlined, SearchOutlined } from '@ant-design/icons';
+import { ProductContext } from '../../context/ProductContextProvider';
 
 const { Option } = Select;
 
 const AddCampaign = () => {
     axios.defaults.withCredentials = true;
-    const { url, product_list } = useContext(StoreContext);
+    const { url, productList } = useContext(ProductContext);
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const [appliesTo, setAppliesTo] = useState('items');
     const [type, setType] = useState('percentage');
-    const [filteredProducts, setFilteredProducts] = useState(product_list);
+    const [filteredProducts, setFilteredProducts] = useState(productList);
 
     const handleSearch = (value) => {
-        const filtered = product_list.filter((product) =>
+        const filtered = productList.filter((product) =>
             product.title.toLowerCase().includes(value.toLowerCase())
         );
         setFilteredProducts(filtered);
@@ -162,7 +163,7 @@ const AddCampaign = () => {
                     title={<><BarChartOutlined style={{ marginRight: 8 }} />Thống kê nhanh</>}
                     bordered={false}
                 >
-                    <p><AppstoreOutlined style={{ color: '#1890ff', marginRight: 8 }} /> Tổng số sản phẩm: {product_list.length}</p>
+                    <p><AppstoreOutlined style={{ color: '#1890ff', marginRight: 8 }} /> Tổng số sản phẩm: {productList.length}</p>
                     <p><SearchOutlined style={{ color: '#722ed1', marginRight: 8 }} /> Bạn có thể chọn áp dụng từng sản phẩm hoặc toàn bộ.</p>
                 </Card>
             </div>

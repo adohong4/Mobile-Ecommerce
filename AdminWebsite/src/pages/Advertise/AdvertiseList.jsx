@@ -1,16 +1,45 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Table, Button, Input, Popconfirm, Modal, Descriptions, Space, Tooltip, Switch } from 'antd';
-import { BookFilled, EditFilled, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+    Table,
+    Button,
+    Input,
+    Popconfirm,
+    Descriptions,
+    Space,
+    Tooltip,
+    Switch,
+    Upload,
+    Checkbox,
+} from 'antd';
+import {
+    BookFilled,
+    EditFilled,
+    DeleteOutlined,
+    UploadOutlined,
+} from '@ant-design/icons';
 import { AdvertiseContext } from '../../context/AdvertiseContextProvider';
-import '../styles/styles.css';
+import axios from 'axios';
 
 const AdvertiseList = () => {
-    const { advertiseList, fetchAdvertiseList, deleteAdvertise, activeAdvertise } = useContext(AdvertiseContext);
+    const {
+        advertiseList,
+        fetchAdvertiseList,
+        deleteAdvertise,
+        activeAdvertise,
+        addAdvertise,
+    } = useContext(AdvertiseContext);
+
     const [searchTerm, setSearchTerm] = useState('');
     const [viewingAdvertise, setViewingAdvertise] = useState(null);
-    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [newBanner, setNewBanner] = useState({
+        imageAds: '',
+        classify: '',
+        recap: '',
+    });
+    const [uploading, setUploading] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -20,7 +49,8 @@ const AdvertiseList = () => {
     const handleDelete = async (advertiseId) => {
         try {
             await deleteAdvertise(advertiseId);
-        } catch (error) {
+            toast.success('Đã xóa quảng cáo');
+        } catch {
             toast.error('Lỗi khi xóa quảng cáo');
         }
     };
@@ -28,22 +58,48 @@ const AdvertiseList = () => {
     const handleToggleStatus = async (advertiseId, currentStatus) => {
         try {
             await activeAdvertise(advertiseId);
-        } catch (error) {
+            toast.success('Đã cập nhật trạng thái');
+        } catch {
             toast.error('Lỗi khi cập nhật trạng thái quảng cáo');
         }
     };
 
-    const handleAddAdvertise = () => {
-        navigate('/add-advertise');
+    const handleAddSubmit = async () => {
+        const { imageAds, classify, recap } = newBanner;
+        if (!imageAds || !classify || !recap) {
+            toast.warning('Vui lòng điền đầy đủ thông tin');
+            return;
+        }
+
+        try {
+            await addAdvertise(newBanner);
+            toast.success('Thêm banner thành công!');
+            setNewBanner({ imageAds: '', classify: '', recap: '' });
+            fetchAdvertiseList();
+        } catch {
+            toast.error('Lỗi khi thêm banner!');
+        }
     };
 
-    const showViewModal = (advertise) => {
-        setViewingAdvertise(advertise);
-        setIsViewModalOpen(true);
+    const handleImageUpload = async (file) => {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            setUploading(true);
+            const res = await axios.post('http://localhost:9004/upload', formData);
+            const filename = res.data.filename;
+            setNewBanner({ ...newBanner, imageAds: filename });
+            toast.success('Tải ảnh lên thành công');
+        } catch {
+            toast.error('Tải ảnh lên thất bại');
+        } finally {
+            setUploading(false);
+        }
     };
 
-    const filteredAdvertises = advertiseList.filter((advertise) =>
-        advertise.recap?.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredAdvertises = advertiseList.filter((ad) =>
+        ad.recap?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const columns = [
@@ -51,7 +107,11 @@ const AdvertiseList = () => {
             title: 'Tiêu đề',
             dataIndex: 'recap',
             key: 'recap',
-            sorter: (a, b) => a.recap.localeCompare(b.recap),
+        },
+        {
+            title: 'Phân loại',
+            dataIndex: 'classify',
+            key: 'classify',
         },
         {
             title: 'Hình ảnh',
@@ -77,38 +137,33 @@ const AdvertiseList = () => {
                     unCheckedChildren="Ngừng"
                 />
             ),
-            sorter: (a, b) => Number(a.status) - Number(b.status),
         },
         {
             title: 'Ngày tạo',
             dataIndex: 'createdAt',
             key: 'createdAt',
             render: (createdAt) => new Date(createdAt).toLocaleString(),
-            sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
         },
         {
             title: 'Ngày cập nhật',
             dataIndex: 'updatedAt',
             key: 'updatedAt',
             render: (updatedAt) => new Date(updatedAt).toLocaleString(),
-            sorter: (a, b) => new Date(a.updatedAt) - new Date(b.updatedAt),
         },
         {
             title: 'Hành động',
             key: 'action',
             align: 'center',
             render: (_, record) => (
-                <Space size="middle">
+                <Space>
                     <Tooltip title="Xem chi tiết">
                         <Button
-                            shape="circle"
                             icon={<BookFilled style={{ color: 'orange' }} />}
-                            onClick={() => showViewModal(record)}
+                            onClick={() => setViewingAdvertise(record)}
                         />
                     </Tooltip>
-                    <Tooltip title="Cập nhật thông tin">
+                    <Tooltip title="Chỉnh sửa">
                         <Button
-                            shape="circle"
                             icon={<EditFilled />}
                             onClick={() => navigate(`/edit-advertise/${record._id}`)}
                         />
@@ -120,7 +175,7 @@ const AdvertiseList = () => {
                         cancelText="Hủy"
                     >
                         <Tooltip title="Xóa">
-                            <Button shape="circle" icon={<DeleteOutlined />} danger />
+                            <Button icon={<DeleteOutlined />} danger />
                         </Tooltip>
                     </Popconfirm>
                 </Space>
@@ -130,35 +185,81 @@ const AdvertiseList = () => {
 
     return (
         <div style={{ padding: 20 }}>
-            <div style={{ display: 'flex', marginBottom: 16 }}>
+            <h2>Thêm banner mới</h2>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 20, justifyContent: 'end' }}>
                 <Input
                     placeholder="Tìm kiếm quảng cáo"
-                    style={{ width: 200, marginRight: 8, backgroundColor: '#fff' }}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ width: 300 }}
                 />
-                <Button type="primary" icon={<PlusOutlined />} onClick={handleAddAdvertise}>
-                    Thêm quảng cáo mới
+                <Input
+                    placeholder="Tiêu đề (recap)"
+                    value={newBanner.recap}
+                    onChange={(e) => setNewBanner({ ...newBanner, recap: e.target.value })}
+                    style={{ width: 200 }}
+                />
+                <Checkbox.Group
+                    options={[
+                        { label: 'Banner', value: 'Banner' },
+                        { label: 'Quảng Cáo', value: 'Quảng Cáo' }
+                    ]}
+                    style={{alignItems:'center'}}
+                    value={[newBanner.classify]} // nếu bạn muốn chọn 1 trong 2
+                    onChange={(checkedValues) => {
+                        // chỉ cho chọn 1 trong 2 (giống radio)
+                        if (checkedValues.length > 0) {
+                            setNewBanner({ ...newBanner, classify: checkedValues[0] });
+                        } else {
+                            setNewBanner({ ...newBanner, classify: '' });
+                        }
+                    }}
+                />
+
+                <Upload
+                    showUploadList={false}
+                    beforeUpload={(file) => {
+                        handleImageUpload(file);
+                        return false;
+                    }}
+                >
+                    <Button icon={<UploadOutlined />} loading={uploading}>
+                        Chọn ảnh
+                    </Button>
+                </Upload>
+                <Button type="primary" onClick={handleAddSubmit}>
+                    Thêm
                 </Button>
             </div>
+
+            {newBanner.imageAds && (
+                <div style={{ marginBottom: 20 }}>
+                    <strong>Xem trước ảnh:</strong><br />
+                    <img
+                        src={`http://localhost:9004/images/${newBanner.imageAds}`}
+                        alt="Preview"
+                        style={{ width: 200, height: 100, objectFit: 'cover', borderRadius: 4 }}
+                    />
+                </div>
+            )}
+
+
+
             <Table
                 columns={columns}
-                dataSource={filteredAdvertises.map((advertise) => ({ ...advertise, key: advertise._id }))}
-                rowKey="key"
+                dataSource={filteredAdvertises.map((ad) => ({ ...ad, key: ad._id }))}
                 pagination={{ pageSize: 7 }}
             />
-            <Modal
-                open={isViewModalOpen}
-                onCancel={() => setIsViewModalOpen(false)}
-                footer={null}
-                title="Thông tin quảng cáo"
-            >
-                {viewingAdvertise && (
-                    <Descriptions column={1} bordered>
+
+            {viewingAdvertise && (
+                <div style={{ marginTop: 40 }}>
+                    <h3>Thông tin quảng cáo</h3>
+                    <Descriptions bordered column={1}>
                         <Descriptions.Item label="Tiêu đề">{viewingAdvertise.recap}</Descriptions.Item>
+                        <Descriptions.Item label="Phân loại">{viewingAdvertise.classify}</Descriptions.Item>
                         <Descriptions.Item label="Hình ảnh">
                             <img
-                                src={viewingAdvertise.imageAds}
+                                src={`http://localhost:9004/images/${viewingAdvertise.imageAds}`}
                                 alt="Advertise"
                                 style={{ width: 200, height: 100, objectFit: 'cover' }}
                             />
@@ -173,8 +274,8 @@ const AdvertiseList = () => {
                             {new Date(viewingAdvertise.updatedAt).toLocaleString()}
                         </Descriptions.Item>
                     </Descriptions>
-                )}
-            </Modal>
+                </div>
+            )}
         </div>
     );
 };
