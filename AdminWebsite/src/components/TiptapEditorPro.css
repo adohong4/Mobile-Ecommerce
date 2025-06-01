@@ -40,3 +40,12 @@
   min-height: 200px;
   outline: none;
 }
+.editor-content p {
+  margin: 0;             
+  line-height: 1.2;       
+}
+.editor-content:focus {
+  outline: none;
+  box-shadow: none;
+}
+
