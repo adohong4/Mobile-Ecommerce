@@ -23,6 +23,7 @@ import VoucherList from '../Voucher/VoucherList';
 import AddVoucher from '../Voucher/AddVoucher';
 import CategoryList from '../Category/CategoryList';
 import AdvertiseList from '../Advertise/AdvertiseList';
+import Mess from '../Messaege/Message';
 
 const Admin = () => {
     // const token = Cookies.get("token");
@@ -73,6 +74,7 @@ const Admin = () => {
                                     <Route path="advertise" element={<AdvertiseList />} />
 
                                     <Route path="statistic" element={<Statistic />} />
+                                    <Route path="mess" element={<Mess />} />
                                 </Routes>
                             </div>
                         </div>

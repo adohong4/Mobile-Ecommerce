@@ -184,13 +184,24 @@ const Sidebar = () => {
                     Danh sách voucher
                   </NavLink>
                 </li>
-                <li>
+                {/* <li>
                   <NavLink to="/trash-campaign" className="submenu-item">
                     Thùng rác
                   </NavLink>
-                </li>
+                </li> */}
               </ul>
             )}
+          </div>
+          <div className="sidebar-dropdown">
+            <div
+              className="sidebar-option sidebar-main"
+              onClick={() => toggleMenu("advertise")}
+            >
+              <div className="dad-menu sidebar-title">
+                <FontAwesomeIcon icon={faImage} />
+                <NavLink to="/mess" className="submenu-item"  style={{ color: "white", fontWeight: 400 }}>CSKH</NavLink>
+              </div>
+            </div>
           </div>
         </div>
 
