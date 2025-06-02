@@ -53,6 +53,54 @@ class MessageService {
             throw error;
         }
     }
+
+    static async sendAdminMessage(req, res) {
+        try {
+            const { text, image, video, audio, file } = req.body;
+            const { id: receiverId } = req.params;
+            const senderId = '682f22449b14ebd1d789b682';
+
+            let imgUrl = null;
+            if (image) {
+                const uploadResponse = await cloudinary.uploader.upload(image);
+                imgUrl = uploadResponse.secure_url;
+            }
+
+            const newMessage = await messageModel.create({
+                senderId,
+                receiverId,
+                content: text,
+                image: imgUrl,
+            });
+
+            const receiverSocketId = getReceiverSocketId(receiverId);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit("newMessage", newMessage);
+            }
+
+            return newMessage;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getAdminMessages(req, res) {
+        try {
+            const { id: userToChatId } = req.params;
+            const myId = '682f22449b14ebd1d789b682';
+
+            const messages = await messageModel.find({
+                $or: [
+                    { senderId: myId, receiverId: userToChatId },
+                    { senderId: userToChatId, receiverId: myId },
+                ],
+            });
+
+            return messages;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = MessageService;

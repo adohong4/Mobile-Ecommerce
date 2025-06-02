@@ -29,6 +29,30 @@ class MessageController {
             next(error);
         }
     }
+
+    sendAdminMessage = async (req, res, next) => {
+        try {
+            const result = await MessageService.sendAdminMessage(req, res);
+            new OK({
+                message: 'Admin send messages',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    getAdminMessages = async (req, res, next) => {
+        try {
+            const result = await MessageService.getAdminMessages(req, res);
+            new OK({
+                message: 'Admin Get messages',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new MessageController();

@@ -3,6 +3,7 @@
 const express = require('express');
 const { asyncHandler } = require('../../helpers/asyncHandler')
 const OrderAdminController = require('../../controllers/admin/order.controller');
+const AccountController = require('../../controllers/admin/account.controller');
 
 const router = express.Router();
 
@@ -19,5 +20,7 @@ router.put('/profile/order/update', asyncHandler(OrderAdminController.updateStat
 
 router.delete('/profile/order/delete/:id', asyncHandler(OrderAdminController.deleteOrder));
 router.delete('/profile/order/status/:id', asyncHandler(OrderAdminController.toggleOrderStatus)); //delete && restore
+
+router.get('/profile/online/user', asyncHandler(AccountController.getAccounts));
 
 module.exports = router;

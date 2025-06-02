@@ -10,4 +10,8 @@ const router = express.Router()
 router.post('/message/send/:id', checkTokenHeader, asyncHandler(MessageController.sendMessage))
 router.get('/message/get/:id', checkTokenHeader, asyncHandler(MessageController.getMessages))
 
+//Admin
+router.post('/message/admin/send/:id', asyncHandler(MessageController.sendAdminMessage));
+router.get('/message/admin/get/:id', asyncHandler(MessageController.getAdminMessages))
+
 module.exports = router;

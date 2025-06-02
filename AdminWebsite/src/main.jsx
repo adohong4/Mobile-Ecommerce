@@ -12,25 +12,28 @@ import AdvertiseContextProvider from './context/AdvertiseContextProvider.jsx'
 import OrderContextProvider from './context/OrderContextProvider.jsx'
 import AccountContextProvider from './context/AccountContextProvider.jsx'
 import StoreContextProvider from './context/StoreContext.jsx'
+import MessageContextProvider from './context/MessageContextProvider.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <AccountContextProvider>
-      <ProductContextProvider>
-        <CategoryContextProvider>
-          <AdvertiseContextProvider>
-            <CampaignContextProvider>
-              <VoucherContextProvider>
-                <OrderContextProvider>
-                  <StoreContextProvider>
-                    <App />
-                  </StoreContextProvider>
-                </OrderContextProvider>
-              </VoucherContextProvider>
-            </CampaignContextProvider>
-          </AdvertiseContextProvider>
-        </CategoryContextProvider>
-      </ProductContextProvider>
+      <MessageContextProvider>
+        <ProductContextProvider>
+          <CategoryContextProvider>
+            <AdvertiseContextProvider>
+              <CampaignContextProvider>
+                <VoucherContextProvider>
+                  <OrderContextProvider>
+                    <StoreContextProvider>
+                      <App />
+                    </StoreContextProvider>
+                  </OrderContextProvider>
+                </VoucherContextProvider>
+              </CampaignContextProvider>
+            </AdvertiseContextProvider>
+          </CategoryContextProvider>
+        </ProductContextProvider>
+      </MessageContextProvider>
     </AccountContextProvider>
   </BrowserRouter>
 )
