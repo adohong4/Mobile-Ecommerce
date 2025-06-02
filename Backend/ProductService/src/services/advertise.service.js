@@ -21,7 +21,7 @@ class AdvertiseService {
             }
 
             const newAdvertise = await advertiseModel.create({
-                classify,
+                classify: classify,
                 recap,
                 imageAds: image_filename,
             });
@@ -91,6 +91,30 @@ class AdvertiseService {
             await advertise.save();
 
             return advertise;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getBannerActive(req) {
+        try {
+            const ads = await advertiseModel.find({ classify: 'BANNER', status: true })
+                .sort({ createdAt: -1 })
+                .limit(5)
+                .exec();
+            return ads;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getAdvertiseActive(req) {
+        try {
+            const ads = await advertiseModel.find({ classify: 'ADVERTISE', status: true })
+                .sort({ createdAt: -1 })
+                .limit(3)
+                .exec();
+            return ads;
         } catch (error) {
             throw error;
         }

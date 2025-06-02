@@ -12,4 +12,7 @@ router.get('/product/advertise/get', asyncHandler(advertiseController.getAdverti
 router.delete('/product/advertise/delete/:id', asyncHandler(advertiseController.deleteAdvertise));
 router.put('/product/advertise/active/:id', asyncHandler(advertiseController.activeAdvertise));
 
+router.get('/product/advertise/banner', asyncHandler(advertiseController.getBannerActive));
+router.get('/product/advertise/adver', asyncHandler(advertiseController.getAdvertiseActive));
+
 module.exports = router;

@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_app/components/banner_component.dart';
+import 'package:mobile_app/components/category_component.dart';
+import 'package:mobile_app/components/advertise_component.dart';
 import 'package:mobile_app/models/productModel.dart';
-import 'package:mobile_app/pages/CartPage.dart';
-import 'package:mobile_app/pages/MessagePage.dart';
-import 'package:mobile_app/pages/ProfilePage.dart';
-import 'package:mobile_app/pages/WishList.dart';
 import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/widgets/HomeAppBar.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:mobile_app/components/product_card.dart' as component;
-import 'package:mobile_app/data/fake_products.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,68 +20,48 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ProductService productService = ProductService();
   late Future<List<ProductsModel>> _productsFuture;
-
-  final PageController _bannerController = PageController(
-    viewportFraction: 0.9,
-  );
-  final PageController _categoryController = PageController(
-    viewportFraction: 1.0,
-  );
-  int _bannerPage = 0;
-  int _categoryPage = 0;
-  late Timer _timer;
-
-  final List<String> _banners = [
-    'assets/banner_1.jpg',
-    'assets/banner_2.png',
-    'assets/banner_3.png',
-  ];
-
-  final List<List<Map<String, String>>> _productCategories = [
-    [
-      {'image': 'assets/apple.png', 'title': 'APPLE'},
-      {'image': 'assets/microsoft.png', 'title': 'MICROSOFT'},
-      {'image': 'assets/apple.png', 'title': 'ASUS'},
-      {'image': 'assets/microsoft.png', 'title': 'SAMSUNG'},
-    ],
-    [
-      {'image': 'assets/apple.png', 'title': 'APPLE'},
-      {'image': 'assets/microsoft.png', 'title': 'MICROSOFT'},
-      {'image': 'assets/apple.png', 'title': 'ASUS'},
-      {'image': 'assets/microsoft.png', 'title': 'SAMSUNG'},
-    ],
-  ];
+  bool _hasShownAd = false;
 
   @override
   void initState() {
     super.initState();
-
     _productsFuture = ProductService.fetchAllProducts();
 
-    // Hiển thị popup quảng cáo khi màn hình load xong
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showAdPopup();
-    });
-
-    // Tự động cuộn banner
-    _timer = Timer.periodic(Duration(seconds: 6), (timer) {
-      if (_bannerController.hasClients) {
-        int nextPage = (_bannerPage + 1) % _banners.length;
-        _bannerController.animateToPage(
-          nextPage,
-          duration: Duration(milliseconds: 1000),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
+    // Kiểm tra trạng thái hiển thị quảng cáo
+    _checkAndShowAd();
   }
 
-  @override
-  void dispose() {
-    _bannerController.dispose();
-    _categoryController.dispose();
-    _timer.cancel();
-    super.dispose();
+  Future<void> _checkAndShowAd() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isAdShown = prefs.getBool('isAdShown') ?? false;
+
+    if (!isAdShown) {
+      // Hiển thị quảng cáo lần đầu
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder:
+              (context) => AdvertiseComponent(
+                // onAdTap: (adId) {
+                //   // TODO: Điều hướng đến trang chi tiết quảng cáo nếu cần
+                //   print('Tapped on ad: $adId');
+                // },
+              ),
+        );
+      });
+      // Lưu trạng thái đã hiển thị quảng cáo
+      await prefs.setBool('isAdShown', true);
+      setState(() {
+        _hasShownAd = true;
+      });
+    }
+  }
+
+  // Reset trạng thái quảng cáo khi đăng xuất (gọi từ trang đăng xuất)
+  static Future<void> resetAdStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isAdShown', false);
   }
 
   @override
@@ -93,197 +72,26 @@ class _HomePageState extends State<HomePage> {
           Container(
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.white, // hoặc bất kỳ màu nền nào của app bar
+              color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1), // màu bóng
+                  color: Colors.black.withOpacity(0.1),
                   spreadRadius: 1,
                   blurRadius: 6,
-                  offset: Offset(0, 3), // đổ bóng xuống dưới
+                  offset: Offset(0, 3),
                 ),
               ],
             ),
             child: HomeAppBar(),
           ),
           Expanded(
-            // Nội dung cuộn được
             child: ListView(
               children: [
                 // Banner slider
-                Container(
-                  height: 200,
-                  margin: EdgeInsets.only(bottom: 10),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: PageView.builder(
-                          controller: _bannerController,
-                          itemCount: _banners.length,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _bannerPage = index;
-                            });
-                          },
-                          itemBuilder: (context, index) {
-                            return buildBanner(_banners[index]);
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          _banners.length,
-                          (index) => Container(
-                            width: 0,
-                            height: 0,
-                            margin: EdgeInsets.symmetric(horizontal: 2),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color:
-                                  _bannerPage == index
-                                      ? Colors.blue
-                                      : Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                BannerComponent(),
 
                 // Product categories
-                Container(
-                  height: 180,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Center(
-                          child: Text(
-                            'DANH MỤC SẢN PHẨM',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Expanded(
-                        child: PageView.builder(
-                          controller: _categoryController,
-                          itemCount: _productCategories.length,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _categoryPage = index;
-                            });
-                          },
-                          itemBuilder: (context, index) {
-                            final categoryList = _productCategories[index];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children:
-                                    categoryList.map<Widget>((category) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          // TODO: Handle tap
-                                        },
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              width: 56, // 2 * radius
-                                              height: 56,
-                                              decoration: BoxDecoration(
-                                                color: const Color(
-                                                  0xFFFFFFFF,
-                                                ), // Nền trắng
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: Color(
-                                                    0xFF194689,
-                                                  ), // Viền màu #194689
-                                                  width: 2,
-                                                ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(
-                                                          0.1,
-                                                        ), // Bóng đổ nhẹ
-                                                    blurRadius: 6,
-                                                    spreadRadius: 1,
-                                                    offset: Offset(
-                                                      0,
-                                                      3,
-                                                    ), // Đổ bóng xuống dưới
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Center(
-                                                child: Image.asset(
-                                                  category['image']!,
-                                                  width: 40,
-                                                  height: 32,
-                                                  fit: BoxFit.contain,
-                                                ),
-                                              ),
-                                            ),
-
-                                            const SizedBox(height: 15),
-                                            SizedBox(
-                                              width: 100,
-                                              child: Text(
-                                                category['title']!,
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                                maxLines: 5,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          _productCategories.length,
-                          (index) => AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            width: _categoryPage == index ? 16 : 8,
-                            height: 8,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color:
-                                  _categoryPage == index
-                                      ? const Color(0xFF1AA7DD)
-                                      : Colors.grey,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                CategoryComponent(),
 
                 // Flash Sale
                 Container(
@@ -349,81 +157,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-
       bottomNavigationBar: CustomBottomNav(parentContext: context),
-    );
-  }
-
-  // Widget hiển thị banner
-  Widget buildBanner(String asset) => Container(
-    margin: EdgeInsets.symmetric(horizontal: 8),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(12),
-      image: DecorationImage(image: AssetImage(asset), fit: BoxFit.cover),
-    ),
-  );
-
-  // Widget hiển thị danh mục sản phẩm
-  Widget buildCategoryRow(List<Map<String, String>> items) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children:
-          items.map((item) {
-            return Row(
-              children: [
-                Image.asset(
-                  item['image']!,
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
-                ),
-                SizedBox(height: 8),
-                Padding(
-                  padding: EdgeInsets.only(left: 16.0),
-                  child: Text(
-                    item['title']!,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
-    );
-  }
-
-  void _showAdPopup() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text(' Ưu đãi đặc biệt!'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'assets/banner_3.png',
-                height: 150,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 10),
-              const Text('Giảm 20% toàn bộ sản phẩm hôm nay!'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Đóng'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Xem ngay'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

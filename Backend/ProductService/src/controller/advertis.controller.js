@@ -51,6 +51,30 @@ class AdvertiseController {
             throw error;
         }
     }
+
+    async getBannerActive(req, res, next) {
+        try {
+            const result = await AdvertiseService.getBannerActive();
+            new CREATED({
+                message: 'get Banner',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getAdvertiseActive(req, res, next) {
+        try {
+            const result = await AdvertiseService.getAdvertiseActive();
+            new CREATED({
+                message: 'get Advertise',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new AdvertiseController();

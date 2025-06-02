@@ -7,7 +7,7 @@ const DOCUMENT_NAME = 'advertises'
 
 const AdvertiseSchema = new Schema({
     imageAds: { type: String },
-    classsify: { type: String, enum: ['BANNER', 'ADVERTISE'], require },
+    classify: { type: String, enum: ['BANNER', 'ADVERTISE'], required: true },
     recap: { type: String },
     status: { type: Boolean, default: false }
 }, { minimize: false, timestamps: true });
