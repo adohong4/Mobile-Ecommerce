@@ -1,9 +1,11 @@
+// edit_profile_page.dart
 import 'package:flutter/material.dart';
+import 'package:mobile_app/services/profile_service.dart';
 
 class EditProfilePage extends StatefulWidget {
   final Map<String, dynamic> profile;
 
-  const EditProfilePage({super.key, required this.profile});
+  const EditProfilePage({Key? key, required this.profile}) : super(key: key);
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -17,13 +19,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   final Color primaryColor = const Color(0xFF194689);
   final Color secondaryColor = const Color(0xFF1AA7DD);
+  final ProfileService _profileService = ProfileService();
 
   @override
   void initState() {
     super.initState();
-    _fullNameController = TextEditingController(text: widget.profile['fullName']);
-    _phoneController = TextEditingController(text: widget.profile['phoneNumber']);
-    _dobController = TextEditingController(text: widget.profile['dateOfBirth']);
+    _fullNameController = TextEditingController(
+      text: widget.profile['fullName'] ?? '',
+    );
+    _phoneController = TextEditingController(
+      text: widget.profile['phoneNumber'] ?? '',
+    );
+    // Chuyển đổi dateOfBirth nếu có
+    _dobController = TextEditingController(
+      text:
+          widget.profile['dateOfBirth'] != null
+              ? _formatDateForDisplay(widget.profile['dateOfBirth'])
+              : '',
+    );
     _gender = widget.profile['gender'];
   }
 
@@ -35,25 +48,149 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
-  void _saveChanges() {
-    // Giả lập lưu dữ liệu thành công
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Cập nhật hồ sơ thành công!',
-          style: TextStyle(fontFamily: 'Poppins'),
+  // Chuyển đổi định dạng ngày từ ISO (Date) hoặc string sang DD-MM-YYYY
+  String _formatDateForDisplay(String date) {
+    try {
+      final parsedDate = DateTime.parse(date);
+      return '${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}';
+    } catch (e) {
+      // Nếu date đã ở định dạng DD-MM-YYYY, trả về nguyên bản
+      if (_isValidDateFormat(date)) return date;
+      return '';
+    }
+  }
+
+  // Hiển thị DatePicker và cập nhật _dobController
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate:
+          _dobController.text.isNotEmpty
+              ? _parseDate(_dobController.text)
+              : DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: primaryColor,
+            colorScheme: ColorScheme.light(primary: secondaryColor),
+            buttonTheme: const ButtonThemeData(
+              textTheme: ButtonTextTheme.primary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _dobController.text =
+            '${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}';
+      });
+    }
+  }
+
+  // Parse ngày từ DD-MM-YYYY sang DateTime
+  DateTime _parseDate(String date) {
+    try {
+      final parts = date.split('-');
+      final day = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final year = int.parse(parts[2]);
+      return DateTime(year, month, day);
+    } catch (e) {
+      return DateTime.now(); // Mặc định nếu parse thất bại
+    }
+  }
+
+  // Kiểm tra định dạng DD-MM-YYYY và ngày hợp lệ
+  bool _isValidDateFormat(String date) {
+    // Biểu thức chính quy: 2 chữ số ngày, 2 chữ số tháng, 4 chữ số năm
+    final regex = RegExp(r'^\d{2}-\d{2}-\d{4}$');
+    if (!regex.hasMatch(date)) return false;
+
+    // Kiểm tra ngày hợp lệ
+    try {
+      final parts = date.split('-');
+      final day = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final year = int.parse(parts[2]);
+
+      if (year < 1900 || year > DateTime.now().year) return false;
+      if (month < 1 || month > 12) return false;
+      if (day < 1 || day > 31) return false;
+
+      // Kiểm tra số ngày tối đa trong tháng
+      final maxDays = DateTime(year, month + 1, 0).day;
+      if (day > maxDays) return false;
+
+      // Kiểm tra ngày tháng năm có tạo thành DateTime hợp lệ
+      DateTime.parse(
+        '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}',
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> _saveChanges() async {
+    // Kiểm tra dữ liệu đầu vào
+    if (_fullNameController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        _dobController.text.isEmpty ||
+        _gender == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng điền đầy đủ thông tin!'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
         ),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+      );
+      return;
+    }
+
+    // Kiểm tra định dạng ngày sinh
+    if (!_isValidDateFormat(_dobController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ngày sinh phải có định dạng DD-MM-YYYY và hợp lệ!'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Gọi API để cập nhật profile
+    final result = await _profileService.updateProfile(
+      fullName: _fullNameController.text,
+      gender: _gender!,
+      phoneNumber: _phoneController.text,
+      dateOfBirth: _dobController.text, // Gửi định dạng DD-MM-YYYY
+    );
+
+    // Hiển thị thông báo dựa trên kết quả
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result['message'],
+          style: const TextStyle(fontFamily: 'Poppins'),
+        ),
+        backgroundColor: result['success'] ? Colors.green : Colors.red,
+        duration: const Duration(seconds: 2),
       ),
     );
 
-    // Delay để người dùng kịp đọc thông báo trước khi quay lại
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pop(context);
-    });
+    // Nếu thành công, quay về trang trước
+    if (result['success']) {
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pop(context);
+      });
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -78,18 +215,34 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
             const SizedBox(height: 16),
             _buildInputLabel("Số điện thoại"),
-            _buildTextField(_phoneController, hint: 'Nhập số điện thoại', keyboardType: TextInputType.phone),
+            _buildTextField(
+              _phoneController,
+              hint: 'Nhập số điện thoại',
+              keyboardType: TextInputType.phone,
+            ),
 
             const SizedBox(height: 16),
             _buildInputLabel("Ngày sinh"),
-            _buildTextField(_dobController, hint: 'YYYY-MM-DD'),
+            GestureDetector(
+              onTap: _selectDate,
+              child: AbsorbPointer(
+                child: _buildTextField(
+                  _dobController,
+                  hint: 'DD-MM-YYYY',
+                  readOnly: true,
+                ),
+              ),
+            ),
 
             const SizedBox(height: 16),
             _buildInputLabel("Giới tính"),
             DropdownButtonFormField<String>(
               value: _gender,
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: primaryColor.withOpacity(0.5)),
@@ -98,7 +251,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               items: const [
                 DropdownMenuItem(value: 'MALE', child: Text('Nam')),
                 DropdownMenuItem(value: 'FEMALE', child: Text('Nữ')),
-                DropdownMenuItem(value: 'Khác', child: Text('Khác')),
+                DropdownMenuItem(value: 'OTHER', child: Text('Khác')),
               ],
               onChanged: (value) => setState(() => _gender = value),
             ),
@@ -115,7 +268,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
               child: const Text(
                 'Lưu thay đổi',
-                style: TextStyle(fontSize: 16, fontFamily: 'Poppins', color: Colors.white),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Poppins',
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
@@ -136,18 +293,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, {
+  Widget _buildTextField(
+    TextEditingController controller, {
     String? hint,
     TextInputType keyboardType = TextInputType.text,
+    bool readOnly = false,
   }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      readOnly: readOnly,
       style: const TextStyle(fontFamily: 'Poppins'),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey[400], fontFamily: 'Poppins'),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: primaryColor.withOpacity(0.5)),

@@ -16,7 +16,7 @@ const upload = multer({
 });
 
 router.get('/profile/get', checkTokenHeader, asyncHandler(ProfileController.getProfile));
-router.post('/profile/update', checkTokenCookie, asyncHandler(ProfileController.updateInfoProfile));
-router.post('/profile/image', checkTokenCookie, upload.single("profilePic"), asyncHandler(ProfileController.updateProfilePic));
+router.post('/profile/update', checkTokenHeader, asyncHandler(ProfileController.updateInfoProfile));
+router.post('/profile/image', checkTokenHeader, upload.single("profilePic"), asyncHandler(ProfileController.updateProfilePic));
 
 module.exports = router;

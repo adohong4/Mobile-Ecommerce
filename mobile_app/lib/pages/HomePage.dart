@@ -27,36 +27,43 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _productsFuture = ProductService.fetchAllProducts();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => const AdvertiseComponent(),
+      );
+    });
     // Kiểm tra trạng thái hiển thị quảng cáo
-    _checkAndShowAd();
+    // _checkAndShowAd();
   }
 
-  Future<void> _checkAndShowAd() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isAdShown = prefs.getBool('isAdShown') ?? false;
+  // Future<void> _checkAndShowAd() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final isAdShown = prefs.getBool('isAdShown') ?? false;
 
-    if (!isAdShown) {
-      // Hiển thị quảng cáo lần đầu
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder:
-              (context) => AdvertiseComponent(
-                // onAdTap: (adId) {
-                //   // TODO: Điều hướng đến trang chi tiết quảng cáo nếu cần
-                //   print('Tapped on ad: $adId');
-                // },
-              ),
-        );
-      });
-      // Lưu trạng thái đã hiển thị quảng cáo
-      await prefs.setBool('isAdShown', true);
-      setState(() {
-        _hasShownAd = true;
-      });
-    }
-  }
+  //   if (!isAdShown) {
+  //     // Hiển thị quảng cáo lần đầu
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       showDialog(
+  //         context: context,
+  //         barrierDismissible: true,
+  //         builder:
+  //             (context) => AdvertiseComponent(
+  //               onAdTap: (adId) {
+  //                 // TODO: Điều hướng đến trang chi tiết quảng cáo nếu cần
+  //                 print('Tapped on ad: $adId');
+  //               },
+  //             ),
+  //       );
+  //     });
+  //     // Lưu trạng thái đã hiển thị quảng cáo
+  //     await prefs.setBool('isAdShown', true);
+  //     setState(() {
+  //       _hasShownAd = true;
+  //     });
+  //   }
+  // }
 
   // Reset trạng thái quảng cáo khi đăng xuất (gọi từ trang đăng xuất)
   static Future<void> resetAdStatus() async {

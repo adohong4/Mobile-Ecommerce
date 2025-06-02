@@ -53,4 +53,56 @@ class ProfileService {
       return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> updateProfile({
+    required String fullName,
+    required String gender,
+    required String phoneNumber,
+    required String dateOfBirth,
+  }) async {
+    final url = Uri.parse('$_baseUrl/update');
+    try {
+      final token = await LoginService.getToken();
+
+      if (token == null) {
+        return {
+          'success': false,
+          'message': 'Không tìm thấy token. Vui lòng đăng nhập lại.',
+        };
+      }
+
+      // Chuẩn bị body cho yêu cầu POST
+      final body = jsonEncode({
+        'fullName': fullName,
+        'gender': gender,
+        'phoneNumber': phoneNumber,
+        'dateOfBirth': dateOfBirth,
+      });
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': '$token',
+        },
+        body: body,
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 201) {
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Cập nhật thông tin thành công',
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Cập nhật thất bại',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
 }

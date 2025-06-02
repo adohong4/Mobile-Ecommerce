@@ -166,7 +166,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           UserInfoRow(
                             label: "Giới tính",
-                            value: _profile!['gender'] ?? 'Chưa cập nhật',
+                            value:
+                                _profile!['gender'] == 'MALE'
+                                    ? 'Nam'
+                                    : (_profile!['gender'] == 'FEMALE'
+                                        ? 'Nữ'
+                                        : 'Chưa xác định'),
                           ),
                         ],
                       ),
