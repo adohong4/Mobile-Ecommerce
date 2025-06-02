@@ -18,9 +18,12 @@ import TrashCampain from '../../pages/Campaign/TrashCampaign';
 import Statistic from '../../pages/Statistic/Statistic';
 import { ToastContainer } from 'react-toastify';
 import Cookies from 'js-cookie';
+
 import VoucherList from '../Voucher/VoucherList';
+import AddVoucher from '../Voucher/AddVoucher';
 import CategoryList from '../Category/CategoryList';
 import AdvertiseList from '../Advertise/AdvertiseList';
+import Mess from '../Messaege/Message';
 
 const Admin = () => {
     // const token = Cookies.get("token");
@@ -63,6 +66,7 @@ const Admin = () => {
                                     <Route path="list-campaign/:id" element={<CampaignInfo />} />
                                     <Route path="trash-campaign" element={<TrashCampain />} />
 
+                                    <Route path="add-voucher" element={<AddVoucher />} />
                                     <Route path="voucher" element={<VoucherList />} />
 
                                     <Route path="category" element={<CategoryList />} />
@@ -70,6 +74,7 @@ const Admin = () => {
                                     <Route path="advertise" element={<AdvertiseList />} />
 
                                     <Route path="statistic" element={<Statistic />} />
+                                    <Route path="mess" element={<Mess />} />
                                 </Routes>
                             </div>
                         </div>
