@@ -43,7 +43,6 @@ class _OrderDetailPageState extends State<OrderDetailPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: tabTitles.length, vsync: this);
-    // Lấy danh sách đơn hàng khi khởi tạo
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CartProvider>(context, listen: false).fetchUserOrders();
     });
@@ -63,146 +62,172 @@ class _OrderDetailPageState extends State<OrderDetailPage>
     }
   }
 
-  Widget _buildOrderCard({
+  Widget _buildOrderItemCard({
     required Order order,
-    required bool showReviewButton,
+    required OrderItem item,
+    required ProductsModel? product,
   }) {
+    final bool showReviewButton = order.status == 'delivered';
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Image.network(
+                  product?.images.isNotEmpty ?? false
+                      ? '${ApiService.imageBaseUrl}${product!.images[0]}'
+                      : 'https://via.placeholder.com/80',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (context, error, stackTrace) => Image.asset(
+                        'assets/microsoft.png',
+                        width: 80,
+                        height: 80,
+                      ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product?.name ?? 'Sản phẩm không xác định',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Số lượng:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                          Text(
+                            'x${item.quantity}',
+                            style: const TextStyle(fontFamily: 'Poppins'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+
+                      Row(
+                        children: [
+                          if (product?.oldPrice != null &&
+                              product!.oldPrice! > item.price)
+                            Text(
+                              '${product!.oldPrice!.toStringAsFixed(0)} đ',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                decoration: TextDecoration.lineThrough,
+                                color: Colors.grey,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                          if (product?.oldPrice != null &&
+                              product!.oldPrice! > item.price)
+                            const SizedBox(width: 8),
+                          Text(
+                            '${item.price.toStringAsFixed(0)} đ',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF0D47A1),
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+
+                      Text(
+                        '${order.payment ? 'Đã thanh toán' : 'Chưa thanh toán'}',
+                        style: const TextStyle(fontFamily: 'Poppins'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Tổng tiền cho item này
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                'Tổng tiền item: ${(item.price * item.quantity).toStringAsFixed(0)} đ',
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+
+            if (showReviewButton && product != null && order.id != null) ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0D47A1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => ReviewPage(
+                              productId: item.id,
+                              orderId: order.id!,
+                            ),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'Đánh giá',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderCard({required Order order}) {
     return FutureBuilder<List<Widget>>(
       future: Future.wait(
         order.items.map((item) async {
           final product = await _fetchProduct(item.id);
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Image.network(
-                        product?.images.isNotEmpty ?? false
-                            ? '${ApiService.imageBaseUrl}${product!.images[0]}'
-                            : 'https://via.placeholder.com/80',
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (context, error, stackTrace) => Image.asset(
-                              'assets/microsoft.png',
-                              width: 80,
-                              height: 80,
-                            ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              product?.name ?? 'Sản phẩm không xác định',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                fontFamily: 'Poppins',
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${item.quantity} sản phẩm',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'Poppins',
-                                  ),
-                                ),
-                                Text(
-                                  'x${item.quantity}',
-                                  style: const TextStyle(fontFamily: 'Poppins'),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                if (product?.oldPrice != null)
-                                  Text(
-                                    '${product!.oldPrice!.toStringAsFixed(0)} đ',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      decoration: TextDecoration.lineThrough,
-                                      color: Colors.grey,
-                                      fontFamily: 'Poppins',
-                                    ),
-                                  ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '${item.price.toStringAsFixed(0)} đ',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Color(0xFF0D47A1),
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Poppins',
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${order.payment ? 'Đã thanh toán' : 'Chưa thanh toán'}',
-                              style: const TextStyle(fontFamily: 'Poppins'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Thành tiền: ${(item.price * item.quantity).toStringAsFixed(0)} đ',
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-
-                  if (showReviewButton) ...[
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0D47A1),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ReviewPage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Đánh giá',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
+          return _buildOrderItemCard(
+            order: order,
+            item: item,
+            product: product,
           );
         }).toList(),
       ),
@@ -211,9 +236,36 @@ class _OrderDetailPageState extends State<OrderDetailPage>
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError || !snapshot.hasData) {
-          return const Center(child: Text('Lỗi khi tải thông tin đơn hàng'));
+          return const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text('Lỗi khi tải thông tin chi tiết đơn hàng'),
+          );
         }
-        return Column(children: snapshot.data!);
+
+        // final totalAmountWidget = Padding(
+        //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        //   child: Align(
+        //     alignment: Alignment.centerRight,
+        //     child: Text(
+        //       'Tổng tiền đơn hàng: ${order.amount.toStringAsFixed(0)} đ',
+        //       style: const TextStyle(
+        //         fontFamily: 'Poppins',
+        //         fontWeight: FontWeight.bold,
+        //         fontSize: 16,
+        //         color: Color(0xFF0D47A1),
+        //       ),
+        //     ),
+        //   ),
+        // );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ...snapshot.data!,
+            // totalAmountWidget,
+            const Divider(height: 20, thickness: 1),
+          ],
+        );
       },
     );
   }
@@ -236,14 +288,12 @@ class _OrderDetailPageState extends State<OrderDetailPage>
       return const Center(child: Text('Không có đơn hàng nào'));
     }
 
-    return ListView(
-      children:
-          filteredOrders.map((order) {
-            return _buildOrderCard(
-              order: order,
-              showReviewButton: status == 'Đánh giá',
-            );
-          }).toList(),
+    return ListView.builder(
+      itemCount: filteredOrders.length,
+      itemBuilder: (context, index) {
+        final order = filteredOrders[index];
+        return _buildOrderCard(order: order);
+      },
     );
   }
 
@@ -279,29 +329,35 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Stack(
+                        clipBehavior: Clip.none,
                         children: [
-                          Icon(tabIcons[index], size: 35),
+                          Icon(tabIcons[index], size: 30),
                           if (count > 0)
                             Positioned(
-                              right: 0,
-                              top: 0,
+                              right: -8,
+                              top: -4,
                               child: Container(
-                                padding: const EdgeInsets.all(2),
+                                padding: const EdgeInsets.all(3),
                                 decoration: BoxDecoration(
                                   color: Colors.red,
                                   borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 1,
+                                  ),
                                 ),
                                 constraints: const BoxConstraints(
-                                  minWidth: 18,
-                                  minHeight: 18,
+                                  minWidth: 20,
+                                  minHeight: 20,
                                 ),
                                 child: Center(
                                   child: Text(
-                                    '$count',
+                                    count > 99 ? '99+' : '$count',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 10,
+                                      fontSize: 11,
                                       fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
@@ -313,10 +369,11 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                       Text(
                         tabTitles[index],
                         style: const TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),

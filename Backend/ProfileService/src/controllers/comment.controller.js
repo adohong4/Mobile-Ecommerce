@@ -8,7 +8,7 @@ class CommentController {
         try {
             const result = await CommentService.commentProduct(req, res);
             new CREATED({
-                message: 'user comment',
+                message: 'Đánh giá sản phẩm thành công',
                 metadata: result
             }).send(res);
         } catch (error) {
@@ -45,6 +45,18 @@ class CommentController {
             const result = await CommentService.deleteComment(req, res);
             new OK({
                 message: 'delete Comment',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getAverageRatingByProduct(req, res, next) {
+        try {
+            const result = await CommentService.getAverageRatingByProduct(req, res);
+            new OK({
+                message: 'get AverageRating By Product',
                 metadata: result
             }).send(res);
         } catch (error) {

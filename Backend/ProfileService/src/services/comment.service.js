@@ -1,21 +1,30 @@
 'use strict';
 
 const commentModel = require('../models/comment.model');
-const orderModel = require('../models/order.model')
-const { BadRequestError, ForbiddenError } = require('../core/error.response')
+const orderModel = require('../models/order.model');
+const { Types } = require('mongoose');
+const { BadRequestError, ForbiddenError } = require('../core/error.response');
 
 class CommentService {
     static async commentProduct(req, res) {
         try {
             const userId = req.user._id;
-            const { productId, comment, rating } = req.body;
+            const { orderId, productId, comment, rating } = req.body;
 
+            if (!orderId || !productId || !comment || !rating) {
+                throw new BadRequestError('Thiếu thông tin bắt buộc');
+            }
+
+            // Kiểm tra đơn hàng
             const order = await orderModel.findOne({
+                _id: orderId,
                 userId,
-                'items.productId': productId,
+                'items.id': productId,
                 status: 'delivered',
+                payment: true,
                 active: true
             });
+
             if (!order) {
                 throw new ForbiddenError('Bạn chỉ có thể bình luận sau khi mua và nhận sản phẩm');
             }
@@ -25,18 +34,23 @@ class CommentService {
                 userId,
                 active: true
             });
+
             if (existingComment) {
                 throw new BadRequestError('Bạn đã bình luận cho sản phẩm này');
             }
 
             let imageFilenames = [];
-            if (files && Array.isArray(files)) {
-                imageFilenames = files.map(file => file.filename);
+            if (req.files && Array.isArray(req.files)) {
+                imageFilenames = req.files.map(file => file.filename);
             }
 
             const newComment = new commentModel({
-                productId, userId, comment, rating,
-                image: imageFilenames,
+                productId,
+                userId,
+                comment,
+                rating,
+                images: imageFilenames,
+                createdAt: new Date()
             });
 
             const savedComment = await newComment.save();
@@ -50,7 +64,7 @@ class CommentService {
 
     static async getCommentProduct(req, res) {
         try {
-            const { productId } = req.body;
+            const { productId } = req.params;
             const comment = await commentModel.find({ productId })
                 .sort({ createdAt: -1 })
                 .exec();
@@ -103,6 +117,18 @@ class CommentService {
             await commentModel.findByIdAndDelete(commentId);
 
             return { message: 'Xóa bình luận thành công' };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getAverageRatingByProduct(req, res) {
+        try {
+            const { productId } = req.params;
+
+            const comments = await commentModel.find({ productId, active: true });
+
+            return comments;
         } catch (error) {
             throw error;
         }
