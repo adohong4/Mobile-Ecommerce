@@ -19,6 +19,24 @@ class CartProvider extends ChangeNotifier {
 
   final CartService _cartService = CartService();
 
+  // Helper method to convert List<dynamic> to Map<String, int>
+  Map<String, int> _convertListToMap(List<dynamic> cartList) {
+    Map<String, int> cartMap = {};
+    for (var item in cartList) {
+      // Adjust the field names based on your backend response structure
+      // Assuming each item has 'itemId' and 'quantity' fields
+      String itemId = item['itemId']?.toString() ?? '';
+      int quantity =
+          item['quantity'] is int
+              ? item['quantity']
+              : int.tryParse(item['quantity'].toString()) ?? 0;
+      if (itemId.isNotEmpty) {
+        cartMap[itemId] = quantity;
+      }
+    }
+    return cartMap;
+  }
+
   // Lấy giỏ hàng từ backend
   Future<void> fetchCart() async {
     _isLoading = true;
@@ -28,7 +46,13 @@ class CartProvider extends ChangeNotifier {
     final result = await _cartService.getListCart();
 
     if (result['success']) {
-      _cartData = Map<String, int>.from(result['cartData']);
+      // Handle cartData as List<dynamic> and convert to Map<String, int>
+      if (result['cartData'] is List<dynamic>) {
+        _cartData = _convertListToMap(result['cartData']);
+      } else {
+        _cartData = Map<String, int>.from(result['cartData'] ?? {});
+      }
+
       if (_cartData.isNotEmpty) {
         final productIds = _cartData.keys.toList();
         try {
@@ -57,7 +81,13 @@ class CartProvider extends ChangeNotifier {
     final result = await _cartService.addToCart(product.id);
 
     if (result['success']) {
-      _cartData = Map<String, int>.from(result['cartData']);
+      // Handle cartData as List<dynamic> and convert to Map<String, int>
+      if (result['cartData'] is List<dynamic>) {
+        _cartData = _convertListToMap(result['cartData']);
+      } else {
+        _cartData = Map<String, int>.from(result['cartData'] ?? {});
+      }
+
       final productIds = _cartData.keys.toList();
       try {
         _cartItems = await ProductService.fetchProductsByIds(productIds);
@@ -80,7 +110,13 @@ class CartProvider extends ChangeNotifier {
     final result = await _cartService.removeFromCart(product.id);
 
     if (result['success']) {
-      _cartData = Map<String, int>.from(result['cartData']);
+      // Handle cartData as List<dynamic> and convert to Map<String, int>
+      if (result['cartData'] is List<dynamic>) {
+        _cartData = _convertListToMap(result['cartData']);
+      } else {
+        _cartData = Map<String, int>.from(result['cartData'] ?? {});
+      }
+
       final productIds = _cartData.keys.toList();
       try {
         _cartItems = await ProductService.fetchProductsByIds(productIds);

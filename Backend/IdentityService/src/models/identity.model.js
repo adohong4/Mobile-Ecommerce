@@ -14,8 +14,7 @@ const UserSchema = new Schema({
     role: { type: String, enum: ['USER', 'ADMIN'], default: 'USER' },
     cartData: {
         type: Object,
-        default: [],
-        validate: [arrayLimit, 'Giỏ hàng chỉ tối đa 20 sản phẩm']
+        default: {},
     },
     active: { type: Boolean, default: true }
 }, { minimize: false, timestamps: true });

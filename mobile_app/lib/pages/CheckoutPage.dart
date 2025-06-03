@@ -5,6 +5,7 @@ import 'package:mobile_app/models/addressModel.dart';
 import 'package:mobile_app/models/order_model.dart';
 import 'package:mobile_app/models/voucher_model.dart';
 import 'package:mobile_app/pages/ShippingAddressPage.dart';
+import 'package:mobile_app/pages/AddAddressPage.dart';
 import 'package:mobile_app/pages/voucher_select.dart';
 import 'package:mobile_app/pages/HomePage.dart'; // Import HomePage
 import 'package:mobile_app/providers/voucher_provider.dart';
@@ -72,10 +73,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final result = await _addressService.getAddresses();
     if (result['success']) {
       final addresses = result['addresses'] as List<AddressModel>;
-      setState(() {
-        defaultAddress = addresses.firstWhere((address) => address.active);
-        isLoadingAddress = false;
-      });
+      if (addresses.isEmpty) {
+        setState(() {
+          isLoadingAddress = false;
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AddAddressPage()),
+        ).then((_) => _fetchDefaultAddress());
+      } else {
+        setState(() {
+          defaultAddress = addresses.firstWhere(
+            (address) => address.active,
+            orElse: () => addresses.first,
+          );
+          isLoadingAddress = false;
+        });
+      }
     } else {
       setState(() {
         addressError = result['message'];

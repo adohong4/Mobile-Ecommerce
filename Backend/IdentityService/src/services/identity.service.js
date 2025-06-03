@@ -1,6 +1,7 @@
 'use strict';
 
 const identityModel = require("../models/identity.model");
+const profileModel = require("../models/profile.model");
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const { BadRequestError, ConflictRequestError, AuthFailureError, ForbiddenError } = require("../core/error.response");
@@ -34,6 +35,10 @@ class IdentityService {
                 password: password,
                 hashedPassword: hashedPassword,
             })
+
+            await profileModel.create({
+                userId: newUser._id,
+            });
 
             const tokenPayload = {
                 userId: newUser._id,

@@ -5,6 +5,53 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LoginService {
   static const String _baseUrl = 'http://localhost:9001/v1/api/identity';
 
+  Future<Map<String, dynamic>> register(
+    String username,
+    String email,
+    String password,
+  ) async {
+    final url = Uri.parse('$_baseUrl/register');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 201) {
+        // Lưu token và user vào SharedPreferences
+        final token = data['metadata']['token'];
+        final user = data['metadata']['user'];
+        final cookie = 'jwt=$token';
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
+        await prefs.setString('user', jsonEncode(user));
+        await prefs.setString('cookies', cookie);
+
+        return {
+          'success': true,
+          'user': user,
+          'token': token,
+          'message': data['message'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Đăng ký thất bại',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
+
   Future<Map<String, dynamic>> login(String email, String password) async {
     final url = Uri.parse('$_baseUrl/login');
     try {
