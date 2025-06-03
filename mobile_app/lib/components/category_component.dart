@@ -1,6 +1,6 @@
-// components/category_component.dart
 import 'package:flutter/material.dart';
 import 'package:mobile_app/models/category_model.dart';
+import 'package:mobile_app/pages/SearchPage.dart';
 import 'package:mobile_app/services/category_service.dart';
 
 class CategoryComponent extends StatefulWidget {
@@ -12,7 +12,7 @@ class CategoryComponent extends StatefulWidget {
 
 class _CategoryComponentState extends State<CategoryComponent> {
   final PageController _categoryController = PageController(
-    viewportFraction: 1.0,
+    viewportFraction: 1.0, // Đảm bảo mỗi trang chiếm toàn bộ chiều rộng
   );
   int _categoryPage = 0;
   late Future<List<CategoryModel>> _categoriesFuture;
@@ -21,6 +21,15 @@ class _CategoryComponentState extends State<CategoryComponent> {
   void initState() {
     super.initState();
     _categoriesFuture = CategoryService.fetchCategories();
+    // Lắng nghe thay đổi trang để cập nhật chỉ số
+    _categoryController.addListener(() {
+      final newPage = _categoryController.page?.round() ?? 0;
+      if (_categoryPage != newPage) {
+        setState(() {
+          _categoryPage = newPage;
+        });
+      }
+    });
   }
 
   @override
@@ -81,6 +90,8 @@ class _CategoryComponentState extends State<CategoryComponent> {
                       child: PageView.builder(
                         controller: _categoryController,
                         itemCount: categoryPages.length,
+                        physics:
+                            const ClampingScrollPhysics(), // Đảm bảo vuốt mượt mà
                         onPageChanged: (index) {
                           setState(() {
                             _categoryPage = index;
@@ -98,8 +109,18 @@ class _CategoryComponentState extends State<CategoryComponent> {
                                   categoryList.map<Widget>((category) {
                                     return GestureDetector(
                                       onTap: () {
-                                        // TODO: Điều hướng đến trang danh mục với categoryIds
-                                        print('Tapped on ${category.category}');
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => SearchPage(
+                                                  categoryId:
+                                                      category.categoryIds,
+                                                  categoryName:
+                                                      category.category,
+                                                ),
+                                          ),
+                                        );
                                       },
                                       child: Column(
                                         children: [
@@ -110,7 +131,7 @@ class _CategoryComponentState extends State<CategoryComponent> {
                                               color: const Color(0xFFFFFFFF),
                                               shape: BoxShape.circle,
                                               border: Border.all(
-                                                color: Color(0xFF194689),
+                                                color: const Color(0xFF194689),
                                                 width: 2,
                                               ),
                                               boxShadow: [
@@ -119,7 +140,7 @@ class _CategoryComponentState extends State<CategoryComponent> {
                                                       .withOpacity(0.1),
                                                   blurRadius: 6,
                                                   spreadRadius: 1,
-                                                  offset: Offset(0, 3),
+                                                  offset: const Offset(0, 3),
                                                 ),
                                               ],
                                             ),
@@ -138,11 +159,13 @@ class _CategoryComponentState extends State<CategoryComponent> {
                                                               context,
                                                               error,
                                                               stackTrace,
-                                                            ) => Icon(
+                                                            ) => const Icon(
                                                               Icons.error,
                                                             ),
                                                       )
-                                                      : Icon(Icons.category),
+                                                      : const Icon(
+                                                        Icons.category,
+                                                      ),
                                             ),
                                           ),
                                           const SizedBox(height: 15),
@@ -172,8 +195,7 @@ class _CategoryComponentState extends State<CategoryComponent> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
-                        categoryPages
-                            .length, // Sử dụng categoryPages.length thay vì snapshot.data
+                        categoryPages.length,
                         (index) => AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           width: _categoryPage == index ? 16 : 8,

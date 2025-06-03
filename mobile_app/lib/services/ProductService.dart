@@ -92,4 +92,32 @@ class ProductService {
       return products;
     }
   }
+
+  static Future<List<ProductsModel>> fetchProductsByCategory(
+    String categoryId,
+  ) async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://localhost:9004/v1/api/product/category/$categoryId'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data is! Map<String, dynamic> || data['metadata'] == null) {
+          throw Exception('Invalid JSON structure: missing metadata');
+        }
+        final List<dynamic> productsJson = data['metadata'];
+        return productsJson
+            .map((json) => ProductsModel.fromJson(json))
+            .toList();
+      } else {
+        throw Exception(
+          'Failed to load products for category: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e) {
+      print('Error fetching products by category: $e');
+      rethrow;
+    }
+  }
 }

@@ -19,4 +19,6 @@ router.delete('/product/delete/:id', asyncHandler(ProductController.deleteProduc
 router.delete('/product/softDelete/:id', asyncHandler(ProductController.softRestoreProduct));
 router.delete('/product/updateQuantityProduct', asyncHandler(ProductController.updateQuantityProduct));
 
+router.get('/product/category/:category', asyncHandler(ProductController.getProductByCategory));
+
 module.exports = router;

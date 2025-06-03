@@ -100,6 +100,18 @@ class ProductController {
         }
     }
 
+    async getProductByCategory(req, res, next) {
+        try {
+            const result = await ProductService.getProductByCategory(req, res)
+            new OK({
+                message: 'get Product By Category',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getProductsByPage(req, res, next) {
         try {
             const result = await ProductService.getProductsByPage(req, res)

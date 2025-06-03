@@ -165,6 +165,19 @@ class ProductService {
         }
     }
 
+    static async getProductByCategory(req, res) {
+        try {
+            const { category } = req.params;
+            const product = await productModel.find({ category })
+                .select('title nameProduct product_slug price images category active')
+                .sort({ createdAt: -1 })
+                .exec();;
+            return product;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     static async getCountProduct() {
         return await productModel.countDocuments();
     }
