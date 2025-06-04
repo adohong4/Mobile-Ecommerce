@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:mobile_app/services/ApiService.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/models/models_products.dart';
 import 'package:mobile_app/models/productModel.dart';
 import 'package:mobile_app/services/ProductService.dart';
-
+import 'package:mobile_app/providers/cart_provider.dart';
 import '../services/ApiService.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -577,7 +580,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             ),
                             minimumSize: const Size(double.infinity, 48),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            final cart = context.read<CartProvider>();
+                            cart.add(product);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
+                            );
+                          },
                           child: const Text(
                             "THÊM GIỎ HÀNG",
                             style: TextStyle(color: Colors.white),
