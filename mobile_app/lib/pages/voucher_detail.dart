@@ -79,8 +79,15 @@ class _VoucherDetailState extends State<VoucherDetail> {
                   Container(
                     height: 180,
                     width: double.infinity,
-                    color: const Color(0xFF0077CC),
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/banner_1.jpg'),
+                        fit: BoxFit.cover,
+                      ),
+                      color: const Color(0xFF0077CC).withOpacity(0.7),
+                    ),
                   ),
+
                   Positioned(
                     bottom: -30,
                     child: Container(
@@ -122,6 +129,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                         decoration: BoxDecoration(
                           color: const Color(0xFF003366),
                           borderRadius: BorderRadius.circular(8),
+
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -199,7 +199,7 @@ class ProductCard extends StatelessWidget {
                   Text(
                     formatCurrency(products.oldPrice!),
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       color: Colors.grey,
                       decoration: TextDecoration.lineThrough,
                     ),

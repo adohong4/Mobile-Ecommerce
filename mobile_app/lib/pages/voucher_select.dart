@@ -110,6 +110,20 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
       ),
       body: Column(
         children: [
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFFFFB74D), // Màu cam
+            ),
+            child: Image.asset(
+              'assets/banner_2.png',
+              height: 200,
+              fit: BoxFit.cover,
+            ),
+          ),
+
+
+
           // TextField nhập mã voucher và nút Áp dụng
           Padding(
             padding: const EdgeInsets.all(16),
@@ -117,52 +131,54 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
               children: [
                 Expanded(
                   child: SizedBox(
-                    height: 48,
+                    height: 50,
                     child: TextField(
                       controller: _codeController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Nhập mã code voucher',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.zero,
-                          borderSide: BorderSide(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8), // bo góc mềm
+                          borderSide: const BorderSide(color: Colors.grey),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.zero,
-                          borderSide: BorderSide(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Colors.grey),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.zero,
-                          borderSide: BorderSide(color: Color(0xFF003366)),
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Color(0xFF003366)),
                         ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       ),
-                      style: const TextStyle(fontFamily: 'Poppins'),
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 SizedBox(
-                  height: 48,
+                  height: 50,
                   child: ElevatedButton(
-                    onPressed:
-                        _codeController.text.trim().isEmpty
-                            ? null
-                            : _applyVoucherCode,
+                    onPressed: _codeController.text.trim().isEmpty ? null : _applyVoucherCode,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          _codeController.text.trim().isEmpty
-                              ? Colors.grey
-                              : const Color(0xFF003366),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero,
+                      backgroundColor: _codeController.text.trim().isEmpty
+                          ? Colors.grey.shade400
+                          : const Color(0xFF003366),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8), // bo góc button
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      elevation: _codeController.text.trim().isEmpty ? 0 : 4,
                     ),
                     child: const Text(
                       'Áp dụng',
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
                       ),
                     ),
                   ),
@@ -170,7 +186,8 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
               ],
             ),
           ),
-          // Danh sách voucher
+
+// Danh sách voucher
           Expanded(
             child: Consumer<VoucherProvider>(
               builder: (context, provider, child) {
@@ -178,64 +195,76 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (provider.errorMessage != null) {
-                  return Center(child: Text(provider.errorMessage!));
+                  return Center(
+                    child: Text(
+                      provider.errorMessage!,
+                      style: const TextStyle(color: Colors.red, fontSize: 16),
+                    ),
+                  );
                 }
                 if (provider.vouchers.isEmpty) {
-                  return const Center(child: Text('Không có voucher nào'));
+                  return const Center(
+                    child: Text(
+                      'Không có voucher nào',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  );
                 }
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: provider.vouchers.length,
                   itemBuilder: (context, index) {
                     final voucher = provider.vouchers[index];
-                    return _buildVoucherItem(voucher);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: _buildVoucherItem(voucher),
+                    );
                   },
                 );
               },
             ),
           ),
-          // Nút Đồng ý
+
+// Nút Đồng ý
           Padding(
             padding: const EdgeInsets.all(16),
             child: SizedBox(
               width: double.infinity,
+              height: 52,
               child: ElevatedButton(
-                onPressed:
-                    _selectedVoucherId == null
-                        ? null
-                        : () => _confirmSelection(
-                          Provider.of<VoucherProvider>(
-                            context,
-                            listen: false,
-                          ).vouchers,
-                        ),
+                onPressed: _selectedVoucherId == null
+                    ? null
+                    : () => _confirmSelection(
+                  Provider.of<VoucherProvider>(context, listen: false).vouchers,
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      _selectedVoucherId == null
-                          ? Colors.grey
-                          : const Color(0xFF003366),
+                  backgroundColor: _selectedVoucherId == null
+                      ? Colors.grey.shade400
+                      : const Color(0xFF003366),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      12,
-                    ), // Làm bo góc cho nút
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  elevation: _selectedVoucherId == null ? 0 : 5,
                 ),
                 child: const Text(
                   'Đồng ý',
                   style: TextStyle(
                     color: Colors.white,
                     fontFamily: 'Poppins',
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
           ),
+
         ],
       ),
+
       backgroundColor: const Color(0xFFF5F5F5),
+
     );
   }
 

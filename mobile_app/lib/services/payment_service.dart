@@ -4,7 +4,7 @@ import 'package:mobile_app/models/order_model.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class PaymentService {
-  static const String _baseUrl = 'http://localhost:9007/v1/api';
+  static const String _baseUrl = 'http://192.168.1.9:9007/v1/api';
   static const String _codVerify = '/payment/cod/verify';
   static const String _stripePlace = '/payment/stripe/place';
   static const String _stripeVerify = '/payment/stripe/verify';

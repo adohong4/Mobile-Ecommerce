@@ -85,6 +85,7 @@ flutter:
     - assets/stripe.png
     - assets/zalopay.png
     - assets/product.png
+    - assets/avatar.png
   fonts:
     - family: Poppins
       fonts:
