@@ -10,5 +10,6 @@ router.use('/v1/api', require('./favourite'));
 router.use('/v1/api', require('./saveAds'));
 router.use('/v1/api', require('./comment'));
 router.use('/v1/api', require('./admin'));
+router.use('/v1/api', require('./viewedProduct'));
 
 module.exports = router;

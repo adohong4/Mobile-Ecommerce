@@ -36,9 +36,9 @@ class IdentityService {
                 hashedPassword: hashedPassword,
             })
 
-            await profileModel.create({
-                userId: newUser._id,
-            });
+            // await profileModel.create({
+            //     userId: newUser._id,
+            // });
 
             const tokenPayload = {
                 userId: newUser._id,

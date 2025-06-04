@@ -6,7 +6,7 @@ import 'package:mobile_app/models/comment_model.dart'; // Import Comment model
 
 class CommentService {
   static const String _baseUrl =
-      'http://192.168.1.9:9003/v1/api/profile'; // Thay đổi nếu cần
+      'http://localhost:9003/v1/api/profile'; // Thay đổi nếu cần
 
   // Hàm gửi bình luận mới
   Future<Map<String, dynamic>> postComment({

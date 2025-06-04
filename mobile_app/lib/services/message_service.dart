@@ -4,12 +4,12 @@ import 'package:mobile_app/services/LoginService.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class MessageService {
-  static const String _baseUrl = 'http://192.168.1.9:9002/v1/api/message';
+  static const String _baseUrl = 'http://localhost:9002/v1/api/message';
   static IO.Socket? _socket;
 
   // Khởi tạo WebSocket
   static void initializeSocket(String userId) {
-    _socket = IO.io('http://192.168.1.9:9002', <String, dynamic>{
+    _socket = IO.io('http://localhost:9002', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });

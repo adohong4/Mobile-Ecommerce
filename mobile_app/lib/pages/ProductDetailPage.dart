@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:mobile_app/services/ApiService.dart';
+import 'package:mobile_app/services/viewed_product_service.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_app/models/models_products.dart';
 import 'package:mobile_app/models/productModel.dart';
 import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/providers/cart_provider.dart';
 import 'package:mobile_app/services/comment_service.dart';
 import 'package:mobile_app/models/comment_model.dart';
-import 'package:mobile_app/models/models_products.dart';
 import 'package:mobile_app/providers/wish_list_provider.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:mobile_app/pages/CheckoutPage.dart';
+
 class ProductDetailPage extends StatefulWidget {
   final ProductsModel product;
 
@@ -33,12 +33,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   bool _isLoadingComments = false;
   String? _commentError;
 
+  final ViewedProductService _viewedProductService = ViewedProductService();
+
   String formatDate(DateTime date) {
     return DateFormat('dd/MM/yyyy').format(date);
   }
-
-  final TextEditingController commentTextController = TextEditingController();
-  double rating = 0;
 
   String formatCurrency(num price) {
     return NumberFormat('#,###', 'vi_VN').format(price) + ' đ';
@@ -49,15 +48,30 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     super.initState();
     _productFuture = _fetchProductWithErrorHandling();
     _loadComments();
+    _addToViewedProducts();
+  }
+
+  Future<void> _addToViewedProducts() async {
+    try {
+      final response = await _viewedProductService.addViewedProduct(
+        widget.product.id,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Lỗi khi ghi nhận sản phẩm đã xem')),
+        );
+      }
+      debugPrint('Error adding viewed product: $e');
+    }
   }
 
   Future<ProductsModel> _fetchProductWithErrorHandling() async {
     try {
       return await ProductService.fetchProductById(widget.product.id);
     } catch (e) {
-      // Xử lý lỗi và trả về sản phẩm mặc định nếu cần
       debugPrint('Error fetching product: $e');
-      return widget.product; // Trả về sản phẩm ban đầu nếu fetch thất bại
+      return widget.product;
     }
   }
 
@@ -70,7 +84,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     });
 
     try {
-      final result = await CommentService().getCommentsByProduct(widget.product.id);
+      final result = await CommentService().getCommentsByProduct(
+        widget.product.id,
+      );
 
       if (mounted) {
         setState(() {
@@ -96,7 +112,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   void dispose() {
-    commentTextController.dispose();
     super.dispose();
   }
 
@@ -105,24 +120,28 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       children: [
         AspectRatio(
           aspectRatio: 1,
-          child: productImages.isNotEmpty
-              ? Image.network(
-            productImages[selectedImageIndex],
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => _buildPlaceholderImage(),
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              );
-            },
-          )
-              : _buildPlaceholderImage(),
+          child:
+              productImages.isNotEmpty
+                  ? Image.network(
+                    productImages[selectedImageIndex],
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (context, error, stackTrace) =>
+                            _buildPlaceholderImage(),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value:
+                              loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                        ),
+                      );
+                    },
+                  )
+                  : _buildPlaceholderImage(),
         ),
         Positioned(
           left: 10,
@@ -158,10 +177,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Widget _buildPlaceholderImage() {
-    return Image.asset(
-      'assets/images/asus.png',
-      fit: BoxFit.cover,
-    );
+    return Image.asset('assets/images/asus.png', fit: BoxFit.cover);
   }
 
   Widget _buildThumbnailImages() {
@@ -181,9 +197,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: selectedImageIndex == index
-                      ? const Color(0xFF194689)
-                      : Colors.grey,
+                  color:
+                      selectedImageIndex == index
+                          ? const Color(0xFF194689)
+                          : Colors.grey,
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(8),
@@ -195,8 +212,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      _buildPlaceholderImage(),
+                  errorBuilder:
+                      (context, error, stackTrace) => _buildPlaceholderImage(),
                 ),
               ),
             ),
@@ -214,10 +231,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         children: [
           Text(
             product.name,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Row(
@@ -261,7 +275,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.remove),
-                  onPressed: quantity > 1 ? () => setState(() => quantity--) : null,
+                  onPressed:
+                      quantity > 1 ? () => setState(() => quantity--) : null,
                   color: quantity > 1 ? const Color(0xFF194689) : Colors.grey,
                 ),
                 Text(quantity.toString(), style: const TextStyle(fontSize: 20)),
@@ -294,10 +309,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("MÔ TẢ SẢN PHẨM",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  "MÔ TẢ SẢN PHẨM",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 6),
-                const SizedBox(height: 12),
                 Text(product.specifications),
               ],
             ),
@@ -309,13 +325,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("MÔ TẢ", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  "MÔ TẢ",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 6),
                 Text(
                   product.description ?? '',
                   style: const TextStyle(fontSize: 14),
                   maxLines: _isExpanded ? null : 3,
-                  overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                  overflow:
+                      _isExpanded
+                          ? TextOverflow.visible
+                          : TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 6),
                 GestureDetector(
@@ -334,7 +356,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                         const SizedBox(width: 4),
                         Icon(
-                          _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                          _isExpanded
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
                           color: const Color(0xFF194689),
                         ),
                       ],
@@ -360,61 +384,62 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
-
           if (_isLoadingComments)
             const Center(child: CircularProgressIndicator()),
-
           if (_commentError != null)
             Text(_commentError!, style: const TextStyle(color: Colors.red)),
-
           if (!_isLoadingComments && productComments.isEmpty)
             const Text('Chưa có bình luận nào'),
-
-          ...productComments.map((comment) => Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
+          ...productComments.map(
+            (comment) => Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        comment.userId ?? 'Người dùng',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 8),
+                      Row(
+                        children: List.generate(
+                          5,
+                          (index) => Icon(
+                            index < comment.rating
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: Colors.amber,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(comment.comment),
+                  const SizedBox(height: 2),
+                  Text(
+                    formatDate(comment.createdAt),
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      comment.userId ?? 'Người dùng',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 8),
-                    Row(
-                      children: List.generate(5, (index) => Icon(
-                        index < comment.rating ? Icons.star : Icons.star_border,
-                        color: Colors.amber,
-                        size: 16,
-                      )),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(comment.comment),
-                const SizedBox(height: 2),
-                Text(
-                  formatDate(comment.createdAt),
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ],
-            ),
-          )),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildBottomNavigationBar() {
-
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: const BoxDecoration(
@@ -440,7 +465,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   }
 
                   Flushbar(
-                    message: isFav ? 'Đã bỏ yêu thích' : 'Đã thêm vào yêu thích',
+                    message:
+                        isFav ? 'Đã bỏ yêu thích' : 'Đã thêm vào yêu thích',
                     duration: const Duration(seconds: 2),
                     margin: const EdgeInsets.all(12),
                     borderRadius: BorderRadius.circular(8),
@@ -455,8 +481,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               );
             },
           ),
-
-
           const SizedBox(width: 8),
           Expanded(
             child: ElevatedButton(
@@ -472,17 +496,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   'id': widget.product.id,
                   'name': widget.product.name,
                   'price': widget.product.price,
-                  'quantity': quantity,  // hoặc số lượng bạn muốn
-                  'image': widget.product.images.isNotEmpty ? widget.product.images[0] : '',
+                  'quantity': quantity,
+                  'image':
+                      widget.product.images.isNotEmpty
+                          ? widget.product.images[0]
+                          : '',
                 };
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CheckoutPage(
-                      selectedItems: [selectedItem],
-                      total: widget.product.price.toInt(),
-                    ),
+                    builder:
+                        (context) => CheckoutPage(
+                          selectedItems: [selectedItem],
+                          total: widget.product.price.toInt() * quantity,
+                        ),
                   ),
                 );
               },
@@ -492,7 +520,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               ),
             ),
           ),
-
           const SizedBox(width: 8),
           Expanded(
             child: ElevatedButton(
@@ -536,10 +563,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             }
 
             final product = snapshot.data ?? widget.product;
-            productImages = product.images
-                .map((image) => '${ApiService.imageBaseUrl}$image')
-                .take(3)
-                .toList();
+            productImages =
+                product.images
+                    .map((image) => '${ApiService.imageBaseUrl}$image')
+                    .take(3)
+                    .toList();
 
             return Column(
               children: [

@@ -27,7 +27,6 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
     _selectedIndex = widget.selectedIndex;
   }
 
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -60,7 +59,6 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
       MaterialPageRoute(builder: (context) => targetPage),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

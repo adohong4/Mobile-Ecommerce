@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:mobile_app/services/profile_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile_app/components/banner_component.dart';
 import 'package:mobile_app/components/category_component.dart';
@@ -9,6 +10,7 @@ import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/widgets/HomeAppBar.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:mobile_app/components/product_card.dart' as component;
+import 'package:mobile_app/pages/EditProfilePage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,6 +21,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ProductService productService = ProductService();
+  final ProfileService profileService =
+      ProfileService(); // Khởi tạo ProfileService
   late Future<List<ProductsModel>> _productsFuture;
   bool _hasShownAd = false;
 
@@ -27,45 +31,52 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _productsFuture = ProductService.fetchAllProducts();
 
+    // Kiểm tra hồ sơ sau khi giao diện được xây dựng
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkProfileAndNavigate();
+      // Hiển thị quảng cáo
       showDialog(
         context: context,
         barrierDismissible: true,
         builder: (context) => const AdvertiseComponent(),
       );
     });
-    // Kiểm tra trạng thái hiển thị quảng cáo
-    // _checkAndShowAd();
   }
 
-  // Future<void> _checkAndShowAd() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final isAdShown = prefs.getBool('isAdShown') ?? false;
+  // Hàm kiểm tra hồ sơ và điều hướng nếu cần
+  Future<void> _checkProfileAndNavigate() async {
+    try {
+      final result = await profileService.getProfile();
+      if (!result['success'] || result['profile'] == null) {
+        // Nếu không có hồ sơ, điều hướng đến EditProfilePage
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => const EditProfilePage(
+                  profile: {}, // Truyền hồ sơ rỗng
+                ),
+          ),
+        ).then((_) {
+          // Làm mới dữ liệu sản phẩm hoặc hồ sơ nếu cần sau khi quay lại
+          setState(() {
+            _productsFuture = ProductService.fetchAllProducts();
+          });
+        });
+      }
+    } catch (e) {
+      debugPrint('Error checking profile: $e');
+      // Có thể hiển thị SnackBar thông báo lỗi nếu cần
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi khi kiểm tra hồ sơ: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
-  //   if (!isAdShown) {
-  //     // Hiển thị quảng cáo lần đầu
-  //     WidgetsBinding.instance.addPostFrameCallback((_) {
-  //       showDialog(
-  //         context: context,
-  //         barrierDismissible: true,
-  //         builder:
-  //             (context) => AdvertiseComponent(
-  //               onAdTap: (adId) {
-  //                 // TODO: Điều hướng đến trang chi tiết quảng cáo nếu cần
-  //                 print('Tapped on ad: $adId');
-  //               },
-  //             ),
-  //       );
-  //     });
-  //     // Lưu trạng thái đã hiển thị quảng cáo
-  //     await prefs.setBool('isAdShown', true);
-  //     setState(() {
-  //       _hasShownAd = true;
-  //     });
-  //   }
-  // }
-
-  // Reset trạng thái quảng cáo khi đăng xuất (gọi từ trang đăng xuất)
+  // Reset trạng thái quảng cáo khi đăng xuất
   static Future<void> resetAdStatus() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isAdShown', false);
@@ -168,7 +179,6 @@ class _HomePageState extends State<HomePage> {
         parentContext: context,
         selectedIndex: 0,
       ),
-
     );
   }
 }

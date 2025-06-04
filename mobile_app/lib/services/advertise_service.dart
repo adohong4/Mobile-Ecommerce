@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/advertise_model.dart';
 
 class AdvertiseService {
-  static const String baseUrl = 'http://192.168.1.9:9004/v1/api';
+  static const String baseUrl = 'http://localhost:9004/v1/api';
 
   // Lấy danh sách banner
   static Future<List<AdvertiseModel>> fetchBanners() async {

@@ -4,7 +4,7 @@ import 'package:mobile_app/models/voucher_model.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class VoucherService {
-  static const String _baseUrl = 'http://192.168.1.9:9004/v1/api/product/voucher';
+  static const String _baseUrl = 'http://localhost:9004/v1/api/product/voucher';
 
   Future<Map<String, dynamic>> getVoucherById(String voucherId) async {
     final url = Uri.parse('$_baseUrl/get/$voucherId');

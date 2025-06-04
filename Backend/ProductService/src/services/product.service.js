@@ -35,7 +35,7 @@ class ProductService {
     static async getProduct() {
         try {
             const product = await productModel.find()
-                .select('title nameProduct product_slug price images category quantity specifications active')
+                .select('title nameProduct price images category active')
                 .sort({ createdAt: -1 })
                 .exec();
 

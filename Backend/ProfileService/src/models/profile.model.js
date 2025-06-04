@@ -30,6 +30,10 @@ const ProfileSchema = new Schema({
     },
     saveVoucher: { type: Object, default: [] },
     address: [AddressSchema],
+    viewedProducts: [{
+        productId: { type: String },
+        viewedAt: { type: Date, default: Date.now }
+    }],
 }, { minimize: false, timestamps: true });
 
 function arrayLimit(val) {

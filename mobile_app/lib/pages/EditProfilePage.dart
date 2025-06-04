@@ -1,4 +1,3 @@
-// edit_profile_page.dart
 import 'package:flutter/material.dart';
 import 'package:mobile_app/services/profile_service.dart';
 
@@ -16,6 +15,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _phoneController;
   late TextEditingController _dobController;
   String? _gender;
+  bool _isProfileSaved = false; // Theo dõi trạng thái lưu hồ sơ
+  late bool _isProfileEmpty; // Kiểm tra hồ sơ có rỗng không
 
   final Color primaryColor = const Color(0xFF194689);
   final Color secondaryColor = const Color(0xFF1AA7DD);
@@ -24,13 +25,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
+    // Kiểm tra hồ sơ có rỗng không
+    _isProfileEmpty =
+        widget.profile.isEmpty ||
+        (widget.profile['fullName'] == null &&
+            widget.profile['phoneNumber'] == null &&
+            widget.profile['dateOfBirth'] == null &&
+            widget.profile['gender'] == null);
+
     _fullNameController = TextEditingController(
       text: widget.profile['fullName'] ?? '',
     );
     _phoneController = TextEditingController(
       text: widget.profile['phoneNumber'] ?? '',
     );
-    // Chuyển đổi dateOfBirth nếu có
     _dobController = TextEditingController(
       text:
           widget.profile['dateOfBirth'] != null
@@ -54,7 +62,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final parsedDate = DateTime.parse(date);
       return '${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}';
     } catch (e) {
-      // Nếu date đã ở định dạng DD-MM-YYYY, trả về nguyên bản
       if (_isValidDateFormat(date)) return date;
       return '';
     }
@@ -101,17 +108,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final year = int.parse(parts[2]);
       return DateTime(year, month, day);
     } catch (e) {
-      return DateTime.now(); // Mặc định nếu parse thất bại
+      return DateTime.now();
     }
   }
 
   // Kiểm tra định dạng DD-MM-YYYY và ngày hợp lệ
   bool _isValidDateFormat(String date) {
-    // Biểu thức chính quy: 2 chữ số ngày, 2 chữ số tháng, 4 chữ số năm
     final regex = RegExp(r'^\d{2}-\d{2}-\d{4}$');
     if (!regex.hasMatch(date)) return false;
 
-    // Kiểm tra ngày hợp lệ
     try {
       final parts = date.split('-');
       final day = int.parse(parts[0]);
@@ -122,11 +127,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (month < 1 || month > 12) return false;
       if (day < 1 || day > 31) return false;
 
-      // Kiểm tra số ngày tối đa trong tháng
       final maxDays = DateTime(year, month + 1, 0).day;
       if (day > maxDays) return false;
 
-      // Kiểm tra ngày tháng năm có tạo thành DateTime hợp lệ
       DateTime.parse(
         '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}',
       );
@@ -137,7 +140,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _saveChanges() async {
-    // Kiểm tra dữ liệu đầu vào
     if (_fullNameController.text.isEmpty ||
         _phoneController.text.isEmpty ||
         _dobController.text.isEmpty ||
@@ -152,7 +154,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return;
     }
 
-    // Kiểm tra định dạng ngày sinh
     if (!_isValidDateFormat(_dobController.text)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -164,15 +165,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return;
     }
 
-    // Gọi API để cập nhật profile
     final result = await _profileService.updateProfile(
       fullName: _fullNameController.text,
       gender: _gender!,
       phoneNumber: _phoneController.text,
-      dateOfBirth: _dobController.text, // Gửi định dạng DD-MM-YYYY
+      dateOfBirth: _dobController.text,
     );
 
-    // Hiển thị thông báo dựa trên kết quả
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -184,98 +183,119 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
 
-    // Nếu thành công, quay về trang trước
     if (result['success']) {
+      setState(() {
+        _isProfileSaved = true; // Đánh dấu hồ sơ đã lưu thành công
+      });
       Future.delayed(const Duration(seconds: 2), () {
         Navigator.pop(context);
       });
     }
   }
 
+  // Xử lý nút quay lại
+  Future<bool> _onWillPop() async {
+    if (!_isProfileEmpty || _isProfileSaved) {
+      // Cho phép quay lại nếu hồ sơ đã có thông tin hoặc đã lưu thành công
+      return true;
+    } else {
+      // Hiển thị thông báo yêu cầu lưu thông tin
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng lưu thông tin hồ sơ trước khi thoát!'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return false; // Chặn nút quay lại
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Chỉnh sửa hồ sơ',
-          style: TextStyle(fontFamily: 'Poppins'),
-        ),
+    return WillPopScope(
+      onWillPop: _onWillPop, // Gắn hàm xử lý nút quay lại
+      child: Scaffold(
         backgroundColor: Colors.white,
-        foregroundColor: primaryColor,
-        elevation: 1,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildInputLabel("Họ và tên"),
-            _buildTextField(_fullNameController, hint: 'Nhập họ và tên'),
-
-            const SizedBox(height: 16),
-            _buildInputLabel("Số điện thoại"),
-            _buildTextField(
-              _phoneController,
-              hint: 'Nhập số điện thoại',
-              keyboardType: TextInputType.phone,
-            ),
-
-            const SizedBox(height: 16),
-            _buildInputLabel("Ngày sinh"),
-            GestureDetector(
-              onTap: _selectDate,
-              child: AbsorbPointer(
-                child: _buildTextField(
-                  _dobController,
-                  hint: 'DD-MM-YYYY',
-                  readOnly: true,
+        appBar: AppBar(
+          title: const Text(
+            'Chỉnh sửa hồ sơ',
+            style: TextStyle(fontFamily: 'Poppins'),
+          ),
+          backgroundColor: Colors.white,
+          foregroundColor: primaryColor,
+          elevation: 1,
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildInputLabel("Họ và tên"),
+              _buildTextField(_fullNameController, hint: 'Nhập họ và tên'),
+              const SizedBox(height: 16),
+              _buildInputLabel("Số điện thoại"),
+              _buildTextField(
+                _phoneController,
+                hint: 'Nhập số điện thoại',
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 16),
+              _buildInputLabel("Ngày sinh"),
+              GestureDetector(
+                onTap: _selectDate,
+                child: AbsorbPointer(
+                  child: _buildTextField(
+                    _dobController,
+                    hint: 'DD-MM-YYYY',
+                    readOnly: true,
+                  ),
                 ),
               ),
-            ),
-
-            const SizedBox(height: 16),
-            _buildInputLabel("Giới tính"),
-            DropdownButtonFormField<String>(
-              value: _gender,
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+              const SizedBox(height: 16),
+              _buildInputLabel("Giới tính"),
+              DropdownButtonFormField<String>(
+                value: _gender,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: primaryColor.withOpacity(0.5),
+                    ),
+                  ),
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: primaryColor.withOpacity(0.5)),
+                items: const [
+                  DropdownMenuItem(value: 'MALE', child: Text('Nam')),
+                  DropdownMenuItem(value: 'FEMALE', child: Text('Nữ')),
+                  DropdownMenuItem(value: 'OTHER', child: Text('Khác')),
+                ],
+                onChanged: (value) => setState(() => _gender = value),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: _saveChanges,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  'Lưu thay đổi',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Poppins',
+                    color: Colors.white,
+                  ),
                 ),
               ),
-              items: const [
-                DropdownMenuItem(value: 'MALE', child: Text('Nam')),
-                DropdownMenuItem(value: 'FEMALE', child: Text('Nữ')),
-                DropdownMenuItem(value: 'OTHER', child: Text('Khác')),
-              ],
-              onChanged: (value) => setState(() => _gender = value),
-            ),
-
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _saveChanges,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              child: const Text(
-                'Lưu thay đổi',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Poppins',
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
