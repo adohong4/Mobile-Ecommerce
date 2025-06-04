@@ -12,6 +12,7 @@ import 'package:mobile_app/models/comment_model.dart';
 import 'package:mobile_app/models/models_products.dart';
 import 'package:mobile_app/providers/wish_list_provider.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:mobile_app/pages/CheckoutPage.dart';
 class ProductDetailPage extends StatefulWidget {
   final ProductsModel product;
 
@@ -466,13 +467,32 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 minimumSize: const Size(double.infinity, 48),
               ),
-              onPressed: () {},
+              onPressed: () {
+                final selectedItem = {
+                  'id': widget.product.id,
+                  'name': widget.product.name,
+                  'price': widget.product.price,
+                  'quantity': quantity,  // hoặc số lượng bạn muốn
+                  'image': widget.product.images.isNotEmpty ? widget.product.images[0] : '',
+                };
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CheckoutPage(
+                      selectedItems: [selectedItem],
+                      total: widget.product.price.toInt(),
+                    ),
+                  ),
+                );
+              },
               child: const Text(
                 "MUA NGAY",
                 style: TextStyle(color: Colors.white),
               ),
             ),
           ),
+
           const SizedBox(width: 8),
           Expanded(
             child: ElevatedButton(
