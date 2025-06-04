@@ -66,9 +66,10 @@ class OrderItem {
     return OrderItem(
       id: json['id'] as String,
       quantity: json['quantity'] as int,
-      price: json['price'] as double,
+      price: (json['price'] as num).toDouble(), // ✅ ép an toàn từ int hoặc double
     );
   }
+
 }
 
 class Address {

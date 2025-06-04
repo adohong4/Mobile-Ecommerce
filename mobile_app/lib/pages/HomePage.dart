@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           Container(
-            height: 80,
+            height: 100,
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -164,7 +164,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: CustomBottomNav(parentContext: context),
+      bottomNavigationBar: CustomBottomNav(
+        parentContext: context,
+        selectedIndex: 0,
+      ),
+
     );
   }
 }

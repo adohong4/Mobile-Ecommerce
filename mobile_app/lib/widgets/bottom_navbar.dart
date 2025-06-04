@@ -1,70 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/pages/CartPage.dart';
-import 'package:mobile_app/pages/MessagePage.dart';
 import 'package:mobile_app/pages/ProfilePage.dart';
 import 'package:mobile_app/pages/WishList.dart';
+import 'package:mobile_app/pages/voucher_page.dart';
+import 'package:mobile_app/pages/HomePage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CustomBottomNav extends StatefulWidget {
   final BuildContext parentContext;
+  final int selectedIndex;
 
-  const CustomBottomNav({required this.parentContext});
-
+  const CustomBottomNav({
+    required this.parentContext,
+    required this.selectedIndex,
+  });
   @override
   State<CustomBottomNav> createState() => _CustomBottomNavState();
 }
 
 class _CustomBottomNavState extends State<CustomBottomNav> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex;
+  }
+
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
+    Widget targetPage;
+
     switch (index) {
+      case 0:
+        targetPage = HomePage(); // Bạn cần import và định nghĩa HomePage
+        break;
       case 1:
-        Navigator.pushReplacement(
-          widget.parentContext,
-          MaterialPageRoute(
-            builder: (context) => WishList(),
-          ), // <- Đúng tên class
-        );
+        targetPage = WishList();
         break;
       case 2:
-        Navigator.pushReplacement(
-          widget.parentContext,
-          MaterialPageRoute(
-            builder:
-                (context) => const MessagePage(
-                  receiverId: '682f22449b14ebd1d789b682', //ID
-                  receiverName: 'Dịch vụ chăm sóc khách hàng',
-                ),
-          ),
-        );
+        targetPage = VoucherPage();
         break;
       case 3:
-        Navigator.pushReplacement(
-          widget.parentContext,
-          MaterialPageRoute(builder: (context) => CartPage()),
-        );
+        targetPage = CartPage();
         break;
       case 4:
-        Navigator.pushReplacement(
-          widget.parentContext,
-          MaterialPageRoute(builder: (context) => ProfilePage()),
-        );
+        targetPage = ProfilePage();
         break;
+      default:
+        targetPage = HomePage();
     }
+
+    Navigator.push(
+      widget.parentContext,
+      MaterialPageRoute(builder: (context) => targetPage),
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _selectedIndex,
+      currentIndex: widget.selectedIndex,
       onTap: _onItemTapped,
       backgroundColor: Color(0xFFEDEDED),
-      selectedItemColor: Color(0xFF194689),
+      // selectedItemColor: Color(0xFF194689),
       unselectedItemColor: Colors.black,
       type: BottomNavigationBarType.fixed,
       selectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
@@ -86,10 +90,10 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
         ),
         BottomNavigationBarItem(
           icon: FaIcon(
-            FontAwesomeIcons.comments,
+            FontAwesomeIcons.tags,
             color: _selectedIndex == 2 ? Color(0xFF194689) : Colors.black,
           ),
-          label: 'Contact',
+          label: 'Voucher',
         ),
         BottomNavigationBarItem(
           icon: FaIcon(

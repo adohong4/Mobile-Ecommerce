@@ -325,7 +325,11 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomNav(parentContext: context),
+      bottomNavigationBar: CustomBottomNav(
+        parentContext: context,
+        selectedIndex: 4,
+      ),
+
     );
   }
 

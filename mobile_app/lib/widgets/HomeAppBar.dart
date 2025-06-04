@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/pages/SearchPage.dart';
-import 'package:mobile_app/pages/voucher_page.dart';
+import 'package:mobile_app/pages/MessagePage.dart';
 import 'dart:async';
 
 class AnimatedSearchText extends StatefulWidget {
@@ -73,7 +73,7 @@ class HomeAppBar extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  height: 40,
+                  height: 60,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -106,11 +106,17 @@ class HomeAppBar extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const VoucherPage()),
+                  MaterialPageRoute(
+                    builder:
+                        (context) => const MessagePage(
+                      receiverId: '682f22449b14ebd1d789b682', //ID
+                      receiverName: 'Dịch vụ chăm sóc khách hàng',
+                    ),
+                  ),
                 );
               },
               child: const Icon(
-                Icons.local_offer,
+                Icons.mark_chat_unread_outlined,
                 color: Color(0xFF4C53A5),
                 size: 28,
               ),

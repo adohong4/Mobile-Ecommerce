@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:mobile_app/models/voucher_model.dart';
 import 'package:mobile_app/pages/voucher_detail.dart';
 import 'package:mobile_app/providers/voucher_provider.dart';
-
+import 'package:mobile_app/pages/HomePage.dart';
 class VoucherPage extends StatefulWidget {
   const VoucherPage({super.key});
 
@@ -43,6 +43,15 @@ class _VoucherPageState extends State<VoucherPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          },
+        ),
         title: const Text(
           'Ưu đãi',
           style: TextStyle(
