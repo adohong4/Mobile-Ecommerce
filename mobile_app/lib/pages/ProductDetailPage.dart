@@ -4,6 +4,8 @@ import 'package:mobile_app/models/models_products.dart';
 import 'package:mobile_app/models/productModel.dart';
 import 'package:mobile_app/services/ProductService.dart';
 
+import '../services/ApiService.dart';
+
 class ProductDetailPage extends StatefulWidget {
   final ProductsModel product;
 
@@ -60,7 +62,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             final product = snapshot.data!;
             productImages =
                 product.images
-                    .map((image) => 'http://localhost:9004/images/$image')
+                    .map((image) => '${ApiService.imageBaseUrl}$image')
                     .take(3)
                     .toList();
 

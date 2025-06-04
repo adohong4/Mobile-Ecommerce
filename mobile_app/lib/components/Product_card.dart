@@ -192,14 +192,14 @@ class ProductCard extends StatelessWidget {
             const SizedBox(height: 6),
 
             // Giá
-            Row(
+            Column(
               children: [
                 if (products.oldPrice != null &&
                     products.oldPrice! > products.price)
                   Text(
                     formatCurrency(products.oldPrice!),
                     style: const TextStyle(
-                      fontSize: 11,
+                      fontSize: 14,
                       color: Colors.grey,
                       decoration: TextDecoration.lineThrough,
                     ),

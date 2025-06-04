@@ -154,7 +154,7 @@ class _WishListState extends State<WishList> {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Row(
+                          child: Column(
                             children: [
                               if (product.oldPrice != null && product.oldPrice! > product.price) ...[
                                 Text(

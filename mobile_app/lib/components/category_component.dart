@@ -75,11 +75,11 @@ class _CategoryComponentState extends State<CategoryComponent> {
                 final categories = snapshot.data!;
                 // Chia danh mục thành các nhóm (4 danh mục mỗi trang)
                 List<List<CategoryModel>> categoryPages = [];
-                for (var i = 0; i < categories.length; i += 4) {
+                for (var i = 0; i < categories.length; i += 3) {
                   categoryPages.add(
                     categories.sublist(
                       i,
-                      i + 4 > categories.length ? categories.length : i + 4,
+                      i + 3 > categories.length ? categories.length : i + 3,
                     ),
                   );
                 }

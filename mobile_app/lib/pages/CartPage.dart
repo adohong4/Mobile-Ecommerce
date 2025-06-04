@@ -144,7 +144,7 @@ class _CartPageState extends State<CartPage> {
                                     height: 60,
                                     fit: BoxFit.cover,
                                   ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 5),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,8 +156,20 @@ class _CartPageState extends State<CartPage> {
                                       ),
                                     ),
                                     const SizedBox(height: 4),
-                                    Row(
+                                    Column(
                                       children: [
+                                        if (item.oldPrice != null &&
+                                            item.oldPrice! > item.price)
+                                          Text(
+                                            formatCurrency(item.oldPrice!),
+                                            style: const TextStyle(
+                                              decoration:
+                                              TextDecoration.lineThrough,
+                                              color: Colors.grey,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+
                                         Text(
                                           formatCurrency(item.price),
                                           style: const TextStyle(
@@ -165,18 +177,7 @@ class _CartPageState extends State<CartPage> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        const SizedBox(width: 6),
-                                        if (item.oldPrice != null &&
-                                            item.oldPrice! > item.price)
-                                          Text(
-                                            formatCurrency(item.oldPrice!),
-                                            style: const TextStyle(
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                            ),
-                                          ),
+
                                       ],
                                     ),
                                   ],

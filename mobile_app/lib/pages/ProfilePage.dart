@@ -67,201 +67,264 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _errorMessage != null
-              ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _errorMessage!,
-                      style: const TextStyle(fontFamily: 'Poppins'),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage != null
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              _errorMessage!,
+              style: const TextStyle(fontFamily: 'Poppins'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _fetchProfile,
+              child: const Text('Thử lại'),
+            ),
+          ],
+        ),
+      )
+          : _profile == null
+          ? const Center(
+        child: Text(
+          'Không tải được hồ sơ',
+          style: TextStyle(fontFamily: 'Poppins'),
+        ),
+      )
+          : SingleChildScrollView(
+        child: Column(
+          children: [
+
+            // Background image phía trên thông tin cá nhân
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  height: 250,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        _profile!['backgroundImage'] ??
+                            'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=800&q=60',
+                      ),
+                      fit: BoxFit.cover,
                     ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: _fetchProfile,
-                      child: const Text('Thử lại'),
-                    ),
-                  ],
+                  ),
                 ),
-              )
-              : _profile == null
-              ? const Center(
-                child: Text(
-                  'Không tải được hồ sơ',
-                  style: TextStyle(fontFamily: 'Poppins'),
+
+                // Overlay mờ tối để chữ và avatar nổi bật
+                Container(
+                  height: 250,
+                  width: double.infinity,
+                  color: Colors.black.withOpacity(0.4),
                 ),
-              )
-              : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.grey,
-                      backgroundImage:
-                          _profile!['profilePic'] != null
+
+                // Nội dung avatar + tên + nút chỉnh sửa
+                Positioned(
+                  bottom: 16,
+                  left: 20,
+                  right: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(3), // độ dày viền
+                        decoration: BoxDecoration(
+                          color: Color(0xFF194689), // màu viền, bạn có thể đổi màu khác
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundColor: Colors.grey,
+                          backgroundImage: _profile!['profilePic'] != null
                               ? NetworkImage(_profile!['profilePic'])
                               : null,
-                      child:
-                          _profile!['profilePic'] == null
+                          child: _profile!['profilePic'] == null
                               ? const Icon(
-                                Icons.person,
-                                size: 40,
-                                color: Colors.white,
-                              )
+                            Icons.person,
+                            size: 40,
+                            color: Colors.white,
+                          )
                               : null,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _profile!['fullName'] ?? user?['email'] ?? 'Người dùng',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    EditProfilePage(profile: _profile!),
-                          ),
-                        ).then((_) => _fetchProfile()); // Refresh sau khi sửa
-                      },
-                      icon: const Icon(Icons.edit, color: Color(0xFF194689)),
-                      label: const Text(
-                        'Chỉnh sửa hồ sơ',
-                        style: TextStyle(
-                          color: Color(0xFF194689),
-                          fontFamily: 'Poppins',
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        children: [
-                          UserInfoRow(
-                            label: "Email",
-                            value: user?['email'] ?? 'Chưa cập nhật',
-                          ),
-                          UserInfoRow(
-                            label: "Số điện thoại",
-                            value: _profile!['phoneNumber'] ?? 'Chưa cập nhật',
-                          ),
-                          UserInfoRow(
-                            label: "Ngày sinh",
-                            value:
-                                _profile!['dateOfBirth'] != null
-                                    ? _formatDate(_profile!['dateOfBirth'])
-                                    : 'Chưa cập nhật',
-                          ),
-                          UserInfoRow(
-                            label: "Giới tính",
-                            value:
-                                _profile!['gender'] == 'MALE'
-                                    ? 'Nam'
-                                    : (_profile!['gender'] == 'FEMALE'
-                                        ? 'Nữ'
-                                        : 'Chưa xác định'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(height: 30),
-                    ListTile(
-                      leading: const Icon(Icons.history),
-                      title: const Text(
-                        "Lịch sử mua hàng",
-                        style: TextStyle(fontFamily: 'Poppins'),
-                      ),
-                      trailing: const Text(
-                        "Chi tiết",
-                        style: TextStyle(
-                          color: Color(0xFF194689),
-                          fontSize: 14,
+                      const SizedBox(height: 8),
+                      Text(
+                        _profile!['fullName'] ??
+                            user?['email'] ??
+                            'Người dùng',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                           fontFamily: 'Poppins',
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black54,
+                              offset: Offset(1, 1),
+                              blurRadius: 3,
+                            )
+                          ],
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const OrderDetailPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.location_on_outlined),
-                      title: const Text(
-                        "Địa chỉ nhận hàng",
-                        style: TextStyle(fontFamily: 'Poppins'),
-                      ),
-                      subtitle: Text(
-                        _getActiveAddress(_profile!['address']),
-                        style: const TextStyle(fontFamily: 'Poppins'),
-                      ),
-                      trailing: const Text(
-                        "Thay đổi địa chỉ",
-                        style: TextStyle(
-                          color: Color(0xFF194689),
-                          fontSize: 14,
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ShippingAddressPage(),
-                          ),
-                        ).then((_) => _fetchProfile());
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF194689),
-                          ),
-                          onPressed: () async {
-                            await Provider.of<AuthProvider>(
-                              context,
-                              listen: false,
-                            ).logout();
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LoginPage(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Đăng xuất",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'Poppins',
+                      TextButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EditProfilePage(profile: _profile!),
                             ),
+                          ).then((_) => _fetchProfile());
+                        },
+                        icon: const Icon(Icons.edit,
+                            color: Color(0xFF194689)),
+                        label: const Text(
+                          'Chỉnh sửa hồ sơ',
+                          style: TextStyle(
+                            color: Color(0xFF194689),
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                          Colors.white.withOpacity(0.85),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  UserInfoRow(
+                    label: "Email",
+                    value: user?['email'] ?? 'Chưa cập nhật',
+                  ),
+                  UserInfoRow(
+                    label: "Số điện thoại",
+                    value: _profile!['phoneNumber'] ?? 'Chưa cập nhật',
+                  ),
+                  UserInfoRow(
+                    label: "Ngày sinh",
+                    value: _profile!['dateOfBirth'] != null
+                        ? _formatDate(_profile!['dateOfBirth'])
+                        : 'Chưa cập nhật',
+                  ),
+                  UserInfoRow(
+                    label: "Giới tính",
+                    value: _profile!['gender'] == 'MALE'
+                        ? 'Nam'
+                        : (_profile!['gender'] == 'FEMALE'
+                        ? 'Nữ'
+                        : 'Chưa xác định'),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 30),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: const Text(
+                "Lịch sử mua hàng",
+                style: TextStyle(fontFamily: 'Poppins'),
+              ),
+              trailing: const Text(
+                "Chi tiết",
+                style: TextStyle(
+                  color: Color(0xFF194689),
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
                 ),
               ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const OrderDetailPage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.location_on_outlined),
+              title: const Text(
+                "Địa chỉ nhận hàng",
+                style: TextStyle(fontFamily: 'Poppins'),
+              ),
+              subtitle: Text(
+                _getActiveAddress(_profile!['address']),
+                style: const TextStyle(fontFamily: 'Poppins'),
+              ),
+              trailing: const Text(
+                "Thay đổi địa chỉ",
+                style: TextStyle(
+                  color: Color(0xFF194689),
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ShippingAddressPage(),
+                  ),
+                ).then((_) => _fetchProfile());
+              },
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF194689),
+                  ),
+                  onPressed: () async {
+                    await Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    ).logout();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginPage(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Đăng xuất",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       bottomNavigationBar: CustomBottomNav(parentContext: context),
     );
   }
@@ -281,13 +344,11 @@ class _ProfilePageState extends State<ProfilePage> {
       return 'Chưa cập nhật';
     }
 
-    // Find the active address
     final activeAddress = addresses.firstWhere(
-      (address) => address['active'] == true,
+          (address) => address['active'] == true,
       orElse: () => addresses[0],
     );
 
-    // Format the address string
     return activeAddress != null
         ? "${activeAddress['street']}, ${activeAddress['city']}${activeAddress['province'] != null ? ', ${activeAddress['province']}' : ''}"
         : 'Chưa cập nhật';
