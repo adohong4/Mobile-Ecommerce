@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:mobile_app/components/comment_component.dart';
+import 'package:mobile_app/components/productIdea_component.dart';
 import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/viewed_product_service.dart';
 import 'package:provider/provider.dart';
@@ -7,8 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:mobile_app/models/productModel.dart';
 import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/providers/cart_provider.dart';
-import 'package:mobile_app/services/comment_service.dart';
-import 'package:mobile_app/models/comment_model.dart';
 import 'package:mobile_app/providers/wish_list_provider.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:mobile_app/pages/CheckoutPage.dart';
@@ -25,19 +25,12 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   late Future<ProductsModel> _productFuture;
   int quantity = 1;
-  List<Comment> productComments = [];
   int selectedImageIndex = 0;
   bool _isExpanded = false;
 
   late List<String> productImages;
-  bool _isLoadingComments = false;
-  String? _commentError;
 
   final ViewedProductService _viewedProductService = ViewedProductService();
-
-  String formatDate(DateTime date) {
-    return DateFormat('dd/MM/yyyy').format(date);
-  }
 
   String formatCurrency(num price) {
     return NumberFormat('#,###', 'vi_VN').format(price) + ' đ';
@@ -47,7 +40,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   void initState() {
     super.initState();
     _productFuture = _fetchProductWithErrorHandling();
-    _loadComments();
     _addToViewedProducts();
   }
 
@@ -56,15 +48,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       final response = await _viewedProductService.addViewedProduct(
         widget.product.id,
       );
-      // if (!response['success'] && mounted) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     SnackBar(
-      //       content: Text(
-      //         response['message'] ?? 'Không thể ghi nhận sản phẩm đã xem',
-      //       ),
-      //     ),
-      //   );
-      // }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -81,41 +64,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     } catch (e) {
       debugPrint('Error fetching product: $e');
       return widget.product;
-    }
-  }
-
-  Future<void> _loadComments() async {
-    if (!mounted) return;
-
-    setState(() {
-      _isLoadingComments = true;
-      _commentError = null;
-    });
-
-    try {
-      final result = await CommentService().getCommentsByProduct(
-        widget.product.id,
-      );
-
-      if (mounted) {
-        setState(() {
-          productComments = result['success'] ? result['comments'] : [];
-          _commentError = result['success'] ? null : result['message'];
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _commentError = 'Lỗi khi tải bình luận';
-        });
-      }
-      debugPrint('Error loading comments: $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingComments = false;
-        });
-      }
     }
   }
 
@@ -382,72 +330,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Widget _buildCommentsSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Bình luận sản phẩm',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          if (_isLoadingComments)
-            const Center(child: CircularProgressIndicator()),
-          if (_commentError != null)
-            Text(_commentError!, style: const TextStyle(color: Colors.red)),
-          if (!_isLoadingComments && productComments.isEmpty)
-            const Text('Chưa có bình luận nào'),
-          ...productComments.map(
-            (comment) => Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        comment.userId ?? 'Người dùng',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(width: 8),
-                      Row(
-                        children: List.generate(
-                          5,
-                          (index) => Icon(
-                            index < comment.rating
-                                ? Icons.star
-                                : Icons.star_border,
-                            color: Colors.amber,
-                            size: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(comment.comment),
-                  const SizedBox(height: 2),
-                  Text(
-                    formatDate(comment.createdAt),
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildBottomNavigationBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
@@ -590,7 +472,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         _buildPriceSection(product),
                         _buildQuantitySelector(),
                         _buildDescriptionSection(product),
-                        _buildCommentsSection(),
+                        CommentComponent(
+                          productId: product.id,
+                        ), // Use new component
+                        const ProductIdeaComponent(),
                         const SizedBox(height: 80),
                       ],
                     ),

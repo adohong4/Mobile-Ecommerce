@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:mobile_app/components/suggest_component.dart';
 import 'package:mobile_app/services/profile_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile_app/components/banner_component.dart';
 import 'package:mobile_app/components/category_component.dart';
 import 'package:mobile_app/components/advertise_component.dart';
-import 'package:mobile_app/components/product_home_component.dart'; // Import component mới
+import 'package:mobile_app/components/product_home_component.dart';
 import 'package:mobile_app/pages/EditProfilePage.dart';
 import 'package:mobile_app/widgets/HomeAppBar.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
@@ -89,6 +90,7 @@ class _HomePageState extends State<HomePage> {
                 BannerComponent(),
                 CategoryComponent(),
                 ProductHomeComponent(), // Thêm component mới
+                SuggestComponent(), // Gợi ý sản phẩm
               ],
             ),
           ),

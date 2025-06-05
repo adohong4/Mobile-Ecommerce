@@ -61,29 +61,35 @@ class ProductCard extends StatelessWidget {
                   ),
                   child: AspectRatio(
                     aspectRatio: 1.1,
-                    child: products.images.isNotEmpty
-                        ? Image.network(
-                      '${ApiService.imageBaseUrl}${products.images[0]}',
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Image.asset(
-                        'assets/images/asus.png',
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                        : Image.asset(
-                      'assets/images/asus.png',
-                      fit: BoxFit.cover,
-                    ),
+                    child:
+                        products.images.isNotEmpty
+                            ? Image.network(
+                              '${ApiService.imageBaseUrl}${products.images[0]}',
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (_, __, ___) => Image.asset(
+                                    'assets/images/asus.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                            )
+                            : Image.asset(
+                              'assets/images/asus.png',
+                              fit: BoxFit.cover,
+                            ),
                   ),
                 ),
 
                 // Badge giảm giá
-                if (products.discountPercent != null && products.discountPercent! > 0)
+                if (products.discountPercent != null &&
+                    products.discountPercent! > 0)
                   Positioned(
                     top: 0,
                     left: 0,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(8),
@@ -117,26 +123,29 @@ class ProductCard extends StatelessWidget {
                           } else {
                             wishList.add(products);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Đã thêm vào yêu thích')),
+                              const SnackBar(
+                                content: Text('Đã thêm vào yêu thích'),
+                              ),
                             );
                           }
                         },
                         child: CircleAvatar(
-                          backgroundColor: wishList.isFavourite(products)
-                              ? Colors.white
-                              : Color(0xFF1AA7DD),
+                          backgroundColor:
+                              wishList.isFavourite(products)
+                                  ? Colors.white
+                                  : Color(0xFF1AA7DD),
                           radius: 18,
                           child: Icon(
                             wishList.isFavourite(products)
                                 ? Icons.favorite
                                 : Icons.favorite_border,
-                            color: wishList.isFavourite(products)
-                                ? Colors.pinkAccent
-                                : Colors.white,
+                            color:
+                                wishList.isFavourite(products)
+                                    ? Colors.pinkAccent
+                                    : Colors.white,
                             size: 20,
                           ),
                         ),
-
                       ),
 
                       const SizedBox(height: 6),
@@ -147,7 +156,9 @@ class ProductCard extends StatelessWidget {
                           final cart = context.read<CartProvider>();
                           cart.add(products);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
+                            const SnackBar(
+                              content: Text('Đã thêm vào giỏ hàng'),
+                            ),
                           );
                         },
                         child: CircleAvatar(
@@ -166,20 +177,19 @@ class ProductCard extends StatelessWidget {
               ],
             ),
 
-
             const SizedBox(height: 8),
 
-            // Thương hiệu (sử dụng category)
-            Text(
-              products.category,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            // // Thương hiệu (sử dụng category)
+            // Text(
+            //   products.category,
+            //   style: const TextStyle(
+            //     fontSize: 14,
+            //     color: Colors.grey,
+            //     fontWeight: FontWeight.w500,
+            //   ),
+            // ),
 
-            const SizedBox(height: 4),
+            // const SizedBox(height: 4),
 
             // Tên sản phẩm
             Text(

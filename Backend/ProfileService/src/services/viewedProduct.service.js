@@ -9,17 +9,15 @@ class ViewedProductService {
             const userId = req.user._id;
             const profile = await profileModel.findOne({ userId }, 'viewedProducts');
 
-            const currentTime = new Date();
-            const viewedProducts = profile?.viewedProducts
-                ?.filter(product => {
-                    const viewedAt = new Date(product.viewedAt);
-                    const daysDiff = (currentTime - viewedAt) / (1000 * 60 * 60 * 24);
-                    return daysDiff <= 3;
-                })
+            const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+
+            const viewedProductIds = profile?.viewedProducts
+                .filter(product => new Date(product.viewedAt) >= threeDaysAgo)
+                .sort((a, b) => new Date(b.viewedAt) - new Date(a.viewedAt))
                 .slice(0, 5)
                 .map(product => product.productId) || [];
 
-            return viewedProducts;
+            return viewedProductIds;
         } catch (error) {
             throw error;
         }
