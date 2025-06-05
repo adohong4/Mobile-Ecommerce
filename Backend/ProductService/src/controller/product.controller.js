@@ -147,6 +147,18 @@ class ProductController {
             next(error);
         }
     }
+
+    async getRandomProductsByCategories(req, res, next) {
+        try {
+            const result = await ProductService.getRandomProductsByCategories(req, res)
+            new OK({
+                message: 'get random product',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new ProductController();

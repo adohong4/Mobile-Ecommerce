@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/components/Product_card.dart';
+import 'package:mobile_app/components/product_card.dart';
+import 'package:mobile_app/components/recommend_component.dart';
 import 'package:mobile_app/models/productModel.dart';
 import 'package:mobile_app/services/ProductService.dart';
+import 'package:mobile_app/services/recommend_service.dart';
 
 class SearchPage extends StatefulWidget {
   final String? categoryId;
   final String? categoryName;
 
-  const SearchPage({super.key, this.categoryId, this.categoryName});
+  const SearchPage({Key? key, this.categoryId, this.categoryName})
+    : super(key: key);
 
   @override
   _SearchPageState createState() => _SearchPageState();
 }
 
 class _SearchPageState extends State<SearchPage> {
+  final TextEditingController _searchController = TextEditingController();
   String _query = "";
   List<ProductsModel> _searchResults = [];
   List<ProductsModel> _categoryProducts = [];
   bool _isLoadingCategoryProducts = false;
+  bool _isLoadingSearch = false;
 
   @override
   void initState() {
@@ -27,19 +32,69 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  void _searchProducts(String query) {
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _searchProducts() async {
+    final query = _searchController.text.trim();
     setState(() {
-      _query = query.trim().toLowerCase();
-      if (_query.isEmpty) {
-        _searchResults = [];
-      } else {
-        _searchResults =
-            _categoryProducts.where((product) {
-              return product.name.toLowerCase().contains(_query) ||
-                  (product.title?.toLowerCase().contains(_query) ?? false);
-            }).toList();
-      }
+      _query = query;
+      _isLoadingSearch = true;
+      _searchResults = [];
     });
+
+    if (_query.isEmpty) {
+      setState(() {
+        _isLoadingSearch = false;
+        _searchResults = [];
+      });
+      return;
+    }
+
+    try {
+      // Gọi API gợi ý sản phẩm
+      final recommendedProducts = await RecommendService.getRecommendedProducts(
+        query: _query,
+        topK: 20,
+      );
+
+      setState(() {
+        _searchResults = recommendedProducts;
+        _isLoadingSearch = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingSearch = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi khi tìm kiếm sản phẩm: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
+    // Nếu có danh mục, lọc thêm trong danh sách danh mục
+    if (widget.categoryId != null && _categoryProducts.isNotEmpty) {
+      final filteredCategoryProducts =
+          _categoryProducts.where((product) {
+            return product.name.toLowerCase().contains(_query.toLowerCase()) ||
+                (product.title?.toLowerCase().contains(_query.toLowerCase()) ??
+                    false);
+          }).toList();
+
+      setState(() {
+        // Kết hợp sản phẩm gợi ý và sản phẩm trong danh mục
+        _searchResults =
+            [
+              ...filteredCategoryProducts,
+              ..._searchResults,
+            ].toSet().toList(); // Loại bỏ trùng lặp
+      });
+    }
   }
 
   Future<void> _fetchCategoryProducts() async {
@@ -59,7 +114,7 @@ class _SearchPageState extends State<SearchPage> {
         _isLoadingCategoryProducts = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading category products: $e')),
+        SnackBar(content: Text('Lỗi khi tải sản phẩm danh mục: $e')),
       );
     }
   }
@@ -89,19 +144,32 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: "Nhập tên sản phẩm...",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: "Nhập tên sản phẩm...",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                    ),
+                    textInputAction: TextInputAction.search,
+                  ),
                 ),
-              ),
-              onSubmitted: _searchProducts,
-              textInputAction: TextInputAction.search,
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.search, color: Color(0xFF194689)),
+                  onPressed: _searchProducts,
+                ),
+              ],
             ),
             const SizedBox(height: 16),
-            if (widget.categoryName != null && widget.categoryId != null) ...[
+            if (widget.categoryName != null &&
+                widget.categoryId != null &&
+                _query.isEmpty) ...[
               Text(
                 widget.categoryName!,
                 style: const TextStyle(
@@ -113,7 +181,7 @@ class _SearchPageState extends State<SearchPage> {
               const SizedBox(height: 8),
               _isLoadingCategoryProducts
                   ? const Center(child: CircularProgressIndicator())
-                  : _categoryProducts.isEmpty
+                  : _categoryProducts.isEmpty && _query.isEmpty
                   ? const Center(
                     child: Text(
                       'Sản phẩm không tồn tại',
@@ -121,59 +189,35 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   )
                   : Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, // 2 sản phẩm mỗi hàng
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 8,
-                            childAspectRatio:
-                                0.7, // Tỷ lệ chiều cao/rộng của ProductCard
-                          ),
-                      itemCount:
-                          _query.isEmpty
-                              ? _categoryProducts.length
-                              : _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final product =
-                            _query.isEmpty
-                                ? _categoryProducts[index]
-                                : _searchResults[index];
-                        return ProductCard(products: product);
-                      },
-                    ),
+                    child:
+                        _query.isEmpty
+                            ? GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 8,
+                                    mainAxisSpacing: 8,
+                                    childAspectRatio: 0.7,
+                                  ),
+                              itemCount: _categoryProducts.length,
+                              itemBuilder: (context, index) {
+                                final product = _categoryProducts[index];
+                                return ProductCard(products: product);
+                              },
+                            )
+                            : RecommendComponent(
+                              recommendedProducts: _searchResults,
+                              isLoading: _isLoadingSearch,
+                              query: _query,
+                            ),
                   ),
             ] else
               Expanded(
-                child:
-                    _query.isEmpty
-                        ? const Center(
-                          child: Text(
-                            "Vui lòng nhập từ khóa để tìm kiếm sản phẩm",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        )
-                        : _searchResults.isEmpty
-                        ? Center(
-                          child: Text(
-                            "Không có sản phẩm liên quan cho '$_query'",
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        )
-                        : GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                                childAspectRatio: 0.7,
-                              ),
-                          itemCount: _searchResults.length,
-                          itemBuilder: (context, index) {
-                            final product = _searchResults[index];
-                            return ProductCard(products: product);
-                          },
-                        ),
+                child: RecommendComponent(
+                  recommendedProducts: _searchResults,
+                  isLoading: _isLoadingSearch,
+                  query: _query,
+                ),
               ),
           ],
         ),

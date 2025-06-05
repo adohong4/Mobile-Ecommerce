@@ -35,7 +35,7 @@ def recommend_products():
         recommendations = df.sort_values(by='similarity', ascending=False).head(top_k)
         
         # Prepare response
-        result = recommendations[['_id', 'nameProduct', 'category', 'price', 'similarity']].to_dict(orient='records')
+        result = recommendations[['_id','similarity']].to_dict(orient='records')
         
         return jsonify({'recommendations': result}), 200
     

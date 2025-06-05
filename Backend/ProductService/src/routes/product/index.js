@@ -21,4 +21,6 @@ router.delete('/product/updateQuantityProduct', asyncHandler(ProductController.u
 
 router.get('/product/category/:category', asyncHandler(ProductController.getProductByCategory));
 
+router.get('/product/random', asyncHandler(ProductController.getRandomProductsByCategories));
+
 module.exports = router;

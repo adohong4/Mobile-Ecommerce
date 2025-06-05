@@ -120,4 +120,55 @@ class ProductService {
       rethrow;
     }
   }
+
+  static Future<List<Map<String, dynamic>>>
+  fetchRandomProductsByCategories() async {
+    try {
+      // Gọi API /random để lấy danh sách productIds theo danh mục
+      final response = await http.get(
+        Uri.parse('http://localhost:9004/v1/api/product/random'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data is! Map<String, dynamic> || data['metadata'] == null) {
+          throw Exception('Invalid JSON structure: missing metadata');
+        }
+
+        // Lấy tất cả sản phẩm từ fetchAllProducts
+        final allProducts = await fetchAllProducts();
+        final List<dynamic> categoriesJson = data['metadata'];
+        final List<Map<String, dynamic>> result = [];
+
+        // Lặp qua từng danh mục trong metadata
+        for (var categoryData in categoriesJson) {
+          final String category = categoryData['category'];
+          final List<dynamic> productIds = categoryData['productIds'] ?? [];
+
+          // Lọc các sản phẩm từ allProducts dựa trên productIds
+          final List<ProductsModel> filteredProducts =
+              allProducts
+                  .where(
+                    (product) =>
+                        productIds.contains(product.id.toString()) &&
+                        product.active == true,
+                  )
+                  .take(5) // Đảm bảo tối đa 5 sản phẩm
+                  .toList();
+
+          // Thêm danh mục và danh sách sản phẩm vào kết quả
+          result.add({'category': category, 'products': filteredProducts});
+        }
+
+        return result;
+      } else {
+        throw Exception(
+          'Failed to load random products: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e) {
+      print('Error fetching random products by categories: $e');
+      rethrow;
+    }
+  }
 }

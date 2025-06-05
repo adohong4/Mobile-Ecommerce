@@ -56,6 +56,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       final response = await _viewedProductService.addViewedProduct(
         widget.product.id,
       );
+      // if (!response['success'] && mounted) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text(
+      //         response['message'] ?? 'Không thể ghi nhận sản phẩm đã xem',
+      //       ),
+      //     ),
+      //   );
+      // }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

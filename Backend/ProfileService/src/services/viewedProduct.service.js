@@ -46,31 +46,42 @@ class ViewedProductService {
                 }
             );
 
-            // Thêm sản phẩm mới với thời gian xem
-            const profile = await profileModel.findOneAndUpdate(
-                { userId },
-                {
-                    $addToSet: {
-                        viewedProducts: {
-                            productId,
-                            viewedAt: new Date()
-                        }
-                    }
-                },
-                { new: true, runValidators: true, upsert: true }
+            // Kiểm tra xem productId đã tồn tại chưa
+            const profile = await profileModel.findOne({ userId });
+            const existingProduct = profile?.viewedProducts?.find(
+                product => product.productId.toString() === productId.toString()
             );
 
-            // Trả về 5 productId đầu tiên còn hạn
-            const viewedProducts = profile.viewedProducts
-                ?.filter(product => {
-                    const viewedAt = new Date(product.viewedAt);
-                    const daysDiff = (new Date() - viewedAt) / (1000 * 60 * 60 * 24);
-                    return daysDiff <= 3;
-                })
-                .slice(0, 5)
-                .map(product => product.productId) || [];
+            if (existingProduct) {
+                // Nếu sản phẩm đã tồn tại, cập nhật thời gian viewedAt
+                await profileModel.updateOne(
+                    { userId, 'viewedProducts.productId': productId },
+                    {
+                        $set: {
+                            'viewedProducts.$.viewedAt': new Date()
+                        }
+                    }
+                );
+            } else {
+                // Nếu sản phẩm chưa tồn tại, thêm mới vào danh sách
+                await profileModel.findOneAndUpdate(
+                    { userId },
+                    {
+                        $addToSet: {
+                            viewedProducts: {
+                                productId,
+                                viewedAt: new Date()
+                            }
+                        }
+                    },
+                    { new: true, runValidators: true, upsert: true }
+                );
+            }
 
-            return viewedProducts;
+            // Lấy profile sau khi cập nhật
+            const updatedProfile = await profileModel.findOne({ userId });
+
+            return updatedProfile;
         } catch (error) {
             throw error;
         }

@@ -299,5 +299,41 @@ class ProductService {
         }
     }
 
+    static async getRandomProductsByCategories(req, res) {
+        try {
+            const categories = ["quatlammat", "maylocnuoc", "giatsay", "tulanh"];
+            const result = [];
+
+            for (const category of categories) {
+                const products = await productModel.aggregate([
+                    {
+                        $match: {
+                            category: category,
+                            active: true // Chỉ lấy sản phẩm đang hoạt động
+                        }
+                    },
+                    {
+                        $sample: { size: 5 } // Chọn ngẫu nhiên 5 sản phẩm
+                    },
+                    {
+                        $project: {
+                            _id: 1
+                        }
+                    }
+                ]);
+
+                // Thêm danh mục và danh sách _id vào kết quả
+                result.push({
+                    category,
+                    productIds: products.map(product => product._id)
+                });
+            }
+
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 module.exports = ProductService;
