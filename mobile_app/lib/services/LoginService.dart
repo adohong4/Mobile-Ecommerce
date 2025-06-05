@@ -99,6 +99,39 @@ class LoginService {
     }
   }
 
+  Future<Map<String, dynamic>> logout() async {
+    final url = Uri.parse('$_baseUrl/logout');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Xóa dữ liệu cục bộ
+        final prefs = await SharedPreferences.getInstance();
+        await Future.wait([
+          prefs.remove('auth_token'),
+          prefs.remove('user'),
+          prefs.remove('cookies'),
+        ]);
+
+        return {'success': true, 'message': 'Đăng xuất thành công'};
+      } else {
+        final data = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message':
+              data['message'] ??
+              'Đăng xuất thất bại (mã ${response.statusCode})',
+        };
+      }
+    } catch (e) {
+      print('Logout error: $e'); // Debug
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
+
   // get token from SharedPreferences
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
