@@ -2,12 +2,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/category_model.dart';
+import 'package:mobile_app/services/ApiService.dart';
 
 class CategoryService {
-  static const String baseUrl = 'http://localhost:9004/v1/api';
+  static const String baseUrl = ApiService.productService;
 
   static Future<List<CategoryModel>> fetchCategories() async {
-    final response = await http.get(Uri.parse('$baseUrl/product/category/get'));
+    final response = await http.get(Uri.parse('$baseUrl/category/get'));
 
     if (response.statusCode == 201) {
       final jsonData = jsonDecode(response.body);

@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class ViewedProductService {
-  static const String _baseUrl = 'http://localhost:9003/v1/api/profile';
+  static const String _baseUrl = ApiService.profileService;
 
   // Lấy danh sách sản phẩm đã xem
   Future<Map<String, dynamic>> getViewedProducts() async {

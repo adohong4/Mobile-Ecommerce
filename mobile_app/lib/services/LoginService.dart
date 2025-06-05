@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mobile_app/services/ApiService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginService {
-  static const String _baseUrl = 'http://localhost:9001/v1/api/identity';
+  static const String _baseUrl = ApiService.identityService;
 
   Future<Map<String, dynamic>> register(
     String username,

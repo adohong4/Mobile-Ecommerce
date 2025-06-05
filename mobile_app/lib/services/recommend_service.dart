@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/productModel.dart';
+import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/services/viewed_product_service.dart';
 
 class RecommendService {
-  static const String _recommendUrl = 'http://localhost:5001/v1/api/recommend';
-  static const String _recommendViewedUrl =
-      'http://localhost:5000/v1/api/recommend/viewed';
+  static const String _recommendUrl = ApiService.Search;
+  static const String _recommendViewedUrl = ApiService.recommend;
 
   static Future<List<ProductsModel>> getRecommendedProducts({
     required String query,

@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/comment_model.dart';
+import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class CommentService {
-  static const String _baseUrl = 'http://localhost:9003/v1/api/profile';
+  static const String _baseUrl = ApiService.profileService;
 
   Future<Map<String, dynamic>> postComment({
     required String productId,

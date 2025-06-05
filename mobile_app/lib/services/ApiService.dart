@@ -1,32 +1,17 @@
 class ApiService {
-  static const String baseUrl =
-      "http://localhost:4001/v1/api"; // Đảm bảo đúng với backend
-  static const String imageBaseUrl = "http://localhost:9004/images/";
+  static const String route = "http://localhost";
+  static const String imageBaseUrl = "$route:9004/images/";
 
-  static const String identity = "$baseUrl/identity";
-  static const String profile = "$baseUrl/profile";
-  static const String product = "http://localhost:9004/v1/api/product";
-  static const String contact = "$baseUrl/contact";
+  static const String identityService = "$route:9001/v1/api/identity";
+  static const String profileService = "$route:9003/v1/api/profile";
+  static const String productService = "$route:9004/v1/api/product";
+  static const String messageService = "$route:9002/v1/api/message";
+  static const String paymentService = "$route:9007/v1/api/payment";
+  static const String recommend = "$route:5000/v1/api/recommend/viewed";
+  static const String Search = "$route:5001/v1/api/recommend";
 
-  static const String login = "$identity/login";
-  static const String register = "$identity/register";
-  static const String userProfile = "$profile/getProfile";
+  static const String productList = "$productService/get";
+  static const String voucher = "$productService/voucher";
 
-  static const String productList = "$product/get";
-  static const String getCampaignProducts =
-      "$product/campaign/updateProductPrice";
-  static const String getProductBySlug = "$product/getBySlug";
-  static const String getAllProducts = "$product/getAll";
-
-  static const String addAddress = "$profile/address/create";
-  static const String listAddresses = "$profile/address/getList";
-  static const String logout = "$identity/logout";
-  static const String deleteAddress = "$profile/address/delete";
-  static const String updateProfile = "$profile/update";
-  static const String addToCart = "$profile/cart/add";
-  static const String getCart = "$profile/cart/get";
-  static const String removeFromCart = "$profile/cart/remove";
-  static const String codVerify = "$profile/cod/verify";
-  static const String getOrder = "$profile/user/order/get";
-  static const String getOrderDetails = "$profile/order/get";
+  static const String address = "$profileService/address";
 }
