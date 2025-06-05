@@ -5,8 +5,9 @@ import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/services/viewed_product_service.dart';
 
 class RecommendService {
-  static const String _recommendUrl = 'http://localhost:5000/v1/api/recommend';
-  static const String _recommendViewedUrl = '$_recommendUrl/viewed';
+  static const String _recommendUrl = 'http://localhost:5001/v1/api/recommend';
+  static const String _recommendViewedUrl =
+      'http://localhost:5000/v1/api/recommend/viewed';
 
   static Future<List<ProductsModel>> getRecommendedProducts({
     required String query,

@@ -301,7 +301,7 @@ class ProductService {
 
     static async getRandomProductsByCategories(req, res) {
         try {
-            const categories = ["quatlammat", "maylocnuoc", "giatsay", "tulanh"];
+            const categories = ["maylocnuoc", "giatsay"];
             const result = [];
 
             for (const category of categories) {
