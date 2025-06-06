@@ -14,7 +14,7 @@ df = pd.read_pickle('products_embeddings.pkl')
 # Load SentenceTransformer model
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-@app.route('/v1/api/recommend', methods=['POST'])
+@app.route('/v1/api/search', methods=['POST'])
 def recommend_products():
     try:
         # Get query from request

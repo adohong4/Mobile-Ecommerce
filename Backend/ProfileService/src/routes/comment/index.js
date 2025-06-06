@@ -11,6 +11,7 @@ router.get('/profile/comment/product/get/:productId', asyncHandler(commentContro
 router.get('/profile/comment/user/get', checkTokenHeader, asyncHandler(commentController.getCommentByUser));
 router.delete('/profile/comment/user/delete/:commentId', checkTokenHeader, asyncHandler(commentController.deleteComment));
 
-router.get('/profile/comment/product/rate/:productId', asyncHandler(commentController.getAverageRatingByProduct));
+router.get('/profile/comment/product/rate/:productId', asyncHandler(commentController.getRatingStatsAndComments));
+router.get('/profile/userComment/:userId', asyncHandler(commentController.getUserById));
 
 module.exports = router;

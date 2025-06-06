@@ -1,14 +1,17 @@
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+
 class ProductsModel {
   final String id;
   final String title;
   final String name;
   final String category;
-  final double price;
+  final double price; // Giá gốc
+  final double? newPrice; // Giá khuyến mãi
+  final String? campaignType; // Loại khuyến mãi: percentage hoặc fixed_amount
+  final double? campaignValue; // Giá trị khuyến mãi (%, hoặc số tiền cố định)
   final String description;
-  final double? oldPrice;
-  final int? discountPercent;
   final List<String> images;
   final String specifications;
   final int quantity;
@@ -23,9 +26,10 @@ class ProductsModel {
     required this.name,
     required this.category,
     required this.price,
+    this.newPrice,
+    this.campaignType,
+    this.campaignValue,
     required this.description,
-    this.oldPrice,
-    this.discountPercent,
     required this.images,
     required this.specifications,
     required this.quantity,
@@ -37,20 +41,18 @@ class ProductsModel {
 
   factory ProductsModel.fromJson(Map<String, dynamic> json) {
     final price = (json['price'] as num?)?.toDouble() ?? 0.0;
-    // Tính toán oldPrice và discountPercent
-    double? oldPrice = price * 1.2;
-    int? discountPercent =
-        oldPrice > price ? ((1 - price / oldPrice) * 100).round() : 0;
+    final newPrice = (json['newPrice'] as num?)?.toDouble();
 
     return ProductsModel(
-      id: json['_id']?.toString() ?? '', // Xử lý null
-      title: json['title']?.toString() ?? '',
+      id: json['_id']?.toString() ?? '',
+      title: json['title']?.toString() ?? json['nameProduct']?.toString() ?? '',
       name: json['nameProduct']?.toString() ?? '',
       category: json['category']?.toString() ?? '',
       price: price,
+      newPrice: newPrice,
+      campaignType: json['campaignType']?.toString(),
+      campaignValue: (json['campaignValue'] as num?)?.toDouble(),
       description: json['description']?.toString() ?? '',
-      oldPrice: oldPrice,
-      discountPercent: discountPercent,
       images: List<String>.from(json['images'] ?? []),
       specifications: json['specifications']?.toString() ?? '',
       quantity: json['quantity'] as int? ?? 0,
@@ -66,9 +68,10 @@ class ProductsModel {
       'nameProduct': name,
       'category': category,
       'price': price,
+      'newPrice': newPrice,
+      'campaignType': campaignType,
+      'campaignValue': campaignValue,
       'description': description,
-      'oldPrice': oldPrice,
-      'discountPercent': discountPercent,
       'images': images,
       'specifications': specifications,
       'quantity': quantity,
@@ -89,5 +92,30 @@ class ProductsModel {
     } catch (e) {
       return {};
     }
+  }
+
+  // Giá hiển thị: newPrice nếu có, nếu không thì dùng price
+  double get displayPrice => newPrice ?? price;
+
+  // Kiểm tra xem có giảm giá không
+  bool get hasDiscount => newPrice != null && newPrice! < price;
+
+  // Tính phần trăm giảm giá dựa trên campaignType và campaignValue
+  String? get discountDisplay {
+    if (!hasDiscount || campaignType == null || campaignValue == null) {
+      return null;
+    }
+    if (campaignType == 'percentage') {
+      return '-${campaignValue!.toInt()}%';
+    } else if (campaignType == 'fixed_amount') {
+      return '-${formatCurrency(campaignValue!)}';
+    }
+    return null;
+  }
+
+  // Định dạng tiền tệ cho giá trị giảm giá
+  String formatCurrency(num price) {
+    final formatter = NumberFormat('#,###', 'vi_VN');
+    return "${formatter.format(price)} đ";
   }
 }

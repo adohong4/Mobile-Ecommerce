@@ -27,5 +27,5 @@ router.post('/product/campaign/addToCampaign', asyncHandler(campaignController.a
 router.post('/product/campaign/removeFromCampaign', asyncHandler(campaignController.removeFromCampaign))
 
 router.get('/product/campaign/updateProductPrice', asyncHandler(campaignController.updateProductPricesForCampaign))
-router.get('/product/campaign/updateProductPrice/:productSlug', asyncHandler(campaignController.updateProductPricesForCampaignBySlug))
+router.get('/product/campaign/updateProductPrice/:productId', asyncHandler(campaignController.updateProductPricesForCampaignBySlug))
 module.exports = router;

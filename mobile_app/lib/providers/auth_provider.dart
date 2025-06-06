@@ -39,14 +39,19 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Đăng xuất
-  Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
-    await prefs.remove('user');
-    await prefs.remove('cookies');
-    _user = null;
-    _token = null;
-    _isAuthenticated = false;
-    notifyListeners();
+  Future<Map<String, dynamic>> logout() async {
+    final result = await LoginService().logout();
+    if (result['success']) {
+      _user = null;
+      _token = null;
+      _isAuthenticated = false;
+      notifyListeners();
+      return {'success': true, 'message': 'Đăng xuất thành công'};
+    } else {
+      return {
+        'success': false,
+        'message': result['message'] ?? 'Đăng xuất thất bại',
+      };
+    }
   }
 }

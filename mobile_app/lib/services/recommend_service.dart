@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/productModel.dart';
+import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/services/viewed_product_service.dart';
 
 class RecommendService {
-  static const String _recommendUrl = 'http://192.168.1.9:5001/v1/api/recommend';
-  static const String _recommendViewedUrl =
-      'http://192.168.1.9:5000/v1/api/recommend/viewed';
 
+  static const String _recommendUrl = ApiService.Search;
+  static const String _recommendViewedUrl = ApiService.recommend;
   static Future<List<ProductsModel>> getRecommendedProducts({
     required String query,
     int topK = 10,
@@ -30,7 +30,7 @@ class RecommendService {
         final List<String> productIds =
             recommendations.map((item) => item['_id'].toString()).toList();
 
-        final allProducts = await ProductService.fetchAllProducts();
+        final allProducts = await ProductService.fetchCampaignProducts();
         final recommendedProducts =
             allProducts
                 .where((product) => productIds.contains(product.id))
@@ -93,7 +93,7 @@ class RecommendService {
             recommendations.map((item) => item['_id'].toString()).toList();
 
         // Step 3: Fetch all products and filter by recommended IDs
-        final allProducts = await ProductService.fetchAllProducts();
+        final allProducts = await ProductService.fetchCampaignProducts();
         final recommendedProducts =
             allProducts
                 .where((product) => recommendedProductIds.contains(product.id))

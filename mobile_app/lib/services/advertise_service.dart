@@ -2,15 +2,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/advertise_model.dart';
+import 'package:mobile_app/services/ApiService.dart';
 
 class AdvertiseService {
-  static const String baseUrl = 'http://192.168.1.9:9004/v1/api';
+
+  static const String baseUrl = ApiService.productService;
 
   // Lấy danh sách banner
   static Future<List<AdvertiseModel>> fetchBanners() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/product/advertise/banner'),
-    );
+    final response = await http.get(Uri.parse('$baseUrl/advertise/banner'));
 
     if (response.statusCode == 201) {
       final jsonData = jsonDecode(response.body);
@@ -23,9 +23,7 @@ class AdvertiseService {
 
   // Lấy danh sách quảng cáo (dùng cho popup)
   static Future<List<AdvertiseModel>> fetchAdvertisements() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/product/advertise/adver'),
-    );
+    final response = await http.get(Uri.parse('$baseUrl/advertise/adver'));
 
     if (response.statusCode == 201) {
       final jsonData = jsonDecode(response.body);

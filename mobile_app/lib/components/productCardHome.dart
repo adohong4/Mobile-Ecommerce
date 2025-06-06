@@ -43,32 +43,58 @@ class ProductCardHome extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-              ),
-              child: AspectRatio(
-                aspectRatio: 1.2,
-                child:
-                    products.images.isNotEmpty
-                        ? Image.network(
-                          '${ApiService.imageBaseUrl}${products.images[0]}',
-                          fit: BoxFit.cover,
-                          errorBuilder:
-                              (_, __, ___) => Image.asset(
-                                'assets/images/asus.png',
-                                fit: BoxFit.cover,
-                              ),
-                        )
-                        : Image.asset(
-                          'assets/images/asus.png',
-                          fit: BoxFit.cover,
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1.2,
+                    child:
+                        products.images.isNotEmpty
+                            ? Image.network(
+                              '${ApiService.imageBaseUrl}${products.images[0]}',
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (_, __, ___) => Image.asset(
+                                    'assets/images/asus.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                            )
+                            : Image.asset(
+                              'assets/images/asus.png',
+                              fit: BoxFit.cover,
+                            ),
+                  ),
+                ),
+                if (products.discountDisplay != null)
+                  Positioned(
+                    top: 4,
+                    left: 4,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        products.discountDisplay!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
                         ),
-              ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 4),
-
             Expanded(
               child: Text(
                 products.name,
@@ -85,10 +111,9 @@ class ProductCardHome extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (products.oldPrice != null &&
-                    products.oldPrice! > products.price)
+                if (products.hasDiscount)
                   Text(
-                    formatCurrency(products.oldPrice!),
+                    formatCurrency(products.price),
                     style: const TextStyle(
                       fontSize: 11,
                       color: Colors.grey,
@@ -96,7 +121,7 @@ class ProductCardHome extends StatelessWidget {
                     ),
                   ),
                 Text(
-                  formatCurrency(products.price),
+                  formatCurrency(products.displayPrice),
                   style: const TextStyle(
                     fontSize: 12,
                     color: Colors.blueAccent,

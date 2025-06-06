@@ -6,6 +6,7 @@ import 'package:mobile_app/providers/cart_provider.dart';
 import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/ProductService.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class OrderDetailPage extends StatefulWidget {
   const OrderDetailPage({super.key});
@@ -62,6 +63,11 @@ class _OrderDetailPageState extends State<OrderDetailPage>
     }
   }
 
+  String formatCurrency(double price) {
+    final formatter = NumberFormat('#,###', 'vi_VN');
+    return "${formatter.format(price)} đ";
+  }
+
   Widget _buildOrderItemCard({
     required Order order,
     required OrderItem item,
@@ -105,9 +111,10 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                           fontSize: 16,
                           fontFamily: 'Poppins',
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -125,36 +132,16 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                         ],
                       ),
                       const SizedBox(height: 4),
-
-                      Row(
-                        children: [
-                          if (product?.oldPrice != null &&
-                              product!.oldPrice! > item.price)
-                            Text(
-                              '${product!.oldPrice!.toStringAsFixed(0)} đ',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                decoration: TextDecoration.lineThrough,
-                                color: Colors.grey,
-                                fontFamily: 'Poppins',
-                              ),
-                            ),
-                          if (product?.oldPrice != null &&
-                              product!.oldPrice! > item.price)
-                            const SizedBox(width: 8),
-                          Text(
-                            '${item.price.toStringAsFixed(0)} đ',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF0D47A1),
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                        ],
+                      Text(
+                        formatCurrency(item.price), // Sử dụng item.price
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF0D47A1),
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                        ),
                       ),
                       const SizedBox(height: 4),
-
                       Text(
                         '${order.payment ? 'Đã thanh toán' : 'Chưa thanh toán'}',
                         style: const TextStyle(fontFamily: 'Poppins'),
@@ -165,12 +152,10 @@ class _OrderDetailPageState extends State<OrderDetailPage>
               ],
             ),
             const SizedBox(height: 8),
-
-            // Tổng tiền cho item này
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Tổng tiền item: ${(item.price * item.quantity).toStringAsFixed(0)} đ',
+                'Tổng tiền item: ${formatCurrency(item.price * item.quantity)}', // Sử dụng item.price
                 style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w500,
@@ -178,7 +163,6 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                 ),
               ),
             ),
-
             if (showReviewButton && product != null && order.id != null) ...[
               const SizedBox(height: 12),
               Align(
@@ -242,27 +226,10 @@ class _OrderDetailPageState extends State<OrderDetailPage>
           );
         }
 
-        // final totalAmountWidget = Padding(
-        //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        //   child: Align(
-        //     alignment: Alignment.centerRight,
-        //     child: Text(
-        //       'Tổng tiền đơn hàng: ${order.amount.toStringAsFixed(0)} đ',
-        //       style: const TextStyle(
-        //         fontFamily: 'Poppins',
-        //         fontWeight: FontWeight.bold,
-        //         fontSize: 16,
-        //         color: Color(0xFF0D47A1),
-        //       ),
-        //     ),
-        //   ),
-        // );
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ...snapshot.data!,
-            // totalAmountWidget,
             const Divider(height: 20, thickness: 1),
           ],
         );

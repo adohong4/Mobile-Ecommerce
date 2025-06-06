@@ -48,15 +48,17 @@ class _CartPageState extends State<CartPage> {
     // Tính toán tổng giá và giảm giá
     final double total = selectedItems.fold(
       0.0,
-      (double sum, item) =>
-          sum + item.price * (cartProvider.cartData[item.id] ?? 1),
+      (sum, item) =>
+          sum + item.displayPrice * (cartProvider.cartData[item.id] ?? 1),
     );
     final double discount = selectedItems.fold(
       0.0,
-      (double sum, item) =>
+      (sum, item) =>
           sum +
-          ((item.oldPrice ?? item.price) - item.price) *
-              (cartProvider.cartData[item.id] ?? 1),
+          (item.hasDiscount
+              ? (item.price - item.displayPrice) *
+                  (cartProvider.cartData[item.id] ?? 1)
+              : 0.0),
     );
 
     return Scaffold(
@@ -144,7 +146,7 @@ class _CartPageState extends State<CartPage> {
                                     height: 60,
                                     fit: BoxFit.cover,
                                   ),
-                              const SizedBox(width: 5),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,45 +155,54 @@ class _CartPageState extends State<CartPage> {
                                       item.name,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
+                                        fontSize: 14,
                                       ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     const SizedBox(height: 4),
-                                    Column(
-                                      children: [
-                                        if (item.oldPrice != null &&
-                                            item.oldPrice! > item.price)
-                                          Text(
-                                            formatCurrency(item.oldPrice!),
-                                            style: const TextStyle(
-                                              decoration:
+                                    if (item.hasDiscount)
+                                      Text(
+                                        formatCurrency(item.price),
+                                        style: const TextStyle(
+                                          decoration:
                                               TextDecoration.lineThrough,
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-
-                                        Text(
-                                          formatCurrency(item.price),
-                                          style: const TextStyle(
-                                            color: Color(0xFF003366),
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          color: Colors.grey,
+                                          fontSize: 12,
                                         ),
-
-                                      ],
+                                      ),
+                                    Text(
+                                      formatCurrency(item.displayPrice),
+                                      style: const TextStyle(
+                                        color: Color(0xFF003366),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
+                                    if (item.discountDisplay != null)
+                                      Text(
+                                        item.discountDisplay!,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed: () async {
-                                      await cartProvider.updateQuantity(
-                                        item,
-                                        quantity - 1,
-                                      );
-                                    },
+                                    onPressed:
+                                        quantity > 1
+                                            ? () async {
+                                              await cartProvider.updateQuantity(
+                                                item,
+                                                quantity - 1,
+                                              );
+                                            }
+                                            : null,
                                     icon: const Icon(Icons.remove, size: 20),
                                   ),
                                   Text('$quantity'),
@@ -261,13 +272,14 @@ class _CartPageState extends State<CartPage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
-                                  'Giảm: ${formatCurrency(discount)}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
+                                if (discount > 0)
+                                  Text(
+                                    'Giảm: ${formatCurrency(discount)}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           ],
@@ -291,9 +303,12 @@ class _CartPageState extends State<CartPage> {
                                                           (item) => {
                                                             'id': item.id,
                                                             'name': item.name,
-                                                            'price': item.price,
-                                                            'oldPrice':
-                                                                item.oldPrice,
+                                                            'price':
+                                                                item.displayPrice,
+                                                            'originalPrice':
+                                                                item.hasDiscount
+                                                                    ? item.price
+                                                                    : null,
                                                             'quantity':
                                                                 cartProvider
                                                                     .cartData[item
@@ -305,6 +320,8 @@ class _CartPageState extends State<CartPage> {
                                                                     ? item
                                                                         .images[0]
                                                                     : 'assets/images/asus.png',
+                                                            'discountDisplay':
+                                                                item.discountDisplay,
                                                           },
                                                         )
                                                         .toList(),

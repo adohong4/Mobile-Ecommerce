@@ -127,7 +127,7 @@ class CampaignService {
             let allProducts;
 
             allProducts = await productModel.find()
-                .select('title nameProduct product_slug price images category quantity')
+                .select('nameProduct price images category')
                 .sort({ createdAt: -1 })
                 .limit(1000)
                 .exec();
@@ -199,9 +199,9 @@ class CampaignService {
     };
 
     static updateProductPricesForCampaignBySlug = async (req, res) => {
-        const { productSlug } = req.params;
+        const { productId } = req.params;
         try {
-            const product = await productModel.findOne({ product_slug: productSlug })
+            const product = await productModel.findById(productId)
                 .exec();
 
             if (!product) {

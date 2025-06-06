@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mobile_app/services/ApiService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginService {
-  static const String _baseUrl = 'http://192.168.1.9:9001/v1/api/identity';
+
+  static const String _baseUrl = ApiService.identityService;
 
   Future<Map<String, dynamic>> register(
     String username,
@@ -94,6 +96,39 @@ class LoginService {
         };
       }
     } catch (e) {
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> logout() async {
+    final url = Uri.parse('$_baseUrl/logout');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Xóa dữ liệu cục bộ
+        final prefs = await SharedPreferences.getInstance();
+        await Future.wait([
+          prefs.remove('auth_token'),
+          prefs.remove('user'),
+          prefs.remove('cookies'),
+        ]);
+
+        return {'success': true, 'message': 'Đăng xuất thành công'};
+      } else {
+        final data = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message':
+              data['message'] ??
+              'Đăng xuất thất bại (mã ${response.statusCode})',
+        };
+      }
+    } catch (e) {
+      print('Logout error: $e'); // Debug
       return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }

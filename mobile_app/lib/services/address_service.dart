@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/addressModel.dart';
+import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class AddressService {
-  static const String _baseUrl = 'http://192.168.1.9:9003/v1/api/profile/address';
+
+  static const String _baseUrl = ApiService.address;
+
 
   Future<Map<String, dynamic>> createAddress(AddressModel address) async {
     final url = Uri.parse('$_baseUrl/create');

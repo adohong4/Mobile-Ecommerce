@@ -60,9 +60,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   Future<ProductsModel> _fetchProductWithErrorHandling() async {
     try {
-      return await ProductService.fetchProductById(widget.product.id);
+      final product = await ProductService.fetchCampaignProductById(
+        widget.product.id!,
+      );
+      return product;
     } catch (e) {
-      debugPrint('Error fetching product: $e');
+      debugPrint('Error fetching campaign product: $e');
       return widget.product;
     }
   }
@@ -111,6 +114,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             ),
           ),
         ),
+        if (product.discountDisplay != null)
+          Positioned(
+            top: 10,
+            right: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                product.discountDisplay!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
         if (selectedImageIndex > 0)
           Positioned(
             left: 10,
@@ -187,14 +210,24 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            product.name,
+            product.name ?? 'Sản phẩm không xác định',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Row(
             children: [
+              if (product.hasDiscount)
+                Text(
+                  formatCurrency(product.price),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                    decoration: TextDecoration.lineThrough,
+                  ),
+                ),
+              if (product.hasDiscount) const SizedBox(width: 8),
               Text(
-                formatCurrency(product.price),
+                formatCurrency(product.displayPrice),
                 style: const TextStyle(
                   color: Color(0xFF194689),
                   fontSize: 18,
@@ -271,7 +304,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
-                Text(product.specifications),
+                Text(product.specifications ?? 'Không có thông tin'),
               ],
             ),
           ),
@@ -288,7 +321,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  product.description ?? '',
+                  product.description ?? 'Không có mô tả',
                   style: const TextStyle(fontSize: 14),
                   maxLines: _isExpanded ? null : 3,
                   overflow:
@@ -386,7 +419,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 final selectedItem = {
                   'id': widget.product.id,
                   'name': widget.product.name,
-                  'price': widget.product.price,
+                  'price': widget.product.displayPrice, // Sử dụng displayPrice
                   'quantity': quantity,
                   'image':
                       widget.product.images.isNotEmpty
@@ -400,7 +433,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     builder:
                         (context) => CheckoutPage(
                           selectedItems: [selectedItem],
-                          total: widget.product.price.toInt() * quantity,
+                          total:
+                              widget.product.displayPrice.toInt() *
+                              quantity, // Sử dụng displayPrice
                         ),
                   ),
                 );
@@ -423,7 +458,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               ),
               onPressed: () {
                 final cart = context.read<CartProvider>();
-                cart.add(widget.product);
+                final productWithQuantity = ProductsModel(
+                  id: widget.product.id,
+                  title: widget.product.title,
+                  name: widget.product.name,
+                  category: widget.product.category,
+                  price: widget.product.price,
+                  newPrice: widget.product.newPrice,
+                  campaignType: widget.product.campaignType,
+                  campaignValue: widget.product.campaignValue,
+                  description: widget.product.description,
+                  images: widget.product.images,
+                  specifications: widget.product.specifications,
+                  quantity: quantity,
+                  active: widget.product.active,
+                  productSlug: widget.product.productSlug,
+                );
+                cart.add(productWithQuantity);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
                 );
@@ -472,9 +523,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         _buildPriceSection(product),
                         _buildQuantitySelector(),
                         _buildDescriptionSection(product),
-                        CommentComponent(
-                          productId: product.id,
-                        ), // Use new component
+                        CommentComponent(productId: product.id!),
                         const ProductIdeaComponent(),
                         const SizedBox(height: 80),
                       ],

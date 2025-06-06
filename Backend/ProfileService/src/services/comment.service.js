@@ -2,6 +2,7 @@
 
 const commentModel = require('../models/comment.model');
 const orderModel = require('../models/order.model');
+const userModel = require('../models/profile.model');
 const { Types } = require('mongoose');
 const { BadRequestError, ForbiddenError } = require('../core/error.response');
 
@@ -122,13 +123,81 @@ class CommentService {
         }
     }
 
-    static async getAverageRatingByProduct(req, res) {
+    static async getRatingStatsAndComments(req, res) {
         try {
             const { productId } = req.params;
 
-            const comments = await commentModel.find({ productId, active: true });
+            // Tìm tất cả bình luận của productId và active = true
+            const comments = await commentModel.find({ productId, active: true })
+                .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo giảm dần
+                .exec();
 
-            return comments;
+            if (!comments || comments.length === 0) {
+                return {
+                    message: 'Không có bình luận nào cho sản phẩm này',
+                    ratingStats: {
+                        1: 0,
+                        2: 0,
+                        3: 0,
+                        4: 0,
+                        5: 0
+                    },
+                    averageRating: 0,
+                    comments: []
+                };
+            }
+
+            // Thống kê số lượt rating từ 1 đến 5
+            const ratingStats = {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0
+            };
+
+            let totalRating = 0;
+            let ratingCount = comments.length;
+
+            comments.forEach(comment => {
+                const rating = comment.rating;
+                if (rating >= 1 && rating <= 5) {
+                    ratingStats[rating]++;
+                    totalRating += rating;
+                }
+            });
+
+            // Tính trung bình cộng rating
+            const averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(2) : 0;
+
+            // Trả về kết quả
+            return {
+                ratingStats,
+                averageRating: parseFloat(averageRating),
+                comments: comments.map(comment => ({
+                    _id: comment._id,
+                    productId: comment.productId,
+                    userId: comment.userId,
+                    comment: comment.comment,
+                    rating: comment.rating,
+                    images: comment.image || [],
+                    createdAt: comment.createdAt,
+                    updatedAt: comment.updatedAt
+                }))
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getUserById(req, res) {
+        try {
+            const { userId } = req.params;
+            console.log(`Fetching user by ID: ${userId}`);
+
+            const user = await userModel.findOne({ userId }).select('profilePic fullName');
+
+            return user;
         } catch (error) {
             throw error;
         }

@@ -52,17 +52,30 @@ class CommentController {
         }
     }
 
-    async getAverageRatingByProduct(req, res, next) {
+    async getRatingStatsAndComments(req, res, next) {
         try {
-            const result = await CommentService.getAverageRatingByProduct(req, res);
+            const result = await CommentService.getRatingStatsAndComments(req, res);
             new OK({
-                message: 'get AverageRating By Product',
+                message: 'get info',
                 metadata: result
             }).send(res);
         } catch (error) {
             next(error);
         }
     }
+
+    async getUserById(req, res, next) {
+        try {
+            const result = await CommentService.getUserById(req, res);
+            new OK({
+                message: 'get info',
+                metadata: result
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
 }
 
 module.exports = new CommentController();
