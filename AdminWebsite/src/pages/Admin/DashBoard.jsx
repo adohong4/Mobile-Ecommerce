@@ -5,6 +5,7 @@ import Factors from "../../components/DashBoardItem/Factors";
 import ColumnChart from "../../components/DashBoardItem/ColumnChart";
 import OrderTable from "../../components/DashBoardItem/OrderTable";
 import LineChart from "../../components/DashBoardItem/LineChart";
+import RevenueStat from "../Statistic/Chart/revenueStat";
 
 const DashBoard = () => {
     return (
@@ -47,6 +48,7 @@ const DashBoard = () => {
                     </Card>
                 </Col>
             </Row>
+            <RevenueStat />
 
             {/* Phần Biểu Đồ Đường */}
             {/* <Row gutter={[16, 16]} style={{ marginTop: 20 }}>

@@ -7,49 +7,87 @@ class CampaignService {
     static createCampaign = async (req, res) => {
         try {
             const {
-                name, description, value, code, startDate, endDate, status,
-                maxValue, appliesTo, productIds, type
-            } = req.body
-            //check conditions of type
+                name,
+                description,
+                value,
+                code,
+                startDate,
+                endDate,
+                status: inputStatus,
+                maxValue,
+                appliesTo,
+                productIds,
+                type,
+            } = req.body;
+
+            // Kiểm tra type
             if (type === 'percentage') {
                 if (value <= 0 || value > 100) {
-                    throw new BadRequestError('Value must be greater than 0 and less than or equal to 100 for percentage type');
+                    throw new BadRequestError('Giá trị giảm phần trăm phải lớn hơn 0 và nhỏ hơn hoặc bằng 100');
                 }
             } else if (type === 'fixed_amount') {
                 if (value <= 0) {
-                    throw new BadRequestError('Value must be greater than 0 for fixed amount type');
+                    throw new BadRequestError('Giá trị giảm cố định phải lớn hơn 0');
                 }
             } else {
-                throw new BadRequestError('Invalid type specified');
+                throw new BadRequestError('Loại khuyến mãi không hợp lệ');
             }
 
-            //check time
-            if (new Date() > new Date(endDate))
-                throw new BadRequestError('Discount codes has expried')
-            if (new Date(startDate) >= new Date(endDate))
-                throw new BadRequestError('Start_Date must be before End_date')
+            // Kiểm tra thời gian
+            const now = new Date();
+            if (now > new Date(endDate)) {
+                throw new BadRequestError('Chiến dịch đã hết hạn');
+            }
+            if (new Date(startDate) >= new Date(endDate)) {
+                throw new BadRequestError('Ngày bắt đầu phải trước ngày kết thúc');
+            }
 
-            //check CODE
-            const foundCampaign = await campaignModel.findOne({ code })
-            if (foundCampaign && foundCampaign.active)
-                throw new BadRequestError('Discount exist!')
+            // Kiểm tra mã code
+            const foundCampaign = await campaignModel.findOne({ code });
+            if (foundCampaign && foundCampaign.active) {
+                throw new ConflictRequestError('Mã khuyến mãi đã tồn tại và đang hoạt động');
+            }
 
-            //set the campaign status
-            if (new Date(startDate) > new Date()) status = "pending";
-            if (new Date(startDate) < new Date()) status = "active";
+            // Xác định trạng thái chiến dịch
+            let campaignStatus = inputStatus || 'pending';
+            if (new Date(startDate) <= now && now <= new Date(endDate)) {
+                campaignStatus = 'active';
+            } else if (new Date(startDate) > now) {
+                campaignStatus = 'pending';
+            }
+
+            // Kiểm tra appliesTo và productIds
+            if (appliesTo === 'items' && (!productIds || productIds.length === 0)) {
+                throw new BadRequestError('Vui lòng chọn ít nhất một sản phẩm áp dụng');
+            }
+            if (appliesTo === 'all') {
+                productIds = [];
+            }
+
+            // Nếu type là fixed_amount, đặt maxValue về null
+            const finalMaxValue = type === 'fixed_amount' ? null : maxValue;
 
             const newCampaign = await campaignModel.create({
-                name, description, value, status, maxValue, appliesTo, productIds,
-                startDate, endDate, code, type,
-            })
+                name,
+                description,
+                value,
+                code,
+                startDate,
+                endDate,
+                status: campaignStatus,
+                maxValue: finalMaxValue,
+                appliesTo,
+                productIds: productIds || [],
+                type,
+            });
 
             return {
-                metadata: newCampaign
-            }
+                metadata: newCampaign,
+            };
         } catch (error) {
-            throw (error);
+            throw new BadRequestError(error.message || 'Lỗi khi tạo chiến dịch');
         }
-    }
+    };
 
     static getAllCampaign = async () => {
         const campaign = await campaignModel.find()
@@ -69,7 +107,7 @@ class CampaignService {
         try {
             const { id } = req.params;
             const { name, description, value, code, startDate, endDate, status, maxValue, appliesTo, productIds, type } = req.body
-            const updates = { userId, staffName, name, description, value, code, startDate, endDate, status, maxValue, appliesTo, productIds, type };
+            const updates = { name, description, value, code, startDate, endDate, status, maxValue, appliesTo, productIds, type };
 
             // Kiểm tra điều kiện của type
             if (type === 'percentage' && (value <= 0 || value > 100)) {

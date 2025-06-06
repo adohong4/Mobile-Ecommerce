@@ -10,12 +10,10 @@ import OrderTrash from '../Order/OrderTrash';
 import DashBoard from '../Admin/DashBoard';
 import ProductTrash from '../Product/Trash';
 import LoginAdmin from '../../pages/Admin/LoginAdmin';
-import ProfileAdmin from '../../pages/Admin/ProfileAdmin';
 import ListCampain from '../../pages/Campaign/ListCampaign';
 import AddCampaign from '../../pages/Campaign/AddCampaign';
 import CampaignInfo from '../../pages/Campaign/CampaignInfo';
 import TrashCampain from '../../pages/Campaign/TrashCampaign';
-import Statistic from '../../pages/Statistic/Statistic';
 import { ToastContainer } from 'react-toastify';
 import Cookies from 'js-cookie';
 
@@ -60,7 +58,6 @@ const Admin = () => {
                                     <Route path="orders" element={<Orders />} />
                                     <Route path="orders/trash" element={<OrderTrash />} />
 
-                                    <Route path="profile-admin" element={<ProfileAdmin />} />
                                     <Route path="list-campaign" element={<ListCampain />} />
                                     <Route path="add-campaign" element={<AddCampaign />} />
                                     <Route path="list-campaign/:id" element={<CampaignInfo />} />
@@ -73,7 +70,6 @@ const Admin = () => {
 
                                     <Route path="advertise" element={<AdvertiseList />} />
 
-                                    <Route path="statistic" element={<Statistic />} />
                                     <Route path="mess" element={<Mess />} />
                                 </Routes>
                             </div>

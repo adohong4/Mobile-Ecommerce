@@ -1,85 +1,69 @@
-import React, { useEffect, useContext, useState, useRef } from 'react';
-import axios from 'axios';
+import React, { useEffect, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
-import { StoreContext } from '../../context/StoreContext';
+import { OrderContext } from '../../context/OrderContextProvider'; // Sử dụng OrderContext
 import { formatHourDayTime, formatCurrency } from '../../lib/utils';
 
 const OrderTable = () => {
-    const { url } = useContext(StoreContext);
-    const [list, setList] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalOrder, setTotalOrder] = useState(0);
-    const [totalPages, setTotalPages] = useState(0); // Theo dõi tổng số trang
+    const { orderList, fetchOrderList } = useContext(OrderContext); // Lấy orderList và fetchOrderList từ context
+    const [currentPage, setCurrentPage] = useState(0); // Bắt đầu từ trang 0
+    const itemsPerPage = 6; // Số mục mỗi trang
+
+    // Tính toán dữ liệu hiển thị cho trang hiện tại
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentItems = orderList.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(orderList.length / itemsPerPage); // Tổng số trang
 
     const handlePageClick = (event) => {
-        setCurrentPage(+event.selected + 1);
-    };
-
-    const fetchListpage = async (page = 1, limit = 6) => {
-        try {
-            const response = await axios.get(`${url}/v1/api/profile/order/paginate?page=${page}&limit=${limit}`);
-            if (response.data.message) {
-                setList(response.data.metadata.order);
-                setTotalOrder(response.data.metadata.totalOrder);
-                setTotalPages(response.data.metadata.totalPages);
-            }
-        } catch (error) {
-            toast.error('Error fetching data');
-        }
+        setCurrentPage(event.selected); // Cập nhật trang hiện tại
     };
 
     useEffect(() => {
-        fetchListpage(currentPage);
-    }, [currentPage]);
+        fetchOrderList(); // Gọi fetchOrderList để lấy toàn bộ danh sách
+    }, [fetchOrderList]);
 
     return (
-        <div className='orderpayment-list-container'>
-            {/* <div className='orderpayment-list-title'>
-                <p>Giao dịch gần đây</p>
-            </div> */}
-
+        <div className="orderpayment-list-container">
             <ul className="transaction-list">
-                {list.map((item) => (
+                {currentItems.map((item) => (
                     <li key={item._id} className="transaction-item">
-                        {/* <div className="transaction-icon">
-                            <br />
-                        </div> */}
                         <div className="transaction-details">
                             <p className="transaction-id">{item._id}</p>
                             <p className="transaction-date">{formatHourDayTime(item.createdAt)}</p>
                         </div>
                         <div className="transaction-amount">
-                            <p>+ {item.amount.toLocaleString()} đ</p>
+                            <p>+ {formatCurrency(item.amount)}</p>
                             <p className="transaction-info">{item.paymentMethod}</p>
                         </div>
                     </li>
                 ))}
             </ul>
 
-            <ReactPaginate
-                breakLabel="..."
-                nextLabel=">"
-                onPageChange={handlePageClick}
-                previousLabel="<"
-                pageCount={totalPages} // Tổng số trang
-                pageRangeDisplayed={1} // Hiển thị tối đa 4 số liên tiếp
-                marginPagesDisplayed={1} // Hiển thị 1 số đầu và cuối cùng
-                renderOnZeroPageCount={null}
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
-                breakClassName="page-item"
-                breakLinkClassName="page-link"
-                containerClassName="pagination"
-                activeClassName="active"
-            />
-
+            {orderList.length > 0 && (
+                <ReactPaginate
+                    breakLabel="..."
+                    nextLabel=">"
+                    onPageChange={handlePageClick}
+                    previousLabel="<"
+                    pageCount={totalPages} // Tổng số trang tính từ client
+                    pageRangeDisplayed={1} // Hiển thị tối đa 4 số liên tiếp
+                    marginPagesDisplayed={1} // Hiển thị 1 số đầu và cuối
+                    renderOnZeroPageCount={null}
+                    pageClassName="page-item"
+                    pageLinkClassName="page-link"
+                    previousClassName="page-item"
+                    previousLinkClassName="page-link"
+                    nextClassName="page-item"
+                    nextLinkClassName="page-link"
+                    breakClassName="page-item"
+                    breakLinkClassName="page-link"
+                    containerClassName="pagination"
+                    activeClassName="active"
+                />
+            )}
         </div>
-    )
-}
+    );
+};
 
-export default OrderTable
+export default OrderTable;

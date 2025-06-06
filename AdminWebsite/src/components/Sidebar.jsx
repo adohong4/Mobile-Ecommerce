@@ -50,13 +50,6 @@ const Sidebar = () => {
             </NavLink>
           </div>
 
-          <div className="sidebar-options">
-            <NavLink to="/statistic" className="sidebar-option">
-              <FontAwesomeIcon icon={faChartLine} />
-              <p>Thống kê</p>
-            </NavLink>
-          </div>
-
           <div className="sidebar-dropdown">
             <div
               className="sidebar-option sidebar-main"
@@ -99,7 +92,7 @@ const Sidebar = () => {
             >
               <div className="dad-menu sidebar-title">
                 <FontAwesomeIcon icon={faImage} />
-                <NavLink to="/advertise" className="submenu-item"  style={{ color: "white", fontWeight: 400 }}>Media</NavLink>
+                <NavLink to="/advertise" className="submenu-item" style={{ color: "white", fontWeight: 400 }}>Media</NavLink>
               </div>
             </div>
           </div>
@@ -199,7 +192,7 @@ const Sidebar = () => {
             >
               <div className="dad-menu sidebar-title">
                 <FontAwesomeIcon icon={faImage} />
-                <NavLink to="/mess" className="submenu-item"  style={{ color: "white", fontWeight: 400 }}>CSKH</NavLink>
+                <NavLink to="/mess" className="submenu-item" style={{ color: "white", fontWeight: 400 }}>CSKH</NavLink>
               </div>
             </div>
           </div>

@@ -3,22 +3,28 @@ import React, { useEffect, useState, useContext } from 'react';
 import { toast } from 'react-toastify';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import { StoreContext } from '../../context/StoreContext';
+import { CampaignContext } from '../../context/CampaignContextProvider';
+import { VoucherContext } from "../../context/VoucherContextProvider";
+import { ProductContext } from "../../context/ProductContextProvider";
+import { OrderContext } from '../../context/OrderContextProvider';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Factors = () => {
-    const { product_list, users, order, contacts } = useContext(StoreContext);
-    const [orders, setOrders] = useState([]);
-    const [user, setUser] = useState([]);
-    const [product, setProduct] = useState([]);
-    const [contact, setContact] = useState([]);
+    const { campaignList } = useContext(CampaignContext);
+    const { VoucherList } = useContext(VoucherContext);
+    const { orderList } = useContext(OrderContext);
+    const { productList } = useContext(ProductContext);
+    const [orders, setOrders] = useState(0);
+    const [campaign, setCampaign] = useState(0);
+    const [product, setProduct] = useState(0);
+    const [voucher, setVoucher] = useState(0);
 
     useEffect(() => {
-        setUser(users?.length);
-        setProduct(product_list?.length);
-        setOrders(order?.length);
-        setContact(contacts?.length);
+        setCampaign(campaignList?.length);
+        setProduct(productList?.length);
+        setOrders(orderList?.length);
+        setVoucher(VoucherList?.length);
     }, []);
 
     const chartData = {
@@ -27,10 +33,10 @@ const Factors = () => {
             {
                 label: 'Người dùng',
                 data: [
-                    user,
+                    voucher,
                     product,
                     orders,
-                    contact,
+                    campaign,
                 ],
                 backgroundColor: [
                     'rgba(75, 192, 192, 0.6)', // Color for Total Users

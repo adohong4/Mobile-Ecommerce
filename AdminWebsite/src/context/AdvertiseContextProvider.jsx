@@ -25,12 +25,9 @@ const AdvertiseContextProvider = ({ children }) => {
 
     const createAdvertise = useCallback(async (data) => {
         try {
-            const response = await axios.post(`${url}/create`, data, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            const response = await axios.post(`${url}/create`, data);
             toast.success('Tạo quảng cáo thành công');
             await fetchAdvertiseList();
-            return response.data.metadata;
         } catch (error) {
             toast.error('Lỗi khi tạo quảng cáo: ' + error.message);
             throw error;

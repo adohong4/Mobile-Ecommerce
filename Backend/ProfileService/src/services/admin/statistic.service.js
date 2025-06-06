@@ -6,7 +6,7 @@ const { BadRequestError, AuthFailureError } = require("../../core/error.response
 class StatisticService {
     static productStatisticTable = async (req, res) => {
         try {
-            const orders = await orderModel.find({ statusActive: true }).lean();
+            const orders = await orderModel.find().lean();
 
             const itemsMap = new Map();
 
@@ -104,7 +104,7 @@ class StatisticService {
                 throw new BadRequestError('Invalid time parameter. Must be "week", "month", or "year".');
             }
 
-            const orders = await orderModel.find({ statusActive: true }).lean();
+            const orders = await orderModel.find().lean();
             const now = new Date();
 
             if (time === 'week') {
