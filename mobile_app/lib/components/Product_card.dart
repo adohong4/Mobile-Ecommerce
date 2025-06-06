@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/providers/cart_provider.dart';
 import 'package:mobile_app/providers/wish_list_provider.dart';
 import 'package:mobile_app/services/ApiService.dart';
-import 'package:provider/provider.dart';
-import 'package:mobile_app/models/productModel.dart'; // Import ProductsModel
+import 'package:mobile_app/models/productModel.dart';
 import 'package:intl/intl.dart';
-
 import 'package:mobile_app/pages/ProductDetailPage.dart';
+import 'package:provider/provider.dart';
 
 class ProductCard extends StatelessWidget {
   final ProductsModel products;
@@ -50,10 +49,8 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hình ảnh + badges + nút yêu thích + giỏ hàng
             Stack(
               children: [
-                // Ảnh sản phẩm
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
@@ -78,10 +75,7 @@ class ProductCard extends StatelessWidget {
                             ),
                   ),
                 ),
-
-                // Badge giảm giá
-                if (products.discountPercent != null &&
-                    products.discountPercent! > 0)
+                if (products.discountDisplay != null)
                   Positioned(
                     top: 0,
                     left: 0,
@@ -95,7 +89,7 @@ class ProductCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '-${products.discountPercent}%',
+                        products.discountDisplay!,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -104,14 +98,11 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                // Hai nút xếp dọc (yêu thích + thêm giỏ hàng)
                 Positioned(
                   top: 0,
                   right: 0,
                   child: Column(
                     children: [
-                      // Nút yêu thích
                       InkWell(
                         onTap: () {
                           final wishList = context.read<WishListProvider>();
@@ -133,7 +124,7 @@ class ProductCard extends StatelessWidget {
                           backgroundColor:
                               wishList.isFavourite(products)
                                   ? Colors.white
-                                  : Color(0xFF1AA7DD),
+                                  : const Color(0xFF1AA7DD),
                           radius: 18,
                           child: Icon(
                             wishList.isFavourite(products)
@@ -147,10 +138,7 @@ class ProductCard extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 6),
-
-                      // Nút thêm vào giỏ hàng
                       InkWell(
                         onTap: () {
                           final cart = context.read<CartProvider>();
@@ -161,10 +149,10 @@ class ProductCard extends StatelessWidget {
                             ),
                           );
                         },
-                        child: CircleAvatar(
+                        child: const CircleAvatar(
                           backgroundColor: Color(0xFF194689),
                           radius: 18,
-                          child: const Icon(
+                          child: Icon(
                             Icons.add_shopping_cart,
                             color: Colors.white,
                             size: 20,
@@ -176,47 +164,28 @@ class ProductCard extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
-
-            // // Thương hiệu (sử dụng category)
-            // Text(
-            //   products.category,
-            //   style: const TextStyle(
-            //     fontSize: 14,
-            //     color: Colors.grey,
-            //     fontWeight: FontWeight.w500,
-            //   ),
-            // ),
-
-            // const SizedBox(height: 4),
-
-            // Tên sản phẩm
             Text(
               products.name,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
-
             const SizedBox(height: 6),
-
-            // Giá
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (products.oldPrice != null &&
-                    products.oldPrice! > products.price)
+                if (products.hasDiscount)
                   Text(
-                    formatCurrency(products.oldPrice!),
+                    formatCurrency(products.price),
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
                       decoration: TextDecoration.lineThrough,
                     ),
                   ),
-                const SizedBox(width: 6),
                 Text(
-                  formatCurrency(products.price),
+                  formatCurrency(products.displayPrice),
                   style: const TextStyle(
                     fontSize: 15,
                     color: Colors.blueAccent,

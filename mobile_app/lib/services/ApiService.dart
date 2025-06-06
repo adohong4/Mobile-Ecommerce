@@ -8,7 +8,7 @@ class ApiService {
   static const String messageService = "$route:9002/v1/api/message";
   static const String paymentService = "$route:9007/v1/api/payment";
   static const String recommend = "$route:5000/v1/api/recommend/viewed";
-  static const String Search = "$route:5001/v1/api/recommend";
+  static const String Search = "$route:5001/v1/api/search";
 
   static const String productList = "$productService/get";
   static const String voucher = "$productService/voucher";

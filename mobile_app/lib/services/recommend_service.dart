@@ -30,7 +30,7 @@ class RecommendService {
         final List<String> productIds =
             recommendations.map((item) => item['_id'].toString()).toList();
 
-        final allProducts = await ProductService.fetchAllProducts();
+        final allProducts = await ProductService.fetchCampaignProducts();
         final recommendedProducts =
             allProducts
                 .where((product) => productIds.contains(product.id))
@@ -93,7 +93,7 @@ class RecommendService {
             recommendations.map((item) => item['_id'].toString()).toList();
 
         // Step 3: Fetch all products and filter by recommended IDs
-        final allProducts = await ProductService.fetchAllProducts();
+        final allProducts = await ProductService.fetchCampaignProducts();
         final recommendedProducts =
             allProducts
                 .where((product) => recommendedProductIds.contains(product.id))

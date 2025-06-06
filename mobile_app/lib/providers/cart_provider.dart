@@ -8,12 +8,12 @@ class CartProvider extends ChangeNotifier {
   Map<String, int> _cartData = {};
   List<ProductsModel> _cartItems = [];
   List<Order> _orders = [];
-  List<Order> get orders => _orders;
   bool _isLoading = false;
   String? _errorMessage;
 
   Map<String, int> get cartData => _cartData;
   List<ProductsModel> get cartItems => _cartItems;
+  List<Order> get orders => _orders;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -23,8 +23,6 @@ class CartProvider extends ChangeNotifier {
   Map<String, int> _convertListToMap(List<dynamic> cartList) {
     Map<String, int> cartMap = {};
     for (var item in cartList) {
-      // Adjust the field names based on your backend response structure
-      // Assuming each item has 'itemId' and 'quantity' fields
       String itemId = item['itemId']?.toString() ?? '';
       int quantity =
           item['quantity'] is int
@@ -37,7 +35,7 @@ class CartProvider extends ChangeNotifier {
     return cartMap;
   }
 
-  // Lấy giỏ hàng từ backend
+  // Lấy giỏ hàng từ backend với thông tin khuyến mãi
   Future<void> fetchCart() async {
     _isLoading = true;
     _errorMessage = null;
@@ -46,7 +44,6 @@ class CartProvider extends ChangeNotifier {
     final result = await _cartService.getListCart();
 
     if (result['success']) {
-      // Handle cartData as List<dynamic> and convert to Map<String, int>
       if (result['cartData'] is List<dynamic>) {
         _cartData = _convertListToMap(result['cartData']);
       } else {
@@ -56,9 +53,17 @@ class CartProvider extends ChangeNotifier {
       if (_cartData.isNotEmpty) {
         final productIds = _cartData.keys.toList();
         try {
-          _cartItems = await ProductService.fetchProductsByIds(productIds);
+          // Gọi fetchCampaignProductById cho từng ID
+          _cartItems = await _fetchCampaignProducts(productIds);
+          print('Fetched cart items: ${_cartItems.length}');
+          for (var item in _cartItems) {
+            print(
+              'Cart item: ${item.name}, newPrice: ${item.newPrice}, '
+              'displayPrice: ${item.displayPrice}, discountDisplay: ${item.discountDisplay}',
+            );
+          }
         } catch (e) {
-          _errorMessage = 'Không lấy được chi tiết sản phẩm: $e';
+          _errorMessage = 'Không lấy được chi tiết sản phẩm khuyến mãi: $e';
           _cartItems = [];
         }
       } else {
@@ -78,10 +83,9 @@ class CartProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final result = await _cartService.addToCart(product.id);
+    final result = await _cartService.addToCart(product.id!);
 
     if (result['success']) {
-      // Handle cartData as List<dynamic> and convert to Map<String, int>
       if (result['cartData'] is List<dynamic>) {
         _cartData = _convertListToMap(result['cartData']);
       } else {
@@ -90,9 +94,10 @@ class CartProvider extends ChangeNotifier {
 
       final productIds = _cartData.keys.toList();
       try {
-        _cartItems = await ProductService.fetchProductsByIds(productIds);
+        _cartItems = await _fetchCampaignProducts(productIds);
+        print('Added product: ${product.name}, newPrice: ${product.newPrice}');
       } catch (e) {
-        _errorMessage = 'Không lấy được chi tiết sản phẩm: $e';
+        _errorMessage = 'Không lấy được chi tiết sản phẩm khuyến mãi: $e';
       }
     } else {
       _errorMessage = result['message'];
@@ -107,10 +112,9 @@ class CartProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final result = await _cartService.removeFromCart(product.id);
+    final result = await _cartService.removeFromCart(product.id!);
 
     if (result['success']) {
-      // Handle cartData as List<dynamic> and convert to Map<String, int>
       if (result['cartData'] is List<dynamic>) {
         _cartData = _convertListToMap(result['cartData']);
       } else {
@@ -119,9 +123,10 @@ class CartProvider extends ChangeNotifier {
 
       final productIds = _cartData.keys.toList();
       try {
-        _cartItems = await ProductService.fetchProductsByIds(productIds);
+        _cartItems = await _fetchCampaignProducts(productIds);
+        print('Removed product: ${product.name}');
       } catch (e) {
-        _errorMessage = 'Không lấy được chi tiết sản phẩm: $e';
+        _errorMessage = 'Không lấy được chi tiết sản phẩm khuyến mãi: $e';
       }
     } else {
       _errorMessage = result['message'];
@@ -194,5 +199,28 @@ class CartProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  // Helper method to fetch campaign products by IDs
+  Future<List<ProductsModel>> _fetchCampaignProducts(
+    List<String> productIds,
+  ) async {
+    final List<ProductsModel> products = [];
+    for (var id in productIds) {
+      try {
+        final product = await ProductService.fetchCampaignProductById(id);
+        products.add(product);
+      } catch (e) {
+        print('Error fetching campaign product $id: $e');
+        // Fallback: Lấy sản phẩm không khuyến mãi nếu cần
+        try {
+          final product = await ProductService.fetchProductById(id);
+          products.add(product);
+        } catch (e) {
+          print('Error fetching product $id: $e');
+        }
+      }
+    }
+    return products;
   }
 }
