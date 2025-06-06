@@ -5,7 +5,9 @@ import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class AddressService {
+
   static const String _baseUrl = ApiService.address;
+
 
   Future<Map<String, dynamic>> createAddress(AddressModel address) async {
     final url = Uri.parse('$_baseUrl/create');

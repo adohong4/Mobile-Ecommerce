@@ -6,6 +6,7 @@ import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class CommentService {
+
   static const String _baseUrl = ApiService.profileService;
 
   Future<Map<String, dynamic>> postComment({

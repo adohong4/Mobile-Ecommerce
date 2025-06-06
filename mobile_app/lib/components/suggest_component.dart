@@ -71,9 +71,9 @@ class _SuggestComponentState extends State<SuggestComponent> {
               ),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // 2 products per row
-                childAspectRatio: 0.65, // Adjust based on ProductCard size
-                crossAxisSpacing: 8.0, // Space between columns
-                mainAxisSpacing: 8.0, // Space between rows
+                childAspectRatio: 0.7, // Adjust based on ProductCard size
+                crossAxisSpacing: 4.0, // Space between columns
+                mainAxisSpacing: 4.0, // Space between rows
               ),
               itemCount: products.length,
               itemBuilder: (context, index) {

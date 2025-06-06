@@ -81,7 +81,7 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
         ),
         BottomNavigationBarItem(
           icon: FaIcon(
-            FontAwesomeIcons.heart,
+            FontAwesomeIcons.solidHeart,
             color: _selectedIndex == 1 ? Color(0xFF194689) : Colors.black,
           ),
           label: 'My favourite',
@@ -102,7 +102,7 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
         ),
         BottomNavigationBarItem(
           icon: FaIcon(
-            FontAwesomeIcons.user,
+            FontAwesomeIcons.solidUser,
             color: _selectedIndex == 4 ? Color(0xFF194689) : Colors.black,
           ),
           label: 'User',

@@ -6,9 +6,9 @@ import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/services/viewed_product_service.dart';
 
 class RecommendService {
+
   static const String _recommendUrl = ApiService.Search;
   static const String _recommendViewedUrl = ApiService.recommend;
-
   static Future<List<ProductsModel>> getRecommendedProducts({
     required String query,
     int topK = 10,

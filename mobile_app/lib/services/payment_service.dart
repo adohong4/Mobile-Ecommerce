@@ -5,6 +5,7 @@ import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class PaymentService {
+
   static const String _baseUrl = ApiService.paymentService;
   static const String _codVerify = '/cod/verify';
   static const String _stripePlace = '/stripe/place';

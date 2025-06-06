@@ -1,5 +1,6 @@
 class ApiService {
-  static const String route = "http://localhost";
+
+  static const String route = "http://192.168.1.9";
   static const String imageBaseUrl = "$route:9004/images/";
 
   static const String identityService = "$route:9001/v1/api/identity";

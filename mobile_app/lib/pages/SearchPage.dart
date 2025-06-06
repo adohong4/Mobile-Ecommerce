@@ -132,40 +132,41 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Tìm kiếm sản phẩm",
-          style: TextStyle(color: Colors.white),
-        ),
         backgroundColor: const Color(0xFF194689),
         iconTheme: const IconThemeData(color: Colors.white),
+        title: Container(
+          height: 40,
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: "   Nhập tên sản phẩm...",
+              hintStyle: TextStyle(color: Colors.white70),
+              filled: true,
+              fillColor: Color(0xFF3167A7),
+              contentPadding: EdgeInsets.zero,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            style: TextStyle(color: Colors.white),
+            textInputAction: TextInputAction.search,
+            onSubmitted: (_) => _searchProducts(),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search, color: Colors.white),
+            onPressed: _searchProducts,
+          ),
+        ],
       ),
+
       body: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: "Nhập tên sản phẩm...",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    textInputAction: TextInputAction.search,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.search, color: Color(0xFF194689)),
-                  onPressed: _searchProducts,
-                ),
-              ],
-            ),
             const SizedBox(height: 16),
             if (widget.categoryName != null &&
                 widget.categoryId != null &&
@@ -173,7 +174,7 @@ class _SearchPageState extends State<SearchPage> {
               Text(
                 widget.categoryName!,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF194689),
                 ),
@@ -195,9 +196,9 @@ class _SearchPageState extends State<SearchPage> {
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 8,
-                                    childAspectRatio: 0.7,
+                                    crossAxisSpacing: 1,
+                                    mainAxisSpacing: 0,
+                                    childAspectRatio: 0.6,
                                   ),
                               itemCount: _categoryProducts.length,
                               itemBuilder: (context, index) {

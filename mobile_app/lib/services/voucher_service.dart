@@ -5,6 +5,7 @@ import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class VoucherService {
+
   static const String _baseUrl = ApiService.voucher;
 
   Future<Map<String, dynamic>> getVoucherById(String voucherId) async {

@@ -105,6 +105,7 @@ class ProductService {
     try {
       // Bước 1: Lấy danh sách sản phẩm thuộc danh mục
       final response = await http.get(
+
         Uri.parse('${ApiService.productService}/category/$categoryId'),
       );
 
@@ -173,6 +174,7 @@ class ProductService {
   fetchRandomProductsByCategories() async {
     try {
       final response = await http.get(
+
         Uri.parse('${ApiService.productService}/random'),
       );
 

@@ -5,8 +5,8 @@ import 'package:mobile_app/models/category_model.dart';
 import 'package:mobile_app/services/ApiService.dart';
 
 class CategoryService {
-  static const String baseUrl = ApiService.productService;
 
+  static const String baseUrl = ApiService.productService;
   static Future<List<CategoryModel>> fetchCategories() async {
     final response = await http.get(Uri.parse('$baseUrl/category/get'));
 

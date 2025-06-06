@@ -4,6 +4,7 @@ import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class FavouriteService {
+
   static const String _baseUrl = ApiService.profileService;
 
   Future<Map<String, dynamic>> addToFavourite(String itemId) async {

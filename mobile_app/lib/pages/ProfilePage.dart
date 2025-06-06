@@ -47,6 +47,40 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: .0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120, // giữ label đều nhau
+            child: Text(
+              "$label:",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontFamily: 'Poppins',
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 16,
+                fontFamily: 'Poppins',
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
@@ -64,7 +98,6 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: const Text("Hồ Sơ"),
         centerTitle: true,
-        actions: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
@@ -104,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       alignment: Alignment.center,
                       children: [
                         Container(
-                          height: 250,
+                          height: 200,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             image: DecorationImage(
@@ -117,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         Container(
-                          height: 250,
+                          height: 200,
                           width: double.infinity,
                           color: Colors.black.withOpacity(0.4),
                         ),
@@ -154,60 +187,56 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              Text(
-                                _profile!['fullName'] ??
-                                    user?['email'] ??
-                                    'Người dùng',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Poppins',
-                                  color: Colors.white,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black54,
-                                      offset: Offset(1, 1),
-                                      blurRadius: 3,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    _profile?['fullName'] ?? user?['email'] ?? 'Người dùng',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                      fontFamily: 'Poppins',
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black54,
+                                          offset: Offset(1, 1),
+                                          blurRadius: 3,
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              TextButton.icon(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) => EditProfilePage(
+                                  ),
+                                  const SizedBox(width: 8),
+                                  TextButton.icon(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EditProfilePage(
                                             profile: _profile!,
                                           ),
+                                        ),
+                                      ).then((_) => _fetchProfile());
+                                    },
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      size: 20,
+                                      color: Colors.white,
                                     ),
-                                  ).then((_) => _fetchProfile());
-                                },
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: Color(0xFF194689),
-                                ),
-                                label: const Text(
-                                  'Chỉnh sửa hồ sơ',
-                                  style: TextStyle(
-                                    color: Color(0xFF194689),
-                                    fontFamily: 'Poppins',
+                                    label: const Text(
+                                      "",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero, // bỏ padding dư thừa
+                                      minimumSize: Size(24, 24), // chỉnh nhỏ nút lại
+                                    ),
                                   ),
-                                ),
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Colors.white.withOpacity(
-                                    0.85,
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
+                                ],
                               ),
+
+
+
                             ],
                           ),
                         ),
@@ -216,36 +245,44 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
+                      child:Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          UserInfoRow(
-                            label: "Email",
-                            value: user?['email'] ?? 'Chưa cập nhật',
-                          ),
-                          UserInfoRow(
-                            label: "Số điện thoại",
-                            value: _profile!['phoneNumber'] ?? 'Chưa cập nhật',
-                          ),
-                          UserInfoRow(
-                            label: "Ngày sinh",
-                            value:
-                                _profile!['dateOfBirth'] != null
-                                    ? _formatDate(_profile!['dateOfBirth'])
-                                    : 'Chưa cập nhật',
-                          ),
-                          UserInfoRow(
-                            label: "Giới tính",
-                            value:
-                                _profile!['gender'] == 'MALE'
-                                    ? 'Nam'
-                                    : (_profile!['gender'] == 'FEMALE'
-                                        ? 'Nữ'
-                                        : 'Chưa xác định'),
+                          Card(
+                            // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                            color: Colors.transparent,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  _buildInfoRow("Email", user?['email'] ?? 'Chưa cập nhật'),
+                                  const Divider(),
+                                  _buildInfoRow("Số điện thoại", _profile!['phoneNumber'] ?? 'Chưa cập nhật'),
+                                  const Divider(),
+                                  _buildInfoRow(
+                                    "Ngày sinh",
+                                    _profile!['dateOfBirth'] != null
+                                        ? _formatDate(_profile!['dateOfBirth'])
+                                        : 'Chưa cập nhật',
+                                  ),
+                                  const Divider(),
+                                  _buildInfoRow(
+                                    "Giới tính",
+                                    _profile!['gender'] == 'MALE'
+                                        ? 'Nam'
+                                        : (_profile!['gender'] == 'FEMALE' ? 'Nữ' : 'Chưa xác định'),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
-                      ),
+                      )
+
+
                     ),
-                    const Divider(height: 30),
+                    const Divider(height: 00),
                     ListTile(
                       leading: const Icon(Icons.history),
                       title: const Text(
@@ -416,6 +453,7 @@ class UserInfoRow extends StatelessWidget {
   const UserInfoRow({super.key, required this.label, required this.value});
 
   @override
+
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
