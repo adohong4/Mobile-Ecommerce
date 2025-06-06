@@ -163,7 +163,7 @@ class _SearchPageState extends State<SearchPage> {
       ),
 
       body: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -174,7 +174,7 @@ class _SearchPageState extends State<SearchPage> {
               Text(
                 widget.categoryName!,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF194689),
                 ),
@@ -198,7 +198,7 @@ class _SearchPageState extends State<SearchPage> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 1,
                                     mainAxisSpacing: 0,
-                                    childAspectRatio: 0.65,
+                                    childAspectRatio: 0.6,
                                   ),
                               itemCount: _categoryProducts.length,
                               itemBuilder: (context, index) {
