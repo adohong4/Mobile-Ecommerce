@@ -26,7 +26,6 @@ class StripeController {
 
         let newOrder;
         try {
-
             if (amount > 99000000) {
                 throw new BadRequestError('Vượt quá hạn mức giao dịch (99 triệu VND)');
             }
@@ -44,61 +43,46 @@ class StripeController {
             await newOrder.save();
 
             // Tạo line_items cho Stripe
-            const line_items = items.map((item) => ({
-                price_data: {
-                    currency: 'vnd',
-                    product_data: {
-                        name: item.nameProduct,
+            const line_items = items.map((item) => {
+                if (!item.nameProduct) {
+                    throw new BadRequestError('Tên sản phẩm không được cung cấp');
+                }
+                return {
+                    price_data: {
+                        currency: 'vnd',
+                        product_data: {
+                            name: item.nameProduct,
+                        },
+                        unit_amount: Math.round(item.price),
                     },
-                    unit_amount: Math.round(item.price), // VND, không cần nhân 100
+                    quantity: item.quantity,
+                };
+            });
+
+            // Kiểm tra tham số để quyết định sử dụng Checkout Session
+            const useCheckoutSession = req.query.useCheckoutSession === 'true' || req.body.useCheckoutSession === true;
+
+            // Luôn tạo Checkout Session cho cả web và mobile nếu useCheckoutSession là true
+            const session = await stripe.checkout.sessions.create({
+                line_items,
+                mode: 'payment',
+                payment_method_types: ['card'],
+                success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
+                cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
+                metadata: { orderId: newOrder._id.toString() },
+            });
+
+            // Xóa giỏ hàng
+            await userModel.findByIdAndUpdate(userId, { cartData: {} });
+
+            new SuccessResponse({
+                message: 'Tạo phiên thanh toán Stripe thành công',
+                metadata: {
+                    sessionId: session.id,
+                    sessionUrl: session.url,
+                    orderId: newOrder._id.toString(),
                 },
-                quantity: item.quantity,
-            }));
-
-            const isWeb = req.headers['user-agent']?.includes('Web') || req.query.platform === 'web';
-
-            if (isWeb) {
-                // Cho web: Tạo Checkout Session
-                const session = await stripe.checkout.sessions.create({
-                    line_items,
-                    mode: 'payment',
-                    payment_method_types: ['card'],
-                    success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-                    cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
-                    metadata: { orderId: newOrder._id.toString() },
-                });
-
-                // Xóa giỏ hàng
-                await userModel.findByIdAndUpdate(userId, { cartData: {} });
-
-                new SuccessResponse({
-                    message: 'Tạo phiên thanh toán Stripe thành công',
-                    metadata: {
-                        sessionId: session.id,
-                        sessionUrl: session.url,
-                        orderId: newOrder._id.toString(),
-                    },
-                }).send(res);
-            } else {
-                // Cho mobile: Tạo PaymentIntent
-                const paymentIntent = await stripe.paymentIntents.create({
-                    amount: Math.round(amount),
-                    currency: 'vnd',
-                    payment_method_types: ['card'],
-                    metadata: { orderId: newOrder._id.toString() },
-                });
-
-                // Xóa giỏ hàng
-                await userModel.findByIdAndUpdate(userId, { cartData: {} });
-
-                new CREATED({
-                    message: 'Đơn hàng đã được tạo, vui lòng hoàn tất thanh toán',
-                    metadata: {
-                        clientSecret: paymentIntent.client_secret,
-                        orderId: newOrder._id.toString(),
-                    },
-                }).send(res);
-            }
+            }).send(res);
         } catch (error) {
             // Xóa đơn hàng nếu có lỗi
             if (newOrder?._id) {

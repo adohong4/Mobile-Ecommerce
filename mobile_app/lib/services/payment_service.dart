@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/order_model.dart';
+import 'package:mobile_app/models/productModel.dart';
 import 'package:mobile_app/services/ApiService.dart';
 import 'package:mobile_app/services/LoginService.dart';
 
 class PaymentService {
-
   static const String _baseUrl = ApiService.paymentService;
   static const String _codVerify = '/cod/verify';
   static const String _stripePlace = '/stripe/place';
@@ -13,15 +13,22 @@ class PaymentService {
 
   Future<Map<String, dynamic>> _postRequest(
     String endpoint,
-    Map<String, dynamic> body,
-  ) async {
+    Map<String, dynamic> body, {
+    Map<String, String>? queryParams,
+  }) async {
     final token = await LoginService.getToken();
     if (token == null) {
       throw Exception('Không tìm thấy token. Vui lòng đăng nhập.');
     }
 
+    // Thêm query parameters nếu có
+    Uri uri = Uri.parse('$_baseUrl$endpoint');
+    if (queryParams != null) {
+      uri = uri.replace(queryParameters: queryParams);
+    }
+
     final response = await http.post(
-      Uri.parse('$_baseUrl$endpoint'),
+      uri,
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode(body),
     );
@@ -68,7 +75,15 @@ class PaymentService {
     };
   }
 
-  Future<Map<String, dynamic>> placeStripeOrder(Order order) async {
+  Future<Map<String, dynamic>> placeStripeOrder(
+    Order order,
+    List<ProductsModel> products,
+  ) async {
+    // Tạo map để ánh xạ id sản phẩm với tên sản phẩm
+    final itemNameMap = {
+      for (var product in products) product.id: product.name,
+    };
+
     final body = {
       'items':
           order.items
@@ -77,6 +92,8 @@ class PaymentService {
                   'id': item.id,
                   'quantity': item.quantity,
                   'price': item.price,
+                  'nameProduct':
+                      itemNameMap[item.id] ?? 'Sản phẩm không xác định',
                 },
               )
               .toList(),
@@ -88,9 +105,15 @@ class PaymentService {
         'city': order.address.city,
         'province': order.address.province,
       },
+      'useCheckoutSession': true, // Thêm tham số để yêu cầu Checkout Session
     };
 
-    final response = await _postRequest(_stripePlace, body);
+    print('Request body: ${jsonEncode(body)}'); // Debug
+    final response = await _postRequest(
+      _stripePlace,
+      body,
+      queryParams: {'useCheckoutSession': 'true'}, // Thêm query param
+    );
     print('Stripe Response: $response'); // Debug
     if (response['status'] != 200 && response['status'] != 201) {
       throw Exception(

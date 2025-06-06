@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_app/components/payment_method_component.dart';
 import 'package:mobile_app/models/addressModel.dart';
 import 'package:mobile_app/models/order_model.dart';
 import 'package:mobile_app/models/voucher_model.dart';
@@ -10,6 +11,7 @@ import 'package:mobile_app/pages/voucher_select.dart';
 import 'package:mobile_app/pages/HomePage.dart'; // Import HomePage
 import 'package:mobile_app/providers/voucher_provider.dart';
 import 'package:mobile_app/services/ApiService.dart';
+import 'package:mobile_app/services/ProductService.dart';
 import 'package:mobile_app/services/address_service.dart';
 import 'package:mobile_app/services/payment_service.dart';
 import 'package:provider/provider.dart';
@@ -178,46 +180,34 @@ class _CheckoutPageState extends State<CheckoutPage> {
             content: Text(response['message'] ?? 'Đặt hàng COD thành công'),
           ),
         );
-        // Chuyển về HomePage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const HomePage()),
         );
       } else if (selectedPaymentMethod == 'stripe') {
-        final stripeResponse = await _paymentService.placeStripeOrder(order);
+        // Lấy danh sách ID sản phẩm từ order.items
+        final productIds = order.items.map((item) => item.id).toList();
+        // Gọi ProductService để lấy thông tin sản phẩm
+        final products = await ProductService.fetchProductsByIds(productIds);
+        // Gọi placeStripeOrder với order và products
+        final stripeResponse = await _paymentService.placeStripeOrder(
+          order,
+          products,
+        );
         final orderId = stripeResponse['orderId'];
-        if (kIsWeb) {
-          // Web: Chuyển hướng đến Stripe Checkout
-          final sessionUrl = stripeResponse['sessionUrl'];
-          final uri = Uri.parse(sessionUrl);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Đã mở Stripe để thanh toán')),
-            );
-            // VerifyPage sẽ xử lý chuyển hướng về HomePage
-          } else {
-            throw Exception('Không thể mở Stripe Checkout');
-          }
-        } else {
-          // Mobile: Sử dụng PaymentSheet
-          final clientSecret = stripeResponse['clientSecret'];
-          await stripe.Stripe.instance.initPaymentSheet(
-            paymentSheetParameters: stripe.SetupPaymentSheetParameters(
-              paymentIntentClientSecret: clientSecret,
-              merchantDisplayName: 'HOAPHAT',
-            ),
-          );
-          await stripe.Stripe.instance.presentPaymentSheet();
-          await _paymentService.verifyStripeOrder(orderId, true);
+        final sessionUrl = stripeResponse['sessionUrl'];
+        final uri = Uri.parse(sessionUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication,
+          ); // Mở trình duyệt trên mobile
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Thanh toán Stripe thành công')),
+            const SnackBar(content: Text('Đã mở Stripe để thanh toán')),
           );
-          // Chuyển về HomePage
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomePage()),
-          );
+          // Không chuyển hướng ngay, chờ VerifyPage xử lý
+        } else {
+          throw Exception('Không thể mở Stripe Checkout');
         }
       }
     } catch (e) {
@@ -503,95 +493,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Phương thức thanh toán',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        ...paymentMethods.map((method) {
-                          return InkWell(
-                            onTap: () {
-                              setState(() {
-                                selectedPaymentMethod = method['id'].toString();
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                              ),
-                              child: Row(
-                                children: [
-                                  Row(
-                                    children: [
-                                      if (method['icon_type'] == 'text')
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 4,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                method['icon_color'] as Color,
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            method['icon_text'] as String,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        )
-                                      else if (method['icon_type'] == 'image' &&
-                                          method['icon_asset'] != null)
-                                        Image.asset(
-                                          method['icon_asset'] as String,
-                                          height: 24,
-                                        ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        method['label'] as String,
-                                        style: const TextStyle(
-                                          fontFamily: 'Poppins',
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  Radio<String>(
-                                    value: method['id'].toString(),
-                                    groupValue: selectedPaymentMethod,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        selectedPaymentMethod =
-                                            value.toString();
-                                      });
-                                    },
-                                    activeColor: const Color(0xFFE91E63),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ],
-                    ),
+                  PaymentMethodComponent(
+                    selectedPaymentMethod: selectedPaymentMethod,
+                    onPaymentMethodChanged: (value) {
+                      setState(() {
+                        selectedPaymentMethod = value;
+                      });
+                    },
+                    paymentMethods: paymentMethods,
                   ),
                   const SizedBox(height: 20),
                 ],
