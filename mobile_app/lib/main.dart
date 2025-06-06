@@ -2,6 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' as stripe;
+import 'package:mobile_app/pages/CartPage.dart';
+import 'package:mobile_app/pages/CheckoutPage.dart';
+import 'package:mobile_app/pages/EditProfilePage.dart';
+import 'package:mobile_app/pages/HomePage.dart' show HomePage;
+import 'package:mobile_app/pages/ProfilePage.dart';
+import 'package:mobile_app/pages/VerifyPage.dart';
 import 'package:mobile_app/providers/auth_provider.dart';
 import 'package:mobile_app/providers/voucher_provider.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +45,30 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Mobile Ecommerce',
       theme: ThemeData(fontFamily: 'Poppins', primarySwatch: Colors.blue),
-      home: LoginPage(), // bỏ const nếu LoginPage không có constructor const
+      home: LoginPage(),
+      // initialRoute: '/login',
+      // routes: {
+      //   '/login': (context) => LoginPage(),
+      //   '/': (context) => const HomePage(),
+      //   '/verify': (context) => const VerifyPage(),
+      //   '/cart': (context) => const CartPage(),
+      //   '/profile': (context) => const ProfilePage(),
+      //   '/edit_profile': (context) => const EditProfilePage(profile: {}),
+      // },
+      // onGenerateRoute: (settings) {
+      //   if (settings.name == '/checkout') {
+      //     final args = settings.arguments as Map<String, dynamic>;
+      //     return MaterialPageRoute(
+      //       builder:
+      //           (context) => CheckoutPage(
+      //             selectedItems:
+      //                 args['selectedItems'] as List<Map<String, dynamic>>,
+      //             total: args['total'] as int,
+      //           ),
+      //     );
+      //   }
+      //   return null;
+      // },
     );
   }
 }

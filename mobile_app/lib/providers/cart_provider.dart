@@ -55,13 +55,6 @@ class CartProvider extends ChangeNotifier {
         try {
           // Gọi fetchCampaignProductById cho từng ID
           _cartItems = await _fetchCampaignProducts(productIds);
-          print('Fetched cart items: ${_cartItems.length}');
-          for (var item in _cartItems) {
-            print(
-              'Cart item: ${item.name}, newPrice: ${item.newPrice}, '
-              'displayPrice: ${item.displayPrice}, discountDisplay: ${item.discountDisplay}',
-            );
-          }
         } catch (e) {
           _errorMessage = 'Không lấy được chi tiết sản phẩm khuyến mãi: $e';
           _cartItems = [];
@@ -95,7 +88,6 @@ class CartProvider extends ChangeNotifier {
       final productIds = _cartData.keys.toList();
       try {
         _cartItems = await _fetchCampaignProducts(productIds);
-        print('Added product: ${product.name}, newPrice: ${product.newPrice}');
       } catch (e) {
         _errorMessage = 'Không lấy được chi tiết sản phẩm khuyến mãi: $e';
       }
@@ -124,7 +116,6 @@ class CartProvider extends ChangeNotifier {
       final productIds = _cartData.keys.toList();
       try {
         _cartItems = await _fetchCampaignProducts(productIds);
-        print('Removed product: ${product.name}');
       } catch (e) {
         _errorMessage = 'Không lấy được chi tiết sản phẩm khuyến mãi: $e';
       }
