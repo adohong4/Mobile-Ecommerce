@@ -1,11 +1,11 @@
 class ApiService {
   static const String baseUrl =
-      "http://localhost:4001/v1/api"; // Đảm bảo đúng với backend
-  static const String imageBaseUrl = "http://localhost:9004/images/";
+      "http://192.168.1.9:4001/v1/api"; // Đảm bảo đúng với backend
+  static const String imageBaseUrl = "http://192.168.1.9:9004/images/";
 
   static const String identity = "$baseUrl/identity";
   static const String profile = "$baseUrl/profile";
-  static const String product = "http://localhost:9004/v1/api/product";
+  static const String product = "http://192.168.1.9:9004/v1/api/product";
   static const String contact = "$baseUrl/contact";
 
   static const String login = "$identity/login";

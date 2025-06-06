@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/category_model.dart';
 
 class CategoryService {
-  static const String baseUrl = 'http://localhost:9004/v1/api';
+  static const String baseUrl = 'http://192.168.1.9:9004/v1/api';
 
   static Future<List<CategoryModel>> fetchCategories() async {
     final response = await http.get(Uri.parse('$baseUrl/product/category/get'));

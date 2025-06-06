@@ -98,7 +98,7 @@ class ProductService {
   ) async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:9004/v1/api/product/category/$categoryId'),
+        Uri.parse('http://192.168.1.9:9004/v1/api/product/category/$categoryId'),
       );
 
       if (response.statusCode == 200) {
@@ -126,7 +126,7 @@ class ProductService {
     try {
       // Gọi API /random để lấy danh sách productIds theo danh mục
       final response = await http.get(
-        Uri.parse('http://localhost:9004/v1/api/product/random'),
+        Uri.parse('http://192.168.1.9:9004/v1/api/product/random'),
       );
 
       if (response.statusCode == 200) {
