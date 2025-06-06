@@ -1,14 +1,14 @@
 import React, { useEffect, useContext } from 'react';
 import { Table } from "antd";
-import { StoreContext } from '../../../context/StoreContext';
+// import { StoreContext } from '../../../context/StoreContext';
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 const ProductStatis = ({ table }) => {
-    const { invoiceStatistic, fectchInvoiceStatistic } = useContext(StoreContext);
+    // const { invoiceStatistic, fectchInvoiceStatistic } = useContext(StoreContext);
 
     useEffect(() => {
-        fectchInvoiceStatistic();
+        // fectchInvoiceStatistic();
     }, []);
 
     const getAvgPriceInput = (productId) => {

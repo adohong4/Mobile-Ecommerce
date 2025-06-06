@@ -3,13 +3,10 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import './Styles/Styles.css';
 import { assets } from '../assets/assets';
 import { motion } from 'framer-motion';
-import { AccountContext } from '../context/AccountContextProvider';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
-
 const Sidebar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const { account, setToken } = useContext(AccountContext);
     const navigate = useNavigate();
 
     const toggleMenu = () => {
@@ -42,7 +39,7 @@ const Sidebar = () => {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 2, repeat: Infinity, repeatType: 'mirror' }}
                     >
-                        Xin chào {account?.StaffName || 'Nhân viên'}!
+                        Xin chào {'Nhân viên'}!
                     </motion.p>
                 </motion.div>
                 <motion.div
@@ -54,7 +51,7 @@ const Sidebar = () => {
                     <div className="profile-container">
                         <img
                             className="logo profile-pic"
-                            src={account?.StaffPic || assets.avt}
+                            src={assets.avt}
                             alt="avatar"
                             onClick={toggleMenu}
                         />

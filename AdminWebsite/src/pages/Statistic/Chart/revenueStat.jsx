@@ -3,19 +3,18 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { OrderContext } from '../../../context/OrderContextProvider';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const RevenueStat = () => {
-    const { url } = useContext(OrderContext);
     axios.defaults.withCredentials = true;
     const [selectedTime, setSelectedTime] = useState('week');
     const [revenue, setRevenue] = useState({ time: '', totalRevenue: 0, data: [] });
 
     const fetchRevenue = async (time) => {
         try {
-            const response = await axios.get(`${url}/v1/api/profile/statistic/revenue/${time}`);
+            const response = await axios.get(`http://localhost:9003/v1/api/profile/statistic/revenue/${time}`);
+            console.log("revenue: ", response.data.metadata)
             if (response.data.status === 200) {
                 setRevenue(response.data.metadata);
             }

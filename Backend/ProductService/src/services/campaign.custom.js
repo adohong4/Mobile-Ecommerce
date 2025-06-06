@@ -123,6 +123,7 @@ class CampaignService {
                 activeCampaign = sortedCampaigns[0];
             }
 
+
             const updatedProducts = [];
             let allProducts;
 
@@ -147,9 +148,8 @@ class CampaignService {
 
                 return { metadata: result };
             }
-
             // Có chiến dịch, xử lý theo appliesTo
-            if (activeCampaign.appliesTo === 'all') {
+            if (activeCampaign.appliesTo == 'all') {
                 for (let product of allProducts) {
                     let newPrice = 0;
                     if (activeCampaign.type === 'percentage') {
@@ -163,7 +163,7 @@ class CampaignService {
                     }
                     updatedProducts.push({ ...product.toObject(), newPrice });
                 }
-            } else if (activeCampaign.appliesTo === 'items') {
+            } else if (activeCampaign.appliesTo == 'items') {
                 const productIdsSet = new Set(activeCampaign.productIds.map(id => id.toString()));
 
                 for (let product of allProducts) {

@@ -16,24 +16,24 @@ import MessageContextProvider from './context/MessageContextProvider.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <AccountContextProvider>
-      <MessageContextProvider>
-        <ProductContextProvider>
-          <CategoryContextProvider>
-            <AdvertiseContextProvider>
-              <CampaignContextProvider>
-                <VoucherContextProvider>
-                  <OrderContextProvider>
-                    <StoreContextProvider>
-                      <App />
-                    </StoreContextProvider>
-                  </OrderContextProvider>
-                </VoucherContextProvider>
-              </CampaignContextProvider>
-            </AdvertiseContextProvider>
-          </CategoryContextProvider>
-        </ProductContextProvider>
-      </MessageContextProvider>
-    </AccountContextProvider>
+
+    <MessageContextProvider>
+      <ProductContextProvider>
+        <CategoryContextProvider>
+          <AdvertiseContextProvider>
+            <CampaignContextProvider>
+              <VoucherContextProvider>
+                <OrderContextProvider>
+
+                  <App />
+
+                </OrderContextProvider>
+              </VoucherContextProvider>
+            </CampaignContextProvider>
+          </AdvertiseContextProvider>
+        </CategoryContextProvider>
+      </ProductContextProvider>
+    </MessageContextProvider>
+
   </BrowserRouter>
 )

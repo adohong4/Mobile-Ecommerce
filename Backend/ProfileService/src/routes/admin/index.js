@@ -3,6 +3,7 @@
 const express = require('express');
 const { asyncHandler } = require('../../helpers/asyncHandler')
 const OrderAdminController = require('../../controllers/admin/order.controller');
+const StatisticController = require('../../controllers/admin/statistic.controller');
 const AccountController = require('../../controllers/admin/account.controller');
 
 const router = express.Router();
@@ -22,5 +23,10 @@ router.delete('/profile/order/delete/:id', asyncHandler(OrderAdminController.del
 router.delete('/profile/order/status/:id', asyncHandler(OrderAdminController.toggleOrderStatus)); //delete && restore
 
 router.get('/profile/online/user', asyncHandler(AccountController.getAccounts));
+
+
+router.get('/profile/statistic/get', asyncHandler(StatisticController.productStatisticTable));
+router.get('/profile/statistic/category/get', asyncHandler(StatisticController.productStatisticCategory)); //cot
+router.get('/profile/statistic/revenue/:time', asyncHandler(StatisticController.getRevenueStats));
 
 module.exports = router;

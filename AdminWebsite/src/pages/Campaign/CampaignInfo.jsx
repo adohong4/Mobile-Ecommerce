@@ -72,11 +72,13 @@ const CampaignInfo = () => {
                 startDate: values.startDate ? values.startDate.toISOString() : null,
                 endDate: values.endDate ? values.endDate.toISOString() : null,
             };
+            console.log("formattedValues", formattedValues)
             await updateCampaignById(id, formattedValues);
+
             toast.success('Cập nhật chiến dịch thành công');
             navigate('/list-campaign');
         } catch (error) {
-            toast.error('Lỗi khi cập nhật chiến dịch: ' + (error.message || 'Vui lòng thử lại'));
+            toast.error(response.data.metadata);
         }
     };
 

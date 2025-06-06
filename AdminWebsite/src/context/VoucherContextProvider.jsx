@@ -10,55 +10,67 @@ const VoucherContextProvider = ({ children }) => {
     const [VoucherId, setVoucherId] = useState(null);
     const url = "http://localhost:9004/v1/api/product/voucher";
 
-
     const fetchVoucherList = useCallback(async () => {
         try {
             const response = await axios.get(`${url}/get`);
             if (response.data.metadata) {
                 setVoucherList(response.data.metadata);
             } else {
-                toast.error("Lỗi khi lấy danh sách sản phẩm");
+                toast.error("Lỗi khi lấy danh sách voucher");
             }
         } catch (error) {
-            toast.error("Lỗi khi lấy danh sách sản phẩm: " + error.message);
+            toast.error("Lỗi khi lấy danh sách voucher: " + error.message);
         }
     }, []);
 
-    const fetchVoucherId = useCallback(async (VoucherId) => {
+    const fetchVoucherId = useCallback(async (voucherId) => {
         try {
-            const response = await axios.get(`${url}/get/${VoucherId}`);
+            const response = await axios.get(`${url}/get/${voucherId}`);
             setVoucherId(response.data.metadata);
         } catch (error) {
-            toast.error("Lỗi khi lấy thông tin sản phẩm: " + error.message);
+            toast.error("Lỗi khi lấy thông tin voucher: " + error.message);
         }
     }, []);
 
-    const updateVoucherId = useCallback(async (VoucherId, data) => {
+    const updateVoucherId = useCallback(async (voucherId, data) => {
         try {
-            const response = await axios.post(`${url}/update/${VoucherId}`, data);
-            setVoucherId(response.data.metadata.Voucher);
-            toast.success("Cập nhật sản phẩm thành công");
+            const response = await axios.post(`${url}/update/${voucherId}`, data);
+            setVoucherId(response.data.metadata.voucher);
+            toast.success("Cập nhật voucher thành công");
         } catch (error) {
-            toast.error("Lỗi khi cập nhật sản phẩm: " + error.message);
+            toast.error("Lỗi khi cập nhật voucher: " + error.message);
         }
     }, []);
 
-    const removeVoucher = useCallback(async (VoucherId) => {
+    const removeVoucher = useCallback(async (voucherId) => {
         try {
-            const response = await axios.delete(`${url}/delete/${VoucherId}`);
+            const response = await axios.delete(`${url}/delete/${voucherId}`);
             if (response.data.status) {
-                toast.success(response.data.message.Voucher);
-                await fetchVoucherList(); // Làm mới danh sách sau khi xóa
+                toast.success(response.data.message);
+                await fetchVoucherList();
             } else {
-                toast.error("Lỗi khi xóa sản phẩm");
+                toast.error("Lỗi khi xóa voucher");
             }
         } catch (error) {
-            toast.error("Lỗi khi xóa sản phẩm: " + error.message);
+            toast.error("Lỗi khi xóa voucher: " + error.message);
+        }
+    }, [fetchVoucherList]);
+
+    const createVoucher = useCallback(async (voucherData) => {
+        try {
+            const response = await axios.post(`${url}/create`, voucherData);
+            if (response.data.status) {
+                toast.success("Tạo voucher thành công");
+                await fetchVoucherList();
+                return { success: true, message: response.data.message };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
         }
     }, [fetchVoucherList]);
 
     useEffect(() => {
-        fetchVoucherList(); // Lấy danh sách sản phẩm khi component mount
+        fetchVoucherList();
     }, [fetchVoucherList]);
 
     const contextValue = useMemo(
@@ -69,8 +81,9 @@ const VoucherContextProvider = ({ children }) => {
             fetchVoucherId,
             updateVoucherId,
             removeVoucher,
+            createVoucher,
         }),
-        [VoucherList, VoucherId, fetchVoucherList, fetchVoucherId, updateVoucherId, removeVoucher]
+        [VoucherList, VoucherId, fetchVoucherList, fetchVoucherId, updateVoucherId, removeVoucher, createVoucher]
     );
 
     return (

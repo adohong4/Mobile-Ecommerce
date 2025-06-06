@@ -318,8 +318,8 @@ const Cart = () => {
                                 <Descriptions.Item label="Khách hàng">{viewingOrder.address?.fullname || 'Không có tên'}</Descriptions.Item>
                                 <Descriptions.Item label="Đơn giá">{formatCurrency(viewingOrder.amount)} VNĐ</Descriptions.Item>
                                 <Descriptions.Item label="Ngày đặt hàng">{formatHourDayTime(viewingOrder.createdAt)}</Descriptions.Item>
-                                <Descriptions.Item label="Thanh toán">{viewingOrder.paymentMethod}</Descriptions.Item>
-                                <Descriptions.Item label="Trạng thái">{viewingOrder.status}</Descriptions.Item>
+                                <Descriptions.Item label="Thanh toán">{viewingOrder.paymentMethod == 'cod' ? 'Tiền mặt' : 'Thanh toán điện tử'}</Descriptions.Item>
+                                <Descriptions.Item label="Trạng thái">{viewingOrder.status == 'pending' ? 'Đợi xác nhận' : viewingOrder.status == 'confirmed' ? 'Đang chuẩn bị hàng' : viewingOrder.status == 'shipping' ? 'Đang giao hàng' : viewingOrder.status == 'delivered' ? 'Giao hàng thành công' : 'Đơn hàng bị hủy'}</Descriptions.Item>
                                 <Descriptions.Item label="Địa chỉ">
                                     {[viewingOrder.address?.street, viewingOrder.address?.precinct, viewingOrder.address?.city, viewingOrder.address?.province]
                                         .filter((part) => part)

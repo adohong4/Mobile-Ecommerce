@@ -10,17 +10,14 @@ import {
     Space,
     Tooltip,
     Switch,
-    Upload,
     Checkbox,
 } from 'antd';
 import {
     BookFilled,
     EditFilled,
     DeleteOutlined,
-    UploadOutlined,
 } from '@ant-design/icons';
 import { AdvertiseContext } from '../../context/AdvertiseContextProvider';
-import axios from 'axios';
 
 const AdvertiseList = () => {
     const {
@@ -28,17 +25,17 @@ const AdvertiseList = () => {
         fetchAdvertiseList,
         deleteAdvertise,
         activeAdvertise,
-        addAdvertise,
+        createAdvertise, // Sử dụng đúng tên hàm từ context
     } = useContext(AdvertiseContext);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [viewingAdvertise, setViewingAdvertise] = useState(null);
     const [newBanner, setNewBanner] = useState({
-        imageAds: '',
+        imageAds: null, // Lưu file gốc
         classify: '',
         recap: '',
+        preview: '', // Lưu URL xem trước
     });
-    const [uploading, setUploading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -46,10 +43,46 @@ const AdvertiseList = () => {
         fetchAdvertiseList();
     }, [fetchAdvertiseList]);
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (!file.type.startsWith('image/')) {
+                toast.error('Vui lòng chọn một tệp ảnh hợp lệ');
+                return;
+            }
+            setNewBanner({
+                ...newBanner,
+                imageAds: file,
+                preview: URL.createObjectURL(file),
+            });
+        }
+    };
+
+    const handleAddSubmit = async () => {
+        const { imageAds, classify, recap } = newBanner;
+        if (!imageAds || !classify || !recap) {
+            toast.warning('Vui lòng điền đầy đủ thông tin');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('imageAds', imageAds);
+        formData.append('classify', classify);
+        formData.append('recap', recap);
+
+        try {
+            const res = await createAdvertise(formData); // Gọi createAdvertise thay vì addAdvertise
+            toast.success('Thêm banner thành công!');
+            setNewBanner({ imageAds: null, classify: '', recap: '', preview: '' });
+            fetchAdvertiseList();
+        } catch (error) {
+            toast.error('Lỗi khi thêm banner: ' + error.message);
+        }
+    };
+
     const handleDelete = async (advertiseId) => {
         try {
             await deleteAdvertise(advertiseId);
-            toast.success('Đã xóa quảng cáo');
         } catch {
             toast.error('Lỗi khi xóa quảng cáo');
         }
@@ -61,40 +94,6 @@ const AdvertiseList = () => {
             toast.success('Đã cập nhật trạng thái');
         } catch {
             toast.error('Lỗi khi cập nhật trạng thái quảng cáo');
-        }
-    };
-
-    const handleAddSubmit = async () => {
-        const { imageAds, classify, recap } = newBanner;
-        if (!imageAds || !classify || !recap) {
-            toast.warning('Vui lòng điền đầy đủ thông tin');
-            return;
-        }
-
-        try {
-            await addAdvertise(newBanner);
-            toast.success('Thêm banner thành công!');
-            setNewBanner({ imageAds: '', classify: '', recap: '' });
-            fetchAdvertiseList();
-        } catch {
-            toast.error('Lỗi khi thêm banner!');
-        }
-    };
-
-    const handleImageUpload = async (file) => {
-        const formData = new FormData();
-        formData.append('image', file);
-
-        try {
-            setUploading(true);
-            const res = await axios.post('http://localhost:9004/upload', formData);
-            const filename = res.data.filename;
-            setNewBanner({ ...newBanner, imageAds: filename });
-            toast.success('Tải ảnh lên thành công');
-        } catch {
-            toast.error('Tải ảnh lên thất bại');
-        } finally {
-            setUploading(false);
         }
     };
 
@@ -202,12 +201,11 @@ const AdvertiseList = () => {
                 <Checkbox.Group
                     options={[
                         { label: 'Banner', value: 'Banner' },
-                        { label: 'Quảng Cáo', value: 'Quảng Cáo' }
+                        { label: 'Quảng Cáo', value: 'ADVERTISE' }
                     ]}
-                    style={{alignItems:'center'}}
-                    value={[newBanner.classify]} // nếu bạn muốn chọn 1 trong 2
+                    style={{ alignItems: 'center' }}
+                    value={[newBanner.classify]}
                     onChange={(checkedValues) => {
-                        // chỉ cho chọn 1 trong 2 (giống radio)
                         if (checkedValues.length > 0) {
                             setNewBanner({ ...newBanner, classify: checkedValues[0] });
                         } else {
@@ -215,35 +213,27 @@ const AdvertiseList = () => {
                         }
                     }}
                 />
-
-                <Upload
-                    showUploadList={false}
-                    beforeUpload={(file) => {
-                        handleImageUpload(file);
-                        return false;
-                    }}
-                >
-                    <Button icon={<UploadOutlined />} loading={uploading}>
-                        Chọn ảnh
-                    </Button>
-                </Upload>
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{ width: 200, paddingTop: 4 }}
+                />
                 <Button type="primary" onClick={handleAddSubmit}>
                     Thêm
                 </Button>
             </div>
 
-            {newBanner.imageAds && (
+            {newBanner.preview && (
                 <div style={{ marginBottom: 20 }}>
                     <strong>Xem trước ảnh:</strong><br />
                     <img
-                        src={`http://localhost:9004/images/${newBanner.imageAds}`}
+                        src={newBanner.preview}
                         alt="Preview"
                         style={{ width: 200, height: 100, objectFit: 'cover', borderRadius: 4 }}
                     />
                 </div>
             )}
-
-
 
             <Table
                 columns={columns}
