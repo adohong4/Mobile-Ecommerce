@@ -68,7 +68,7 @@ const Sidebar = () => {
               <ul className="sidebar-submenu">
                 <li><NavLink to="/add" className="submenu-item">Thêm sản phẩm</NavLink></li>
                 <li><NavLink to="/product" className="submenu-item">Danh sách sản phẩm</NavLink></li>
-                <li><NavLink to="/product/trash" className="submenu-item">Thùng rác</NavLink></li>
+                {/* <li><NavLink to="/product/trash" className="submenu-item">Thùng rác</NavLink></li> */}
               </ul>
             )}
           </div>
@@ -110,7 +110,7 @@ const Sidebar = () => {
             {isOpenOrder && (
               <ul className="sidebar-submenu">
                 <li><NavLink to="/orders" className="submenu-item">Danh sách Hóa đơn</NavLink></li>
-                <li><NavLink to="/orders/trash" className="submenu-item">Thùng rác</NavLink></li>
+                {/* <li><NavLink to="/orders/trash" className="submenu-item">Thùng rác</NavLink></li> */}
               </ul>
             )}
           </div>
@@ -142,11 +142,11 @@ const Sidebar = () => {
                     Danh sách chiến dịch
                   </NavLink>
                 </li>
-                <li>
+                {/* <li>
                   <NavLink to="/trash-campaign" className="submenu-item">
                     Thùng rác
                   </NavLink>
-                </li>
+                </li> */}
               </ul>
             )}
           </div>
