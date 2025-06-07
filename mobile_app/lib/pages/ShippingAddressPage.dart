@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app/models/addressModel.dart';
 import 'package:mobile_app/pages/AddAddressPage.dart';
@@ -61,9 +62,15 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
                 .toList();
         addresses[index] = addresses[index].copyWith(active: true);
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã đặt địa chỉ làm mặc định')),
-      );
+      Flushbar(
+        message: 'Đã đặt địa chỉ làm mặc định',
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(12),
+        borderRadius: BorderRadius.circular(8),
+        backgroundColor: Colors.green,
+        flushbarPosition: FlushbarPosition.TOP,
+        icon: const Icon(Icons.location_on, color: Colors.white),
+      ).show(context);
     } else {
       ScaffoldMessenger.of(
         context,
@@ -83,9 +90,16 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
       setState(() {
         addresses.removeAt(index);
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Đã xóa địa chỉ')));
+
+      Flushbar(
+        message: 'Đã xóa địa chỉ',
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(12),
+        borderRadius: BorderRadius.circular(8),
+        backgroundColor: Colors.red,
+        flushbarPosition: FlushbarPosition.TOP,
+        icon: const Icon(Icons.location_on, color: Colors.white),
+      ).show(context);
     } else {
       ScaffoldMessenger.of(
         context,

@@ -475,9 +475,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   productSlug: widget.product.productSlug,
                 );
                 cart.add(productWithQuantity);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
-                );
+
+                Flushbar(
+                  message: 'Đã thêm vào giỏ hàng',
+                  duration: const Duration(seconds: 2),
+                  margin: const EdgeInsets.all(12),
+                  borderRadius: BorderRadius.circular(8),
+                  backgroundColor: Colors.black87,
+                  flushbarPosition: FlushbarPosition.TOP,
+                  icon: const Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.white,
+                  ),
+                ).show(context);
               },
               child: const Text(
                 "THÊM GIỎ HÀNG",

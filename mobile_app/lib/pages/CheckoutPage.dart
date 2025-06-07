@@ -194,7 +194,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
           order,
           products,
         );
-        final orderId = stripeResponse['orderId'];
         final sessionUrl = stripeResponse['sessionUrl'];
         final uri = Uri.parse(sessionUrl);
         if (await canLaunchUrl(uri)) {
@@ -205,7 +204,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Đã mở Stripe để thanh toán')),
           );
-          // Không chuyển hướng ngay, chờ VerifyPage xử lý
+          // Ngay lập tức chuyển hướng về HomePage
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomePage()),
+          );
         } else {
           throw Exception('Không thể mở Stripe Checkout');
         }

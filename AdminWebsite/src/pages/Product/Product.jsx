@@ -94,18 +94,18 @@ const ListProduct = () => {
             render: (price) => formatCurrency(price),
             sorter: (a, b) => a.price - b.price,
         },
-        {
-            title: "Số lượng",
-            dataIndex: "quantity",
-            key: "quantityCount",
-            sorter: (a, b) => a.quantity - b.quantity,
-        },
-        {
-            title: "Tồn kho",
-            dataIndex: "quantity",
-            key: "inventoryCount",
-            sorter: (a, b) => a.quantity - b.quantity,
-        },
+        // {
+        //     title: "Số lượng",
+        //     dataIndex: "quantity",
+        //     key: "quantityCount",
+        //     sorter: (a, b) => a.quantity - b.quantity,
+        // },
+        // {
+        //     title: "Tồn kho",
+        //     dataIndex: "quantity",
+        //     key: "inventoryCount",
+        //     sorter: (a, b) => a.quantity - b.quantity,
+        // },
         {
             title: "Hành động",
             key: "action",

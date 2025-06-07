@@ -194,15 +194,12 @@ class _CartPageState extends State<CartPage> {
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed:
-                                        quantity > 1
-                                            ? () async {
-                                              await cartProvider.updateQuantity(
-                                                item,
-                                                quantity - 1,
-                                              );
-                                            }
-                                            : null,
+                                    onPressed: () async {
+                                      await cartProvider.updateQuantity(
+                                        item,
+                                        quantity - 1,
+                                      );
+                                    },
                                     icon: const Icon(Icons.remove, size: 20),
                                   ),
                                   Text('$quantity'),

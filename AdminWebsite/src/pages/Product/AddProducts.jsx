@@ -1,14 +1,16 @@
-
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import '../styles/styles.css';
 import { assets } from '../../assets/assets';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Tab, Tabs } from 'react-bootstrap';
 import { ProductContext } from '../../context/ProductContextProvider';
+import { CategoryContext } from '../../context/CategoryContextProvider';
 import TiptapEditor from '../../components/TiptapEditor';
+
 const AddProduct = () => {
     const { url } = useContext(ProductContext);
+    const { categoryList, fetchCategoryList } = useContext(CategoryContext);
     const [images, setImage] = useState([]);
     const [data, setData] = useState({
         title: "",
@@ -16,28 +18,26 @@ const AddProduct = () => {
         price: "",
         recap: "",
         description: "",
-        category: "Màn hình LED",
+        category: "",
         quantity: "",
-        mainBoard: "",
-        chip: "",
-        cpu: "",
-        gpu: "",
-        ram: "",
-        memory: "",
-        version: "",
-        ports: "",
-        displaySize: "",
-        pixelDensity: "",
-        display: "",
-        refreshRate: "",
     });
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        fetchCategoryList();
+    }, [fetchCategoryList]);
+
 
     const onChangeHandler = (event) => {
         const name = event.target.name;
         const value = event.target.value;
         setData(data => ({ ...data, [name]: value }))
     };
+
+    const onEditorChangeHandler = (name, value) => {
+        setData(data => ({ ...data, [name]: value }));
+    };
+
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
@@ -51,22 +51,10 @@ const AddProduct = () => {
         formData.append("quantity", Number(data.quantity));
         formData.append("category", data.category);
         Array.from(images).forEach(image => formData.append("images", image));
-        formData.append("mainBoard", data.mainBoard);
-        formData.append("chip", data.chip);
-        formData.append("cpu", data.cpu);
-        formData.append("gpu", data.gpu);
-        formData.append("ram", data.ram);
-        formData.append("memory", data.memory);
-        formData.append("version", data.version);
-        formData.append("ports", data.ports);
-        formData.append("displaySize", data.displaySize);
-        formData.append("pixelDensity", data.pixelDensity);
-        formData.append("display", data.display);
-        formData.append("refreshRate", data.refreshRate);
 
         try {
             console.log("data: ", formData)
-            const response = await axios.post(`${url}/v1/api/product/add`, formData);
+            const response = await axios.post(`http://localhost:9004/v1/api/product/add`, formData);
             if (response.data.status) {
                 setData({
                     title: "",
@@ -74,27 +62,16 @@ const AddProduct = () => {
                     price: "",
                     recap: "",
                     description: "",
-                    category: "Màn hình LED",
+                    category: "",
                     quantity: "",
-                    mainBoard: "",
-                    chip: "",
-                    cpu: "",
-                    gpu: "",
-                    ram: "",
-                    memory: "",
-                    version: "",
-                    ports: "",
-                    displaySize: "",
-                    pixelDensity: "",
-                    display: "",
-                    refreshRate: "",
                 });
-                setImage(false);
+                setImage([]);
                 toast.success("Thêm sản phẩm thành công");
             } else {
                 toast.error(response.data.message);
             }
         } catch (error) {
+            console.error("Error adding product:", error);
             toast.error("Đã có lỗi xảy ra!");
         } finally {
             setLoading(false);
@@ -181,12 +158,16 @@ const AddProduct = () => {
                                                 name="category"
                                                 id="category"
                                                 className="form-control rounded-pill"
+                                                required
                                             >
-                                                <option value="Màn hình LED">Màn hình LED</option>
-                                                <option value="MH tương tác">MH tương tác</option>
-                                                <option value="MH quảng cáo LCD">MH quảng cáo LCD</option>
-                                                <option value="Quảng cáo 3D (OOH)">Quảng cáo 3D (OOH)</option>
-                                                <option value="KTV 5D">KTV 5D</option>
+
+                                                <option value="" disabled selected>lựa chọn phân loại</option>
+
+                                                {categoryList.map((cat) => (
+                                                    <option key={cat._id} value={cat.category}>
+                                                        {cat.category}
+                                                    </option>
+                                                ))}
                                             </select>
                                         </div>
 
@@ -204,12 +185,12 @@ const AddProduct = () => {
                                             />
                                         </div>
                                     </div>
-                                    
+
                                     <div className="form-group">
                                         <label htmlFor="recap" className="mb-2">Mô tả sản phẩm (*)</label>
                                         <TiptapEditor
                                             value={data.recap}
-                                            onChange={(value) => onChangeHandler('recap', value)}
+                                            onChange={(value) => onEditorChangeHandler('recap', value)}
                                         />
                                     </div>
 
@@ -217,7 +198,7 @@ const AddProduct = () => {
                                         <label htmlFor="description" className="mb-2">Mô tả(*)</label>
                                         <TiptapEditor
                                             value={data.description}
-                                            onChange={(value) => onChangeHandler('recap', value)}
+                                            onChange={(value) => onEditorChangeHandler('description', value)}
                                         />
                                     </div>
 
@@ -225,30 +206,18 @@ const AddProduct = () => {
                                 </Tab>
 
 
-                                {/* Tab 2 */}
-
                             </Tabs>
 
                         </div>
                         <div className='tab-right col-2'>
                             <div className='tab-right-content'>
-                               
+
                                 <div className="text-center mt-4">
                                     <button type="submit" className="btn btn-primary rounded-pill px-4 py-2" disabled={loading}>
                                         {loading ? "Đang tải..." : "Thêm Sản Phẩm"}
                                     </button>
                                 </div>
-                                <div className="text-center mt-4">
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary rounded-pill px-4 py-2"
-                                        disabled={loading}
-                                        style={{ background: "#1AA7DD" }}  
-                                    >
-                                        {loading ? "Đang tải..." : "Làm mới"}
-                                    </button>
-                                </div>
-                                 <img src={assets.add_product} alt="add products" />
+                                <img src={assets.add_product} alt="add products" />
                             </div>
                         </div>
 

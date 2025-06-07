@@ -6,6 +6,7 @@ import 'package:mobile_app/models/productModel.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/pages/ProductDetailPage.dart';
 import 'package:provider/provider.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class ProductCard extends StatelessWidget {
   final ProductsModel products;
@@ -106,32 +107,56 @@ class ProductCard extends StatelessWidget {
                       InkWell(
                         onTap: () {
                           final wishList = context.read<WishListProvider>();
-                          if (wishList.isFavourite(products)) {
+                          final bool isFav = wishList.isFavourite(products);
+
+                          if (isFav) {
                             wishList.remove(products);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Đã bỏ yêu thích')),
-                            );
+                            Flushbar(
+                              message: 'Đã bỏ yêu thích',
+                              duration: const Duration(seconds: 2),
+                              margin: const EdgeInsets.all(12),
+                              borderRadius: BorderRadius.circular(8),
+                              backgroundColor: Colors.black87,
+                              flushbarPosition: FlushbarPosition.TOP,
+                              icon: const Icon(
+                                Icons.favorite_border,
+                                color: Colors.white,
+                              ),
+                            ).show(context);
                           } else {
                             wishList.add(products);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Đã thêm vào yêu thích'),
+                            Flushbar(
+                              message: 'Đã thêm vào yêu thích',
+                              duration: const Duration(seconds: 2),
+                              margin: const EdgeInsets.all(12),
+                              borderRadius: BorderRadius.circular(8),
+                              backgroundColor: Colors.black87,
+                              flushbarPosition: FlushbarPosition.TOP,
+                              icon: const Icon(
+                                Icons.favorite,
+                                color: Colors.white,
                               ),
-                            );
+                            ).show(context);
                           }
                         },
                         child: CircleAvatar(
                           backgroundColor:
-                              wishList.isFavourite(products)
+                              context.watch<WishListProvider>().isFavourite(
+                                    products,
+                                  )
                                   ? Colors.white
                                   : const Color(0xFF1AA7DD),
                           radius: 18,
                           child: Icon(
-                            wishList.isFavourite(products)
+                            context.watch<WishListProvider>().isFavourite(
+                                  products,
+                                )
                                 ? Icons.favorite
                                 : Icons.favorite_border,
                             color:
-                                wishList.isFavourite(products)
+                                context.watch<WishListProvider>().isFavourite(
+                                      products,
+                                    )
                                     ? Colors.pinkAccent
                                     : Colors.white,
                             size: 20,
@@ -143,11 +168,18 @@ class ProductCard extends StatelessWidget {
                         onTap: () {
                           final cart = context.read<CartProvider>();
                           cart.add(products);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Đã thêm vào giỏ hàng'),
+                          Flushbar(
+                            message: 'Đã thêm vào giỏ hàng',
+                            duration: const Duration(seconds: 2),
+                            margin: const EdgeInsets.all(12),
+                            borderRadius: BorderRadius.circular(8),
+                            backgroundColor: Colors.black87,
+                            flushbarPosition: FlushbarPosition.TOP,
+                            icon: const Icon(
+                              Icons.check_circle_outline,
+                              color: Colors.white,
                             ),
-                          );
+                          ).show(context);
                         },
                         child: const CircleAvatar(
                           backgroundColor: Color(0xFF194689),
