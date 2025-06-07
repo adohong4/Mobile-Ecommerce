@@ -37,7 +37,7 @@ class StripeController {
                 amount,
                 address,
                 paymentMethod: 'online',
-                payment: false,
+                payment: true,
             });
 
             await newOrder.save();
