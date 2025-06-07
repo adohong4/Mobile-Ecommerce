@@ -25,12 +25,13 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-            <!-- Thay your-app.com bằng domain của bạn -->
+
                 <data
                     android:scheme="https"
-                    android:host="your-app.com"
+                    android:host="7d2a-2405-4802-47d-3910-e4fc-ec73-4110-99c8.ngrok-free.app"
                     android:pathPrefix="/verify" />
             </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
