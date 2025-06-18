@@ -90,14 +90,14 @@ const AddProduct = () => {
                                     <div className="form-group text-center" style={{ display: "flex", gap: "10px", alignItems: "center" }}                                    >
                                         <p className="font-weight-bold mb-1">Thêm ảnh sản phẩm</p>
                                         <label htmlFor="images" style={{ cursor: 'pointer' }}>
-                                            <div className="upload-preview-container">
+                                            <div className="upload-preview-container" >
                                                 {images.length > 0 ? (
                                                     images.map((img, index) => (
                                                         <img
                                                             key={index}
                                                             src={URL.createObjectURL(img)}
                                                             alt={`Upload Preview ${index + 1}`}
-                                                            className=" shadow-sm"
+                                                            className=" shadow-sm" style={{ height: "100px", width: "100px", padding: "5px" }}
 
                                                         />
                                                     ))
@@ -105,7 +105,7 @@ const AddProduct = () => {
                                                     <img
                                                         src={assets.download_img}
                                                         alt="Upload Preview"
-                                                        className=" shadow-sm"
+                                                        className=" shadow-sm" style={{ height: "100px", width: "100px", padding: "5px" }}
 
                                                     />
                                                 )}

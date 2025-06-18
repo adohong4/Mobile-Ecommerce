@@ -46,21 +46,53 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
     }
 
     final provider = Provider.of<VoucherProvider>(context, listen: false);
-    final error = await provider.addVoucherToUser(code);
+
+    // Fetch the user's voucher list to check if the code exists
+    await provider.fetchUserVouchers();
+    final vouchers = provider.vouchers;
+    final matchingVoucher = vouchers.firstWhere(
+      (voucher) => voucher.code == code,
+      orElse:
+          () => VoucherModel(
+            id: null,
+            code: '',
+            discountType: '',
+            discountValue: 0,
+            startDate: DateTime.now(),
+            endDate: DateTime.now(),
+          ),
+    );
+
+    if (matchingVoucher.id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Mã voucher không tồn tại'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // If the voucher exists, attempt to apply it using its ID
+    final error = await provider.addVoucherToUser(matchingVoucher.id!);
     if (error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error), backgroundColor: Colors.red),
       );
     } else {
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Áp dụng voucher thành công'),
           backgroundColor: Colors.green,
         ),
       );
+      // Clear the text field
       _codeController.clear();
-      // Làm mới danh sách voucher để hiển thị voucher vừa thêm
-      await provider.fetchUserVouchers();
+      // Update the selected voucher in VoucherProvider
+      await provider.fetchVoucherById(matchingVoucher.id!);
+      // Navigate back to the previous page with the selected voucher
+      Navigator.pop(context, matchingVoucher);
     }
   }
 
@@ -122,8 +154,6 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
             ),
           ),
 
-
-
           // TextField nhập mã voucher và nút Áp dụng
           Padding(
             padding: const EdgeInsets.all(16),
@@ -146,9 +176,14 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFF003366)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF003366),
+                          ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                       ),
                       style: const TextStyle(
                         fontFamily: 'Poppins',
@@ -161,11 +196,15 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
                 SizedBox(
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _codeController.text.trim().isEmpty ? null : _applyVoucherCode,
+                    onPressed:
+                        _codeController.text.trim().isEmpty
+                            ? null
+                            : _applyVoucherCode,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _codeController.text.trim().isEmpty
-                          ? Colors.grey.shade400
-                          : const Color(0xFF003366),
+                      backgroundColor:
+                          _codeController.text.trim().isEmpty
+                              ? Colors.grey.shade400
+                              : const Color(0xFF003366),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8), // bo góc button
                       ),
@@ -187,7 +226,7 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
             ),
           ),
 
-// Danh sách voucher
+          // Danh sách voucher
           Expanded(
             child: Consumer<VoucherProvider>(
               builder: (context, provider, child) {
@@ -211,7 +250,10 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
                   );
                 }
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   itemCount: provider.vouchers.length,
                   itemBuilder: (context, index) {
                     final voucher = provider.vouchers[index];
@@ -225,22 +267,27 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
             ),
           ),
 
-// Nút Đồng ý
+          // Nút Đồng ý
           Padding(
             padding: const EdgeInsets.all(16),
             child: SizedBox(
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: _selectedVoucherId == null
-                    ? null
-                    : () => _confirmSelection(
-                  Provider.of<VoucherProvider>(context, listen: false).vouchers,
-                ),
+                onPressed:
+                    _selectedVoucherId == null
+                        ? null
+                        : () => _confirmSelection(
+                          Provider.of<VoucherProvider>(
+                            context,
+                            listen: false,
+                          ).vouchers,
+                        ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _selectedVoucherId == null
-                      ? Colors.grey.shade400
-                      : const Color(0xFF003366),
+                  backgroundColor:
+                      _selectedVoucherId == null
+                          ? Colors.grey.shade400
+                          : const Color(0xFF003366),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -259,12 +306,10 @@ class _VoucherSelectPageState extends State<VoucherSelectPage> {
               ),
             ),
           ),
-
         ],
       ),
 
       backgroundColor: const Color(0xFFF5F5F5),
-
     );
   }
 

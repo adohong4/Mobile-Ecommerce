@@ -74,7 +74,7 @@ class VoucherModel {
     if (discountType == 'PERCENTAGE') {
       return '${discountValue.toStringAsFixed(0)}%';
     } else {
-      return '${discountValue.toStringAsFixed(0)} VNĐ';
+      return '${discountValue.toStringAsFixed(0)} VNĐ'; 
     }
   }
 
